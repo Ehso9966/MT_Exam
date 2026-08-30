@@ -1,0 +1,294 @@
+/* MT Exam Studio — editor.css (question editing) */
+.editor-panel { max-width: 900px; width: 100%; }
+
+/* Section editor */
+.section-editor { margin-bottom: 20px; }
+.section-editor .section-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.section-editor .section-meta .field { flex: 1; min-width: 120px; margin-bottom: 0; }
+
+/* Question editor */
+.question-editor { margin-bottom: 6px; }
+.question-editor .qe-textarea {
+  min-height: 60px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  resize: vertical;
+  font-size: .9rem;
+  line-height: 1.55;
+}
+.question-editor .qe-textarea:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(26,95,142,.12); }
+
+.question-editor .qe-options { margin-top: 8px; }
+.question-editor .qe-option {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.question-editor .qe-option .opt-letter {
+  font-weight: 700;
+  font-size: .85rem;
+  color: var(--color-text-muted);
+  min-width: 22px;
+  text-align: center;
+}
+.question-editor .qe-option input {
+  flex: 1;
+  padding: 5px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+}
+.question-editor .qe-option .btn-remove-opt { padding: 2px 6px; font-size: .8rem; }
+.qe-add-opt {
+  width: 100%;
+  margin-top: 6px;
+  border-style: dashed;
+  border-color: var(--color-primary);
+  color: var(--color-primary-dark);
+  background: var(--color-primary-light);
+  font-weight: 600;
+}
+.qe-add-opt:hover {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
+/* Popup editor option rows */
+.popup-editor .qe-options { margin-top: 4px; }
+.popup-editor .qe-option {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.popup-editor .qe-option .opt-letter {
+  font-weight: 700;
+  font-size: .85rem;
+  color: var(--color-text-muted);
+  min-width: 22px;
+  text-align: center;
+}
+.popup-editor .qe-option input {
+  flex: 1;
+  padding: 5px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: .85rem;
+  min-height: 36px;
+}
+.popup-editor .qe-option .btn-remove-opt { padding: 2px 6px; font-size: .8rem; }
+.popup-editor .qe-options .btn { margin-top: 4px; }
+
+/* Popup editor sub-question sections (a), (b)... */
+.popup-editor .qe-subs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.popup-editor .qe-part-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.popup-editor .qe-part-head .popup-editor-section-title {
+  margin-bottom: 0;
+  font-size: .95rem;
+  color: var(--color-primary-deep);
+  letter-spacing: .2px;
+  text-transform: none;
+}
+.popup-editor .qe-part-head .btn-remove-sub { padding: 2px 8px; font-size: .8rem; flex-shrink: 0; }
+.popup-editor .qe-sub-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+.popup-editor .qe-sub-actions .math-btn-inline,
+.popup-editor .qe-sub-actions .qe-sub-img,
+.popup-editor .qe-sub-actions .qe-sub-marks input {
+  height: 36px;
+}
+.popup-editor .qe-sub-actions .qe-sub-img { flex-shrink: 0; }
+.popup-editor .qe-sub-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+  margin-left: auto;
+}
+.popup-editor .qe-sub-meta .field { margin-bottom: 0; }
+.popup-editor .qe-sub-meta .qe-sub-marks label { display: block; margin-bottom: 2px; font-size: .72rem; }
+.popup-editor .qe-sub-meta .qe-sub-review label { display: block; margin-bottom: 2px; font-size: .72rem; }
+.popup-editor .qe-sub-meta .qe-sub-review .mt-row { display: flex; align-items: center; gap: 6px; }
+.popup-editor .qe-add-sub { align-self: flex-start; }
+
+/* Math toolbar */
+.math-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 0;
+  margin-bottom: 6px;
+}
+.math-toolbar .math-btn {
+  padding: 4px 10px;
+  font-size: .85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  background: var(--color-surface);
+  cursor: pointer;
+  font-family: serif;
+  transition: .1s;
+}
+.math-toolbar .math-btn:hover { background: var(--color-primary-light); border-color: var(--color-primary); }
+.math-toolbar .math-btn .hint {
+  display: none;
+  position: absolute;
+  background: #333;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: .7rem;
+  font-family: var(--font-body);
+  margin-top: 22px;
+  white-space: nowrap;
+  z-index: 10;
+}
+.math-toolbar .math-btn:hover .hint { display: block; }
+
+/* Insert position indicator */
+.insert-indicator {
+  text-align: center;
+  padding: 6px;
+  color: var(--color-primary);
+  font-size: .8rem;
+  cursor: pointer;
+  opacity: .3;
+  transition: opacity .15s;
+}
+.insert-indicator:hover { opacity: 1; }
+
+/* Source image in question */
+.q-source-toggle {
+  background: none;
+  border: 0;
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: .78rem;
+  padding: 2px 0;
+}
+.q-source-toggle:hover { text-decoration: underline; }
+.q-source-img {
+  max-width: 200px;
+  max-height: 150px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  margin-top: 6px;
+  display: none;
+}
+.q-source-img.visible { display: block; }
+
+/* AI status indicators */
+.ai-status {
+  display: inline-block;
+  font-size: .72rem;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+.ai-status.extracting { background: var(--color-warn-bg); color: var(--color-warn); }
+.ai-status.done { background: var(--color-ok-bg); color: var(--color-ok); }
+.ai-status.failed { background: var(--color-error-bg); color: var(--color-error); }
+
+/* Batch processing progress */
+.batch-progress {
+  width: 100%;
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+.batch-progress .bar {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: 3px;
+  transition: width .3s;
+}
+
+@media (max-width: 480px) {
+  .q-row { flex-wrap: wrap; }
+  .q-row .q-content { flex: 1 1 100%; order: 1; }
+  .q-row .q-marks { order: 2; margin-left: 0; }
+  .q-row .q-actions { order: 3; margin-left: auto; }
+  .section-editor .section-meta .field { min-width: 100%; }
+}
+
+/* ===== Popup question editor (click on paper to edit) ===== */
+.popup-editor { display: flex; flex-direction: column; gap: 14px; }
+.popup-editor-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 2px;
+}
+.popup-editor-head .popup-editor-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.popup-editor-head .exs-type-badge { flex-shrink: 0; align-self: center; }
+.popup-editor-info {
+  font-weight: 600;
+  color: var(--color-text-muted);
+  font-size: .85rem;
+}
+.popup-editor-section {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.popup-editor-section-title {
+  font-weight: 700;
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+  color: var(--color-primary-dark);
+  margin-bottom: 8px;
+}
+.popup-editor-section .field { margin-bottom: 0; }
+.popup-editor-textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: .95rem;
+  line-height: 1.6;
+  resize: vertical;
+  font-family: var(--font-myanmar);
+}
+.popup-editor-textarea:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(26,95,142,.12); }
+.popup-editor-empty-hint {
+  margin-top: 4px;
+  font-size: .75rem;
+  color: var(--color-warn);
+}
+
+.popup-editor-meta {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+.popup-editor-review .mt-row { display: flex; align-items: center; }
+

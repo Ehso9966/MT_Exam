@@ -1,0 +1,112 @@
+/* MT Exam Studio — print.css (prints the paginated A4 pages exactly as laid out) */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+
+  html, body {
+    background: #fff;
+    font-family: "Padauk", "Pyidaungsu", "Myanmar Text", "Noto Sans Myanmar", serif;
+    line-height: 1.5;
+    color: #000;
+    margin: 0;
+    padding: 0;
+  }
+
+  .app-header, .app-sidebar,
+  .main-topbar, .status-strip, .editor-panel,
+  .modal-overlay, .toast-container, .loading-overlay,
+  .btn, .q-actions, .insert-indicator, .math-toolbar,
+  .section-editor, .question-editor, .q-row .q-actions,
+  .panel-tabs, .sidebar-section,
+  .header-actions, .header-actions .btn, .theme-toggle,
+  .add-section-slot, .inline-edit-input,
+  .page-size-bar, .fab, .sheet-handle,
+  .tour-root, .app-footer {
+    display: none !important;
+  }
+
+  /* Reset the paper-container chain for print */
+  .app-shell, .app-body, .app-main, #previewArea, #paperPreview {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    background: none !important;
+  }
+
+  .paper-preview .editable { background: transparent; box-shadow: none; }
+  .paper-preview .editable-empty { color: #000; }
+
+  /* The screen preview wraps each physical page in a scaled-down wrapper.
+     In print the wrapper must not clip or shrink anything. */
+  .preview-page-wrap {
+    display: block !important;
+    width: auto !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Each .paper-preview carries its real physical size (px @ 96dpi == mm)
+     as inline width/height. We only strip the phone-fit transform so the
+     page prints at its true A4 dimensions. */
+  .paper-preview {
+    display: block !important;
+    transform: none !important;
+    scale: none !important;
+    zoom: 1 !important;
+    max-width: none !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    aspect-ratio: auto !important;
+    background: #fff;
+    color: #000;
+  }
+
+  a { color: #000; text-decoration: none; }
+
+  .no-print { display: none !important; }
+  .print-only { display: block !important; }
+
+  /* ---- Print typography (independent of the screen --qfont-size) ---- */
+  .paper-preview {
+    font-size: 12pt !important;
+    line-height: 1.5 !important;
+  }
+  .paper-preview .paper-header .sch-item { font-size: 10pt !important; }
+  .paper-preview .paper-header .school-name { font-size: 10.5pt !important; }
+  .paper-preview .paper-header .exam-title { font-size: 17pt !important; }
+  .paper-preview .paper-header .exam-meta { font-size: 10pt !important; }
+  .paper-preview .section-title { font-size: 14pt !important; }
+  .paper-preview .section-title-marks { font-size: 11pt !important; }
+  .paper-preview .section-instruction { font-size: 11.5pt !important; }
+  .paper-preview .preview-question { font-size: 12pt !important; }
+  .paper-preview .pq-options { font-size: 11pt !important; }
+  .paper-preview .pq-marks { font-size: 10pt !important; }
+
+  /* ---- KaTeX print sizing ---- */
+  .katex { font-size: 1em !important; }
+  .katex-display { margin: 0.4em 0 !important; overflow-x: auto; }
+
+  /* ---- Page-break rules ---- */
+  h2, h3 { page-break-after: avoid; }
+  .section-block { page-break-inside: avoid; }
+  .preview-question {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .section-title-row, .section-a-row {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  /* Each on-screen page prints as one sheet */
+  .paper-preview { page-break-after: always; }
+  .paper-preview:last-of-type { page-break-after: auto; }
+}
+
+.print-only { display: none; }

@@ -1,0 +1,30 @@
+# Dependencies / build
+node_modules/
+dist/
+build/
+
+# Sensitive
+*.key
+.env
+.env.local
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temp / local drafts
+tmp/
+.tmp/
+
+# Do NOT commit API keys
+# (The app uses BYOK — keys live in user's browser localStorage only)
+.git_backup/

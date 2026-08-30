@@ -1,0 +1,84 @@
+/* MT Exam Studio — tour.css (interactive onboarding tour) */
+/* Overlay + highlight + tooltip for the step-by-step guide. */
+
+.tour-root {
+  position: fixed;
+  inset: 0;
+  z-index: 900; /* above FAB (500), below modals (1000) */
+  background: transparent;
+  pointer-events: auto;
+}
+.tour-root.tour-center {
+  background: rgba(0, 0, 0, .55);
+}
+
+/* The "light": a transparent box over the target whose huge box-shadow dims
+   the whole screen. As the tour advances it glides across, revealing each
+   control, then the tooltip explains it. */
+.tour-highlight {
+  position: fixed;
+  z-index: 1;
+  pointer-events: none;
+  border-radius: 8px;
+  border: 2px solid var(--color-primary);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, .55);
+  transition: left .25s ease, top .25s ease, width .25s ease, height .25s ease;
+  will-change: left, top, width, height;
+}
+
+.tour-tooltip {
+  position: fixed;
+  z-index: 3;
+  width: min(88vw, 340px);
+  max-height: calc(100vh - 24px);
+  overflow-y: auto;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 16px 16px 12px;
+  color: var(--color-text);
+  font-family: var(--font-body);
+}
+.tour-tooltip .tour-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: none;
+  border: 0;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  padding: 4px;
+  min-width: 28px;
+  min-height: 28px;
+  border-radius: 6px;
+}
+.tour-tooltip .tour-close:hover { background: var(--color-bg); color: var(--color-text); }
+.tour-tooltip .tour-step {
+  font-size: .72rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  margin-bottom: 4px;
+  letter-spacing: .3px;
+}
+.tour-tooltip .tour-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-primary-dark);
+  margin-bottom: 6px;
+  padding-right: 22px;
+}
+.tour-tooltip .tour-body {
+  font-size: .88rem;
+  line-height: 1.5;
+  color: var(--color-text);
+}
+.tour-tooltip .tour-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+.tour-tooltip .tour-actions .btn { min-height: 34px; }

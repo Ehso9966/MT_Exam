@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n="features.pageTitle">MT Exam Features — Exam Paper Creator for Myanmar Teachers</title>
+<meta name="description" content="Explore MT Exam features: AI OCR, MCQ/True-False/short answer question types, KaTeX math, validation engine, A4 print/PDF, and full Myanmar language support.">
+<link rel="canonical" href="https://mt-exam-studio.vercel.app/features.html">
+<link rel="icon" type="image/png" href="assets/icons/MT_logo.png">
+<link rel="apple-touch-icon" href="assets/icons/MT_logo.png">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mt-exam-studio.vercel.app/features.html">
+<meta property="og:site_name" content="MT Exam Studio">
+<meta property="og:title" content="MT Exam Features — Exam Paper Creator for Myanmar Teachers">
+<meta property="og:description" content="AI OCR, question types, KaTeX math, validation, and A4 print/PDF — all free in your browser.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MT Exam Features — Exam Paper Creator for Myanmar Teachers">
+<meta name="twitter:description" content="AI OCR, question types, KaTeX math, validation, and A4 print/PDF — all free in your browser.">
+<meta name="theme-color" content="#4C9A50">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/layout.css">
+<style>
+.static-page { max-width: 900px; margin: 0 auto; padding: 32px 20px 56px; }
+#app.app-shell { height: auto; }
+.static-hero { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 32px 28px; margin-bottom: 20px; }
+.static-hero h1 { font-size: 1.9rem; color: var(--color-primary-deep); margin-bottom: 8px; }
+.static-hero p { margin: 0; color: var(--color-text-muted); }
+.static-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 28px; margin-bottom: 20px; }
+.static-card h2 { font-size: 1.25rem; color: var(--color-primary-deep); margin-bottom: 10px; }
+.static-card ul { margin: 0; padding-left: 20px; }
+.static-card li { margin-bottom: 6px; }
+.static-banner { background: var(--color-primary-light); border: 1px solid var(--color-primary); border-radius: var(--radius-sm); padding: 14px 18px; text-align: center; }
+.static-banner a { font-weight: 700; text-decoration: none; }
+</style>
+</head>
+<body>
+<div class="app-shell" id="app">
+  <header class="app-header">
+    <div class="logo" aria-label="MT Exam Studio">
+      <span class="logo-mt">MT</span>
+      <span class="logo-exam">EXAM</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="header-actions">
+      <a class="btn sm" href="index.html" data-i18n="ui.openApp" data-i18n-title="ui.openApp" title="Open MT Exam app">▶ Open App</a>
+      <a class="btn sm secondary" href="guide.html" data-i18n="footer.guide" data-i18n-title="footer.guide" title="How to use MT Exam">How to Use</a>
+      <button class="btn sm secondary" id="btnPageLang" data-i18n="ui.langToggle">မြန်မာ / EN</button>
+    </div>
+  </header>
+</div>
+
+<main class="static-page">
+  <div class="static-hero">
+    <h1 data-i18n="features.pageTitle">MT Exam Features</h1>
+    <p data-i18n="features.hero">Everything you need to create a beautiful မေးခွန်းစာရွက် (exam paper) — free, in your browser.</p>
+  </div>
+
+  <div class="static-card">
+    <h2 data-i18n="features.aiTitle">🤖 AI OCR — Extract questions from photos</h2>
+    <p data-i18n="features.aiBody">Take a photo of a handwritten or printed exam and MT Exam extracts the questions for you using the B.AI API (bring your own key). You review and confirm everything — the teacher always decides.</p>
+  </div>
+
+  <div class="static-card">
+    <h2 data-i18n="features.typesTitle">📚 Question types</h2>
+    <ul>
+      <li data-i18n="features.types1">MCQ (multiple choice)</li>
+      <li data-i18n="features.types2">True / False (မှန်/မှား)</li>
+      <li data-i18n="features.types3">Short answer (အတိုဖြေ)</li>
+      <li data-i18n="features.types4">Detailed answer (အသေးစိတ်ဖြေ)</li>
+      <li data-i18n="features.types5">Math / equations (သင်္ချာ)</li>
+    </ul>
+  </div>
+
+  <div class="static-card">
+    <h2 data-i18n="features.katexTitle">🧮 KaTeX math</h2>
+    <p data-i18n="features.katexBody">Write LaTeX formulas and they render beautifully — perfect for mathematics exam papers.</p>
+  </div>
+
+  <div class="static-card">
+    <h2 data-i18n="features.cropTitle">✂️ Batch crop</h2>
+    <p data-i18n="features.cropBody">Split a full page photo into multiple questions with the built-in batch crop tool.</p>
+  </div>
+
+  <div class="static-card">
+    <h2 data-i18n="features.valTitle">✅ Validation engine</h2>
+    <p data-i18n="features.valBody">Automatic checks on total marks, question numbering, and completeness so your paper is error-free before printing.</p>
+  </div>
+
+  <div class="static-card">
+    <h2 data-i18n="features.printTitle">🖨️ Print / PDF</h2>
+    <p data-i18n="features.printBody">A4 print stylesheet with Padauk and Pyidaungsu Myanmar fonts. Print directly or save as PDF.</p>
+  </div>
+
+  <div class="static-card">
+    <h2 data-i18n="features.saveTitle">💾 Save &amp; privacy</h2>
+    <p data-i18n="features.saveBody">Your exam content stays in your browser — nothing is uploaded. Save drafts locally and export/import JSON.</p>
+  </div>
+
+  <div class="static-banner">
+    <a href="index.html" data-i18n="features.cta">Start creating your exam paper free →</a>
+  </div>
+</main>
+
+<footer class="app-footer" style="max-width:900px;margin:0 auto 24px;">
+  <div class="app-footer-brand">
+    <div class="app-footer-logo"><span class="logo-mt">MT</span><span class="logo-exam">EXAM</span></div>
+    <p class="app-footer-tagline" data-i18n="footer.tagline">Empowering Myanmar Teachers with Quick Exam Formatting</p>
+  </div>
+  <div class="app-footer-legal">
+    <p>© 2026 MT Exam Studio — Built for Education</p>
+  </div>
+</footer>
+
+<script src="js/core/constants.js"></script>
+<script src="js/core/utils.js"></script>
+<script src="js/core/events.js"></script>
+<script src="js/core/i18n.js"></script>
+<script>
+MT.I18n.init();
+MT.I18n.applyDOM();
+document.documentElement.lang = MT.I18n.getLang();
+var b = document.getElementById('btnPageLang');
+if (b) b.addEventListener('click', function () {
+  MT.I18n.toggle();
+  document.documentElement.lang = MT.I18n.getLang();
+});
+</script>
+</body>
+</html>

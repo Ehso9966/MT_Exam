@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MT Exam — Exam Paper Creator for Myanmar Teachers | မေးခွန်းစာရွက်ဖန်တီးမှု</title>
+<meta name="description" content="MT Exam is a free online exam paper creator for Myanmar teachers. Create, format, and print မေးခွန်းစာရွက်များ with AI OCR, KaTeX math, and built-in validation. Browser-based, no install needed.">
+<link rel="canonical" href="https://mt-exam-studio.vercel.app/">
+<link rel="icon" type="image/png" href="assets/icons/MT_logo.png">
+<link rel="apple-touch-icon" href="assets/icons/MT_logo.png">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mt-exam-studio.vercel.app/">
+<meta property="og:site_name" content="MT Exam Studio">
+<meta property="og:title" content="MT Exam — Exam Paper Creator for Myanmar Teachers">
+<meta property="og:description" content="Free online exam paper creator for Myanmar teachers. AI OCR, KaTeX math, validation, PDF print. Browser-based tool — no installation required.">
+<meta property="og:image" content="https://mt-exam-studio.vercel.app/assets/icons/MT_logo.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@mtexam">
+<meta name="twitter:title" content="MT Exam — Exam Paper Creator for Myanmar Teachers">
+<meta name="twitter:description" content="Free online exam paper creator for Myanmar teachers. AI OCR, KaTeX math, validation, PDF print. Browser-based tool — no installation required.">
+<meta name="twitter:image" content="https://mt-exam-studio.vercel.app/assets/icons/MT_logo.png">
+<meta name="theme-color" content="#4C9A50">
+<link rel="alternate" hreflang="my" href="https://mt-exam-studio.vercel.app/">
+<link rel="alternate" hreflang="en" href="https://mt-exam-studio.vercel.app/?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://mt-exam-studio.vercel.app/">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "MT Exam Studio",
+  "alternateName": "MT Exam",
+  "url": "https://mt-exam-studio.vercel.app/",
+  "description": "Free online exam paper creator for Myanmar teachers. AI OCR, KaTeX math, validation, PDF print.",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Any",
+  "browserRequirements": "Requires JavaScript",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "inLanguage": ["my", "en"],
+  "author": {
+    "@type": "Organization",
+    "name": "MT Exam Studio"
+  }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is MT Exam?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "MT Exam is a free browser-based exam paper creator for Myanmar teachers. It helps you create, format, and print exam papers with AI OCR, math formulas, and validation."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is MT Exam free to use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, MT Exam is completely free. You only need to bring your own B.AI API key if you want to use the AI OCR feature."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to install anything?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. MT Exam runs entirely in your browser. Just open the website and start creating exam papers."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I type math formulas in my exam paper?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, MT Exam supports KaTeX rendering for LaTeX math formulas. You can add equations directly in your questions."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does MT Exam work in Myanmar language?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, MT Exam has full Myanmar language support with Padauk and Pyidaungsu fonts, including Burmese number styles."
+      }
+    }
+  ]
+}
+</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<link rel="stylesheet" href="css/editor.css">
+<link rel="stylesheet" href="css/preview.css">
+<link rel="stylesheet" href="css/paperui.css">
+<link rel="stylesheet" href="css/tour.css">
+<link rel="stylesheet" href="css/print.css">
+</head>
+<body>
+<div id="bootLoader"><div class="boot-spinner"></div></div>
+
+<!-- ===== SEO / landing content ===== -->
+<section class="seo-section" id="seoContent">
+  <div class="seo-hero">
+    <div class="seo-lang-row">
+      <button type="button" class="lang-toggle-btn" id="btnSeoLang" data-i18n="ui.langToggle">မြန်မာ / EN</button>
+    </div>
+    <h1 data-i18n="seo.h1">MT Exam — မြန်မာကျောင်းဆရာ/ဆရာမများအတွက် စာမေးပွဲစာရွက် ဖန်တီးမှု</h1>
+    <p class="seo-tagline" data-i18n="seo.tagline">အခမဲ့ အွန်လိုင်း မေးခွန်းစာရွက် ဖန်တီးမှုကိရိယာ</p>
+    <p data-i18n="seo.intro">MT Exam သည် မြန်မာကျောင်းဆရာ/ဆရာမများအတွက် အခမဲ့ browser-based စာမေးပွဲစာရွက် ဖန်တီးကိရိယာတစ်ခုဖြစ်သည်။ လက်ရေးစာများ သို့မဟုတ် ဓာတ်ပုံမှ မေးခွန်းများကို လှပသော format ရှိသည့် ပုံနှိပ်နိုင်သော မေးခွန်းစာရွက်အဖြစ် မိနစ်ပိုင်းအတွင်း ပြောင်းလဲပေးနိုင်သည် — install လုပ်စရာ မလိုပါ။</p>
+    <div class="seo-cta">
+      <a class="btn" href="#app" data-i18n="seo.ctaStart">အခမဲ့ စတင်ဖန်တီးမည်</a>
+      <a class="btn secondary" href="features.html" data-i18n="seo.ctaFeatures">အင်္ဂါရပ်အားလုံး ကြည့်ရန်</a>
+      <a class="btn ghost" href="guide.html" data-i18n="seo.ctaGuide">အသုံးပြုနည်း</a>
+    </div>
+  </div>
+
+  <div class="seo-features">
+    <h2 data-i18n="seo.featuresTitle">အဓိကအင်္ဂါရပ်များ</h2>
+    <ul class="seo-list">
+      <li data-i18n="seo.f1">AI OCR — ဓာတ်ပုံမှ မေးခွန်းများကို ထုတ်ယူခြင်း</li>
+      <li data-i18n="seo.f2">မေးခွန်းအမျိုးအစားများ — MCQ, မှန်/မှား, အတိုဖြေ, အသေးစိတ်ဖြေ, သင်္ချာ</li>
+      <li data-i18n="seo.f3">KaTeX သင်္ချာ — LaTeX ပုံသေနည်းများ လှပစွာ render</li>
+      <li data-i18n="seo.f4">စစ်ဆေးမှုစနစ် — အမှတ်၊ နံပါတ်စဉ်၊ မေးခွန်းများ အလိုအလျောက် စစ်ဆေးခြင်း</li>
+      <li data-i18n="seo.f5">ပုံနှိပ်/PDF — Padauk နှင့် Pyidaungsu မြန်မာဖောင့်များ ပါဝင်သော A4 print stylesheet</li>
+      <li data-i18n="seo.f6">ကိုယ်ရေးလုံခြုံမှု — သင့် စာမေးပွဲ မေးခွန်းများသည် သင့် browser ထဲတွင်သာ ရှိပြီး မည်သည့်နေရာသို့မျှ upload မလုပ်ပါ</li>
+    </ul>
+  </div>
+
+  <div class="seo-faq">
+    <h2 data-i18n="seo.faqTitle">မေးလေ့ရှိသော မေးခွန်းများ</h2>
+    <h3 data-i18n="seo.q1">MT Exam ဆိုတာဘာလဲ?</h3>
+    <p data-i18n="seo.a1">MT Exam သည် မြန်မာကျောင်းဆရာ/ဆရာမများအတွက် အခမဲ့ browser-based စာမေးပွဲစာရွက် ဖန်တီးကိရိယာဖြစ်သည်။ AI OCR၊ သင်္ချာပုံသေနည်းများနှင့် စစ်ဆေးမှုစနစ်များဖြင့် စာမေးပွဲစာရွက်များကို ဖန်တီး၊ ဖော်မတ်ပြုပြင်၊ ပုံနှိပ်နိုင်သည်။</p>
+    <h3 data-i18n="seo.q2">MT Exam အခမဲ့လား?</h3>
+    <p data-i18n="seo.a2">ဟုတ်ကဲ့။ MT Exam သည် လုံးဝ အခမဲ့ဖြစ်သည်။ AI OCR အင်္ဂါရပ်ကို သုံးလိုပါက ကိုယ်ပိုင် B.AI API သော့တစ်ခုသာ လိုအပ်ပါသည်။</p>
+    <h3 data-i18n="seo.q3">ဘာမှ တပ်ဆင်ရန် လိုအပ်ပါသလား?</h3>
+    <p data-i18n="seo.a3">မလိုပါ။ MT Exam သည် သင့် browser ထဲတွင်သာ အလုပ်လုပ်ပါသည်။ ဝဘ်ဆိုက်ကို ဖွင့်ပြီး စာမေးပွဲစာရွက် စတင်ဖန်တီးနိုင်ပါသည်။</p>
+    <h3 data-i18n="seo.q4">သင်္ချာပုံသေနည်းများ ရိုက်ထည့်နိုင်ပါသလား?</h3>
+    <p data-i18n="seo.a4">ရနိုင်ပါသည်။ MT Exam သည် LaTeX သင်္ချာပုံသေနည်းများအတွက် KaTeX rendering ကို ထောက်ပံ့ပေးပါသည်။ သင့်မေးခွန်းများထဲတွင် equations များ တိုက်ရိုက်ထည့်နိုင်ပါသည်။</p>
+    <h3 data-i18n="seo.q5">MT Exam သည် မြန်မာဘာသာဖြင့် အလုပ်လုပ်ပါသလား?</h3>
+    <p data-i18n="seo.a5">အလုပ်လုပ်ပါသည်။ MT Exam သည် Padauk နှင့် Pyidaungsu ဖောင့်များ၊ မြန်မာနံပါတ်ပုံစံများ အပါအဝင် ပြည့်စုံသော မြန်မာဘာသာစကား ထောက်ပံ့မှုရှိပါသည်။</p>
+  </div>
+</section>
+
+<div class="app-shell" id="app">
+
+  <!-- ===== Header ===== -->
+  <header class="app-header">
+    <div class="logo" aria-label="MT Exam Studio">
+      <span class="logo-mt">MT</span>
+      <span class="logo-exam">EXAM</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="header-actions">
+      <button class="btn sm" id="btnNewExam" data-i18n="ui.new" title="New" aria-label="New exam">🆕</button>
+      <button class="btn sm secondary" id="btnImportJson" data-i18n="ui.open" title="Open" aria-label="Open exam">📂</button>
+      <button class="btn sm" id="btnDownload" data-i18n="ui.download" title="Download" aria-label="Download">📥</button>
+      <button class="btn sm" id="btnHelp" data-i18n="ui.help" data-i18n-title="ui.help" title="How to Use" aria-label="How to use">အသုံးပြုနည်း</button>
+      <button class="btn sm secondary" id="btnLangToggle" data-i18n="ui.langToggle" title="Language" aria-label="Language">မြန်မာ / EN</button>
+    </div>
+  </header>
+
+  <div class="app-body">
+
+    <!-- ===== Sidebar (section list only) ===== -->
+    <aside class="app-sidebar" id="sidebar">
+      <div class="sidebar-section">
+        <h3 data-i18n="ui.sections">အပိုင်းများ</h3>
+        <div id="sectionList"></div>
+        <button class="btn sm sidebar-add-section-btn" id="btnAddSection" data-i18n="ui.addSectionTitle">မေးခွန်းခေါင်းစဉ် ထည့်မည်</button>
+      </div>
+    </aside>
+
+    <!-- ===== Main area ===== -->
+    <main class="app-main">
+      <div class="main-topbar">
+        <div class="doc-title">
+          <input type="text" id="inpDocTitle" data-i18n-placeholder="ui.filenamePlaceholder" placeholder="သိမ်းမည့် ဖိုင်အမည် ရိုက်ပါ…">
+        </div>
+        <div class="mt-row">
+          <span class="badge neutral" id="badgeQuestionCount">မေးခွန်း ၀</span>
+          <span class="badge neutral" id="badgeTotalMarks">အမှတ် ၀</span>
+        </div>
+      </div>
+
+      <div class="status-strip" id="statusStrip">
+        <span class="pulse"></span>
+        <span id="statusText" data-i18n="valid.statusOk">အဆင်သင့်။</span>
+      </div>
+
+      <div id="pageSizeBar" class="page-size-bar" title="Page size">
+        <div id="pageSizeChips" class="page-size-chips"></div>
+        <div class="stepper">
+          <button type="button" id="btnPadMinus" class="stepper-btn" data-i18n-aria="ui.decreaseSpacing" data-i18n-title="ui.decreaseSpacing" aria-label="Decrease spacing">−</button>
+          <div id="pageSpacingValue" class="stepper-value" role="img" aria-label="Spacing density" title="57px">
+            <div id="pageSpacingFill" class="stepper-fill"></div>
+          </div>
+          <button type="button" id="btnPadPlus" class="stepper-btn" data-i18n-aria="ui.increaseSpacing" data-i18n-title="ui.increaseSpacing" aria-label="Increase spacing">+</button>
+        </div>
+      </div>
+
+      <div id="editorArea" class="editor-panel mt-hidden"></div>
+
+      <div id="previewArea">
+        <div id="paperPreview"></div>
+      </div>
+
+      <footer class="app-footer">
+        <div class="app-footer-brand">
+          <div class="app-footer-logo"><span class="logo-mt">MT</span><span class="logo-exam">EXAM</span></div>
+          <p class="app-footer-tagline" data-i18n="footer.tagline">Empowering Myanmar Teachers with Quick Exam Formatting</p>
+          <p class="app-footer-note" data-i18n="footer.devNote">Crafted with ❤️ for Myanmar teachers</p>
+          <a class="app-footer-feedback" id="footerFeedback" href="https://t.me/Mt_Exam" target="_blank" rel="noopener"></a>
+        </div>
+        <div class="app-footer-support">
+          <button type="button" class="app-footer-btn" id="footerSupportBtn" data-i18n="footer.support">☕ Support this tool</button>
+        </div>
+        <div class="app-footer-links">
+          <a href="features.html" data-i18n="footer.features">Features</a>
+          <a href="guide.html" data-i18n="footer.guide">How to Use</a>
+          <a href="https://t.me/Mt_Exam" target="_blank" rel="noopener">Telegram</a>
+        </div>
+        <div class="app-footer-legal">
+          <p class="app-footer-copy">© <span id="footerYear">2026</span> <span data-i18n="footer.copyright">MT Exam Studio — Built for Education</span></p>
+          <p class="app-footer-privacy" data-i18n="footer.privacy">Your exam content stays in your browser — nothing is uploaded.</p>
+        </div>
+      </footer>
+    </main>
+  </div>
+</div>
+
+<!-- Modal container -->
+<div id="modalRoot"></div>
+<div id="toastRoot" class="toast-container"></div>
+
+<!-- Floating action button -->
+<button id="btnFab" class="fab" data-i18n-aria="ui.add" data-i18n-title="ui.add" aria-label="Add" title="Add">➕</button>
+
+<!-- Scripts -->
+<script>
+// Load CDN libraries asynchronously so the app starts immediately on first open.
+window.MT_CDN = (function () {
+  function loadLink(href) {
+    var l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = href;
+    document.head.appendChild(l);
+  }
+  function loadScript(src) {
+    return new Promise(function (resolve) {
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = function () { resolve(); };
+      s.onerror = function () { resolve(); };
+      document.head.appendChild(s);
+    });
+  }
+  function load() {
+    loadLink('https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css');
+    loadLink('https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css');
+    return Promise.all([
+      loadScript('https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js'),
+      loadScript('https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js'),
+      loadScript('https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js'),
+      loadScript('https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js'),
+      loadScript('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js')
+    ]).catch(function () {});
+  }
+  return { load: load };
+})();
+</script>
+
+<script src="js/core/constants.js"></script>
+<script src="js/core/ids.js"></script>
+<script src="js/core/utils.js"></script>
+<script src="js/core/numberStyles.js"></script>
+<script src="js/core/events.js"></script>
+<script src="js/core/i18n.js"></script>
+<script src="js/core/state.js"></script>
+<script src="js/models/questionModel.js"></script>
+<script src="js/models/examModel.js"></script>
+<script src="js/models/schema.js"></script>
+<script src="js/ai/errors.js"></script>
+<script src="js/ai/prompts.js"></script>
+<script src="js/ai/responseParser.js"></script>
+<script src="js/ai/modelDiscovery.js"></script>
+<script src="js/ai/baiClient.js"></script>
+<script src="js/image/imageLoader.js"></script>
+<script src="js/image/cropFlow.js"></script>
+<script src="js/ui/toast.js"></script>
+<script src="js/ui/modal.js"></script>
+<script src="js/ui/loading.js"></script>
+<script src="js/ui/dialogs.js"></script>
+<script src="js/render/mathRenderer.js"></script>
+<script src="js/render/paperLocale.js"></script>
+<script src="js/render/examRenderer.js"></script>
+<script src="js/validation/marks.js"></script>
+<script src="js/validation/questions.js"></script>
+<script src="js/validation/examValidation.js"></script>
+<script src="js/storage/localDraft.js"></script>
+<script src="js/storage/exportJson.js"></script>
+<script src="js/storage/importJson.js"></script>
+<script src="js/editor/numbering.js"></script>
+<script src="js/editor/mathToolbar.js"></script>
+<script src="js/editor/sectionManager.js"></script>
+<script src="js/editor/questionPopupEditor.js"></script>
+<script src="js/ui/sectionPopup.js"></script>
+<script src="js/ui/examSectionsPopup.js"></script>
+<script src="js/ui/tour.js"></script>
+<script src="js/ui/paperUi.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
