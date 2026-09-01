@@ -20,7 +20,8 @@ MT.Constants = (function () {
     MCQ: 'mcq',
     TRUE_FALSE: 'tf',
     LONG: 'long',
-    MATH: 'math'
+    MATH: 'math',
+    BLANK: 'blank'
   };
 
   const SECTION_TYPES = {
@@ -29,6 +30,7 @@ MT.Constants = (function () {
     SHORT: 'short',
     LONG: 'long',
     MATH: 'math',
+    BLANK: 'blank',
     SECTION_A: 'section_a'
   };
 

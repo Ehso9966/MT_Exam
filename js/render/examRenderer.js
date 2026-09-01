@@ -285,7 +285,7 @@ html += '<span class="section-title-marks">' +
       html += '</ul>';
     }
 
-    if (settings.showAnswerLines !== false && (q.type === 'long' || q.type === 'short' || q.type === 'math')) {
+    if (settings.showAnswerLines !== false && (q.type === 'long' || q.type === 'short' || q.type === 'math' || q.type === 'blank')) {
       html += '<div class="answer-lines"><div class="line"></div>';
       if (q.type === 'long') html += '<div class="line"></div>';
       html += '</div>';

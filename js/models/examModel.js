@@ -40,6 +40,7 @@ MT.ExamModel = (function () {
       'short': 'အတိုဖြေ မေးခွန်းများ',
       'long': 'အသေးစိတ်ဖြေ မေးခွန်းများ',
       'math': 'တွက်ချက်မှုပုစ္ဆာ မေးခွန်းများ',
+      'blank': 'ကွက်လပ်ဖြည့် မေးခွန်းများ',
       'section_a': 'Section A'
     };
   }
@@ -51,6 +52,7 @@ MT.ExamModel = (function () {
       'short': { my: 'အတိုဖြေ', en: 'Short Answer' },
       'long': { my: 'အသေးစိတ်ဖြေ', en: 'Long Answer' },
       'math': { my: 'တွက်ချက်မှုပုစ္ဆာ', en: 'Mathematics' },
+      'blank': { my: 'ကွက်လပ်ဖြည့်', en: 'Fill in the Blank' },
       'section_a': { my: 'အပိုင်း (က)', en: 'Section A' }
     };
     const entry = map[type];

@@ -135,7 +135,7 @@ MT.PaperUi = (function () {
     const chips = document.createElement('div');
     chips.className = 'add-section-chips';
     const chipLang = MT.PaperLocale.getLanguage(MT.State.getMetadata().subject);
-    const SECTION_TYPE_KEYS = ['mcq', 'tf', 'short', 'long', 'math'];
+    const SECTION_TYPE_KEYS = ['mcq', 'tf', 'short', 'long', 'math', 'blank'];
     SECTION_TYPE_KEYS.forEach(function (key) {
       const chip = MT.Utils.el('button', { type: 'button', class: 'add-section-chip' },
         MT.ExamModel.getSectionTypeLabel(key, chipLang));

@@ -790,6 +790,7 @@ button.section-num:hover, button.sp-num:hover { filter: brightness(.94); }
 .st-long { --sec: #7A5AC9; --sec-bg: #F1EBFB; --sec-dark: #5B3FA8; }
 .st-math { --sec: #D64545; --sec-bg: #FDEBEB; --sec-dark: #B03030; }
 .st-section_a { --sec: #0E8A84; --sec-bg: #E4F6F5; --sec-dark: #0B6E69; }
+.st-blank { --sec: #B07CC6; --sec-bg: #F6EDFA; --sec-dark: #8E5DA8; }
 
 .exs-section {
   border-radius: 12px;
