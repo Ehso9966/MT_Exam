@@ -169,6 +169,8 @@
   content: counter(opt, upper-alpha) '. ';
   font-weight: 600;
 }
+.paper-preview .preview-question .pq-options.my li::before { content: none; }
+.paper-preview .preview-question .pq-options.my .pq-opt-letter { font-weight: 600; }
 
 .paper-preview .answer-lines { margin-top: calc(var(--mt-spacing, 1) * .3em); }
 .paper-preview .answer-lines .line {

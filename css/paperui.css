@@ -798,11 +798,25 @@ button.section-num:hover, button.sp-num:hover { filter: brightness(.94); }
   border: 1px solid var(--color-border);
   border-left: 4px solid var(--sec, var(--color-primary));
   transition: border-color .2s ease, border-left-color .2s ease;
+  position: relative;
 }
 .exs-section.open { border-color: var(--sec, var(--color-primary)); }
 .exs-section .exs-header { background: var(--sec-bg, transparent); }
 .exs-section.section-card-dragging { opacity: .6; border-style: dashed; transform: scale(1.02); box-shadow: 0 6px 18px rgba(0,0,0,.18); }
-.exs-section.section-card-dragover { border-color: var(--sec, var(--color-primary)); box-shadow: 0 0 0 2px rgba(26,95,142,.25); }
+.exs-section.section-insert-before::before,
+.exs-section.section-insert-after::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--sec, var(--color-primary));
+  box-shadow: 0 0 6px var(--sec, var(--color-primary));
+  z-index: 2;
+}
+.exs-section.section-insert-before::before { top: -4px; }
+.exs-section.section-insert-after::after { bottom: -4px; }
 .exs-type-badge {
   flex-shrink: 0;
   font-size: .66rem;

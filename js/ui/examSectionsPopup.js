@@ -12,6 +12,7 @@ MT.ExamSectionsPopup = (function () {
   var dragQuestionIndex = null;
   var justDragged = false;
   var backTo = null;
+  var insertTargetEl = null;
 
   function t(key, fallback) { return MT.Utils.t(key, null, fallback); }
   function lang() {
@@ -134,6 +135,23 @@ MT.ExamSectionsPopup = (function () {
     return MT.ExamModel.getSectionTypeLabel(type, lang());
   }
 
+  // Removes the insertion-preview line from whichever section currently shows it.
+  function clearInsertIndicator() {
+    if (insertTargetEl) {
+      insertTargetEl.classList.remove('section-insert-before', 'section-insert-after');
+      insertTargetEl = null;
+    }
+  }
+
+  // Absolute landing slot (in the pre-drag list) is `index` (insert before the
+  // hovered section) or `index + 1` (insert after it). Because moveSection()
+  // removes the dragged item first, the real toIndex is one less when moving down.
+  function computeDropIndex(fromIndex, before, index) {
+    var pos = before ? index : index + 1;
+    if (fromIndex === pos || fromIndex === pos - 1) return null;
+    return fromIndex < pos ? pos - 1 : pos;
+  }
+
   // Clickable number chip that opens the number-style dropdown. Changing the
   // style applies to every title/question in the exam (global per scope).
   function makeNumberChip(num, styleId, scope) {
@@ -211,25 +229,40 @@ MT.ExamSectionsPopup = (function () {
       setTimeout(function () { justDragged = false; }, 0);
       dragSectionIndex = null;
       sec.classList.remove('section-card-dragging');
+      clearInsertIndicator();
       if (container) {
-        container.querySelectorAll('.section-card-dragover').forEach(function (el) {
-          el.classList.remove('section-card-dragover');
+        container.querySelectorAll('.section-card-dragover, .section-insert-before, .section-insert-after').forEach(function (el) {
+          el.classList.remove('section-card-dragover', 'section-insert-before', 'section-insert-after');
         });
       }
     });
     sec.addEventListener('dragover', function (e) {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
-      sec.classList.add('section-card-dragover');
+      var rect = sec.getBoundingClientRect();
+      var before = (e.clientY < rect.top + rect.height / 2);
+      var cls = before ? 'section-insert-before' : 'section-insert-after';
+      if (insertTargetEl && insertTargetEl !== sec) {
+        insertTargetEl.classList.remove('section-insert-before', 'section-insert-after');
+      }
+      insertTargetEl = sec;
+      sec.classList.remove('section-insert-before', 'section-insert-after');
+      sec.classList.add(cls);
     });
-    sec.addEventListener('dragleave', function () {
-      sec.classList.remove('section-card-dragover');
+    sec.addEventListener('dragleave', function (e) {
+      if (e.relatedTarget && sec.contains(e.relatedTarget)) return;
+      sec.classList.remove('section-insert-before', 'section-insert-after');
+      if (insertTargetEl === sec) insertTargetEl = null;
     });
     sec.addEventListener('drop', function (e) {
       e.preventDefault();
-      sec.classList.remove('section-card-dragover');
-      if (dragSectionIndex === null || dragSectionIndex === index) return;
-      MT.State.moveSection(dragSectionIndex, index);
+      clearInsertIndicator();
+      if (dragSectionIndex === null) return;
+      var rect = sec.getBoundingClientRect();
+      var before = (e.clientY < rect.top + rect.height / 2);
+      var idx = computeDropIndex(dragSectionIndex, before, index);
+      if (idx === null || idx === dragSectionIndex) { dragSectionIndex = null; return; }
+      MT.State.moveSection(dragSectionIndex, idx);
       dragSectionIndex = null;
     });
 

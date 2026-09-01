@@ -278,9 +278,13 @@ html += '<span class="section-title-marks">' +
     // Options are only shown for MCQ questions (never for math/calculation etc.).
     var displayOptions = q.type === 'mcq' ? ((q.options && q.options.length > 0) ? q.options : extractedOptions) : null;
     if (displayOptions && displayOptions.length > 0) {
-      html += '<ul class="pq-options">';
-      displayOptions.forEach(function (opt) {
-        html += '<li>' + MT.MathRenderer.renderTextWithMath(ensureMathDelimiters(opt)) + '</li>';
+      var myLang = lang === 'my';
+      var myLetters = MT.ExamModel && MT.ExamModel.SECTION_LETTERS_MY;
+      html += '<ul class="pq-options' + (myLang ? ' my' : '') + '">';
+      displayOptions.forEach(function (opt, oi) {
+        html += '<li>' +
+          (myLang && myLetters[oi] ? '<span class="pq-opt-letter">' + myLetters[oi] + '.</span>' : '') +
+          MT.MathRenderer.renderTextWithMath(ensureMathDelimiters(opt)) + '</li>';
       });
       html += '</ul>';
     }

@@ -35,7 +35,7 @@ MT.SectionPopup = (function () {
     if (!sec) return;
     // For tf and mcq sections, skip the structure chooser — sub-parts don't
     // apply to true/false or multiple-choice questions.
-    if (sec.type === 'tf' || sec.type === 'mcq') {
+    if (sec.type === 'tf' || sec.type === 'mcq' || sec.type === 'blank') {
       openSourcePopup(sectionId);
       return;
     }
