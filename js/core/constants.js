@@ -12,7 +12,8 @@ MT.Constants = (function () {
     settings: 'mt-exam:settings',
     i18nLang: 'mt-i18n-lang',
     tourSeen: 'mt-exam:tour-seen',
-    aiMode: 'mt-exam:ai-mode'
+    aiMode: 'mt-exam:ai-mode',
+    baseUrl: 'mt-exam:baseurl'
   };
 
   const QUESTION_TYPES = {

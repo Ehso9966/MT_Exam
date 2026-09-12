@@ -10,15 +10,23 @@ MT.CropFlow = (function () {
   function open(options) {
     const opts = Object.assign({}, options || {});
 
-    // BYOK mode without a saved key → ask the user to configure the API first
-    // so they don't get a confusing failure mid-crop. MT AI mode always works
-    // because the free demo key is built in.
-    if (MT.BaiClient && MT.BaiClient.getMode && MT.BaiClient.getMode() === 'custom' &&
-        !(MT.BaiClient.getCustomKey ? MT.BaiClient.getCustomKey() : '')) {
-      MT.Toast.warning(t('crop.noKeyPrompt', '🔑 API သော့ မထည့်ရသေးပါ — သော့ ထည့်ပြီးမှ ပုံမှ ဖတ်နိုင်မည်'));
-      if (MT.App && MT.App.openApiSettings) MT.App.openApiSettings();
-      return;
-    }
+    // Ping the local backend first. If it's down, prompt the user to start it.
+    // If it's up but the server has no key configured, prompt to configure backend/.env.
+    var base = (MT.BaiClient && MT.BaiClient.LOCAL_API_BASE) || 'http://localhost:8000';
+    fetch(base.replace(/\/+$/, '') + '/api/health', { method: 'GET' })
+      .then(function (res) { return res.json().catch(function () { return null; }); })
+      .then(function (data) {
+        var serverHasKey = data && data.server_key_configured === true;
+        if (!serverHasKey) {
+          MT.Toast.warning(t('crop.noKeyPrompt', '🔑 Server not configured — add SARGALAY_API_KEY to backend/.env'));
+          if (MT.App && MT.App.openApiSettings) MT.App.openApiSettings();
+          return;
+        }
+        launchFilePicker(opts.capture);
+      })
+      .catch(function () {
+        MT.Toast.error(t('crop.backendDown', '⚠ Backend not found — start with `uvicorn app.main:app`'));
+      });
 
     // Launch the native file picker with the chosen source (camera vs gallery).
     function launchFilePicker(captureAttr) {

@@ -377,134 +377,81 @@ MT.App = (function () {
   /* ---------- API settings modal ---------- */
   function openApiSettings() {
     const body = MT.Utils.el('div', { class: 'ai-settings' });
+    var currentMode = MT.BaiClient.getMode() || 'mtai';
 
-    const intro = MT.Utils.el('p', { class: 'ai-settings-intro' }, t('ui.aiModeTitle'));
-    body.appendChild(intro);
+    const toggleWrap = MT.Utils.el('div', { class: 'ai-toggle' });
+    const mtBtn = MT.Utils.el('button', { type: 'button', class: 'ai-toggle-btn' + (currentMode === 'mtai' ? ' active' : '') }, t('ui.mtAi'));
+    const customBtn = MT.Utils.el('button', { type: 'button', class: 'ai-toggle-btn' + (currentMode === 'custom' ? ' active' : '') }, t('ui.customApiKey'));
+    toggleWrap.appendChild(mtBtn);
+    toggleWrap.appendChild(customBtn);
+    body.appendChild(toggleWrap);
 
-    // ---- Mode selector (MT AI vs BYOK) ----
-    const modeWrap = MT.Utils.el('div', { class: 'add-question-popup' });
+    const mtPanel = MT.Utils.el('div', { class: 'ai-panel' });
+    if (currentMode !== 'mtai') mtPanel.style.display = 'none';
+    mtPanel.appendChild(MT.Utils.el('p', { class: 'ai-settings-intro' }, t('ui.aiKeyIntro')));
+    body.appendChild(mtPanel);
 
-    const mtaiCard = MT.Utils.el('button', { type: 'button', class: 'add-question-option' });
-    mtaiCard.innerHTML = '<span class="aq-icon">🤖</span>' +
-      '<span class="aq-text"><b>' + t('ui.aiModeMtai') + '</b><span class="aq-desc">' + t('ui.aiModeMtaiDesc') + '</span></span>';
-    const byokCard = MT.Utils.el('button', { type: 'button', class: 'add-question-option' });
-    byokCard.innerHTML = '<span class="aq-icon">🔑</span>' +
-      '<span class="aq-text"><b>' + t('ui.aiModeByok') + '</b><span class="aq-desc">' + t('ui.aiModeByokDesc') + '</span></span>';
-    modeWrap.appendChild(mtaiCard);
-    modeWrap.appendChild(byokCard);
-    body.appendChild(modeWrap);
+    const customPanel = MT.Utils.el('div', { class: 'ai-panel' });
+    if (currentMode !== 'custom') customPanel.style.display = 'none';
+    const keyInput = MT.Utils.el('input', { type: 'password', class: 'input', placeholder: t('ui.customApiPlaceholder'), value: MT.BaiClient.getCustomKey() });
+    customPanel.appendChild(keyInput);
+    body.appendChild(customPanel);
 
-    let mode = MT.BaiClient.getMode();
+    function setToggle(mode) {
+      if (mode === 'mtai') {
+        mtBtn.classList.add('active');
+        customBtn.classList.remove('active');
+        mtPanel.style.display = 'block';
+        customPanel.style.display = 'none';
+      } else {
+        customBtn.classList.add('active');
+        mtBtn.classList.remove('active');
+        customPanel.style.display = 'block';
+        mtPanel.style.display = 'none';
+      }
+    }
 
-    // ---- BYOK key field (hidden in MT AI mode) ----
-    const keyField = MT.Utils.el('div', { class: 'field' });
-    keyField.appendChild(MT.Utils.el('label', {}, t('ui.apiKey') + ' (BYOK)'));
-    const keyWrap = MT.Utils.el('div', { class: 'ai-key-wrap' });
-    const keyInput = MT.Utils.el('input', {
-      type: 'password',
-      class: 'input',
-      value: MT.BaiClient.getCustomKey ? MT.BaiClient.getCustomKey() : '',
-      placeholder: 'sk-...',
-      autocomplete: 'off'
-    });
-    const keyToggle = MT.Utils.el('button', { type: 'button', class: 'ai-key-toggle', title: t('ui.showHide') }, '👁');
-    keyToggle.addEventListener('click', function () {
-      const show = keyInput.type === 'password';
-      keyInput.type = show ? 'text' : 'password';
-      keyToggle.textContent = show ? '🙈' : '👁';
-    });
-    keyWrap.appendChild(keyInput);
-    keyWrap.appendChild(keyToggle);
-    keyField.appendChild(keyWrap);
-    keyField.appendChild(MT.Utils.el('div', { class: 'hint' }, t('ui.apiKeyWarning')));
-    body.appendChild(keyField);
+    mtBtn.addEventListener('click', function () { setToggle('mtai'); });
+    customBtn.addEventListener('click', function () { setToggle('custom'); });
 
-    // ---- Model field (hidden in MT AI mode) ----
-    const modelField = MT.Utils.el('div', { class: 'field' });
-    modelField.appendChild(MT.Utils.el('label', {}, t('ui.model')));
-    const modelInput = MT.Utils.el('input', {
-      type: 'text',
-      class: 'input',
-      value: MT.BaiClient.getModel() || '',
-      placeholder: 'deepseek-v4-flash-vision-exp'
-    });
-    modelField.appendChild(modelInput);
-    modelField.appendChild(MT.Utils.el('div', { class: 'hint' }, t('ui.visionModelHint')));
-    body.appendChild(modelField);
-
-    // ---- MT AI note (shown only in MT AI mode) ----
-    const mtaiNote = MT.Utils.el('div', { class: 'hint' }, '🤖 ' + t('ui.mtaiNote'));
-    body.appendChild(mtaiNote);
-
-    // ---- Status area ----
     const statusDiv = MT.Utils.el('div', { id: 'apiStatus', class: 'ai-settings-status' });
     body.appendChild(statusDiv);
 
-    // ---- Active / visible state -----
-    function refreshMode() {
-      const isMtai = mode === 'mtai';
-      mtaiCard.classList.toggle('active', isMtai);
-      byokCard.classList.toggle('active', !isMtai);
-      keyField.style.display = isMtai ? 'none' : '';
-      modelField.style.display = isMtai ? 'none' : '';
-      mtaiNote.style.display = isMtai ? '' : 'none';
-      if (!isMtai && !modelInput.value) modelInput.value = MT.BaiClient.getModel() || '';
+    function getActiveMode() {
+      return mtBtn.classList.contains('active') ? 'mtai' : 'custom';
     }
-    refreshMode();
 
-    mtaiCard.addEventListener('click', function () { mode = 'mtai'; refreshMode(); });
-    byokCard.addEventListener('click', function () { mode = 'custom'; refreshMode(); });
-
-    // ---- Test / Discover ----
-    let modelList = [];
     function runTest() {
-      const isMtai = mode === 'mtai';
-      const key = isMtai ? MT.BaiClient.getApiKey() : keyInput.value.trim();
-      if (!key) { statusDiv.innerHTML = '<span class="badge err">' + t('error.noKey') + '</span>'; return; }
+      var mode = getActiveMode();
+      MT.BaiClient.setMode(mode);
+      if (mode === 'custom') MT.BaiClient.setApiKey(keyInput.value);
       statusDiv.innerHTML = '<span class="spinner"></span> ' + t('ui.settingLoading');
-      MT.BaiClient.testConnection(key, MT.BaiClient.DEFAULT_BASE_URL)
+      MT.BaiClient.testConnection()
         .then(function (data) {
-          modelList = (data.data || data.models || []).map(function (m) {
-            return typeof m === 'string' ? { id: m } : { id: m.id };
-          });
-          if (MT.ModelDiscovery && MT.ModelDiscovery.setModels) {
-            MT.ModelDiscovery.setModels(modelList);
-          }
+          var modelName = (data && data.model) || MT.BaiClient.getModel() || '';
           statusDiv.innerHTML = '<span class="badge ok">' + t('ui.connectionSuccess') + '</span>' +
-            '<div class="mt-mt"><label class="mt-small">' + t('ui.visionModels') + '</label>' +
-            '<select class="select" id="apiModelSelect">' +
-            modelList.filter(function (m) { return /vision|ocr|vl|image/i.test(m.id); })
-              .map(function (m) { return '<option>' + m.id + '</option>'; }).join('') +
-            '</select></div>';
-          const sel = document.getElementById('apiModelSelect');
-          if (sel) {
-            sel.onchange = function () {
-              if (mode === 'custom') modelInput.value = sel.value;
-            };
-          }
+            '<div class="mt-mt"><label class="mt-small">' + t('ui.currentModel') + '</label>' +
+            '<div class="input" style="background:#f5f5f5;padding:6px 10px;border-radius:6px">' +
+            MT.Utils.escapeHtml(modelName) + '</div></div>';
         })
         .catch(function (err) {
           statusDiv.innerHTML = '<span class="badge err">' + MT.AIErrors.friendlyMessage(err) + '</span>';
         });
     }
+
     const testBtn = MT.Utils.el('button', { type: 'button', class: 'btn secondary sm' }, '🔌 ' + t('ui.testConnection'));
     testBtn.onclick = runTest;
-    const discoverBtn = MT.Utils.el('button', { type: 'button', class: 'btn ghost sm' }, t('ui.modelList'));
-    discoverBtn.onclick = runTest;
     const btnRow = MT.Utils.el('div', { class: 'ai-settings-actions' });
     btnRow.appendChild(testBtn);
-    btnRow.appendChild(discoverBtn);
     body.appendChild(btnRow);
 
     const footer = function (close) {
       const wrap = MT.Utils.el('div', { style: { display: 'flex', justifyContent: 'flex-end', width: '100%' } });
       const saveBtn = MT.Utils.el('button', { type: 'button', class: 'btn' }, '💾 ' + t('ui.save'));
       saveBtn.onclick = function () {
+        var mode = getActiveMode();
         MT.BaiClient.setMode(mode);
-        if (mode === 'custom') {
-          MT.BaiClient.setApiKey(keyInput.value.trim());
-          MT.BaiClient.setModel(modelInput.value.trim());
-        }
+        if (mode === 'custom') MT.BaiClient.setApiKey(keyInput.value);
         MT.Toast.success(t('ui.aiSettingsSaved'));
         close();
       };
@@ -513,7 +460,7 @@ MT.App = (function () {
     };
 
     MT.Modal.open({
-      title: '🔑 ' + t('ui.aiSettings'),
+      title: '🤖 ' + t('ui.aiSettings'),
       content: body,
       sheet: true,
       footer: footer,

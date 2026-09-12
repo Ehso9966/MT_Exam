@@ -422,6 +422,29 @@
 .sections-empty .empty-icon { font-size: 2rem; }
 
 /* ===== AI settings popup ===== */
+.ai-toggle {
+  display: flex;
+  gap: 0;
+  margin: 0 0 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.ai-toggle-btn {
+  flex: 1;
+  font-size: .85rem;
+  font-weight: 600;
+  padding: 8px 12px;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  border: 0;
+  cursor: pointer;
+  transition: all .25s ease;
+  white-space: nowrap;
+}
+.ai-toggle-btn + .ai-toggle-btn { border-left: 1px solid var(--color-border); }
+.ai-toggle-btn:hover { background: var(--color-primary-light); color: var(--color-primary-dark); }
+.ai-toggle-btn.active { background: var(--color-primary-dark); color: #fff; }
 .ai-settings-intro {
   font-size: .85rem;
   color: var(--color-text-muted);

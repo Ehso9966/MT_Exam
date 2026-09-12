@@ -26,5 +26,17 @@ tmp/
 .tmp/
 
 # Do NOT commit API keys
-# (The app uses BYOK — keys live in user's browser localStorage only)
+# Server manages the key. No client-side key is stored.
 .git_backup/
+
+# Python backend
+__pycache__/
+*.pyc
+*.pyo
+backend/.venv/
+backend/venv/
+backend/.env
+*.pid
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
