@@ -283,6 +283,18 @@ window.MT_CDN = (function () {
   return { load: load };
 })();
 </script>
+<script>
+// Automatically set the FastAPI backend base URL.
+//
+// On localhost (development), point at the local FastAPI running on port 8000.
+// On any other host (Vercel, production), point at the deployment origin so the
+// frontend can reach the Vercel Python function we added in vercel.json.
+if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+  window.MT_API_BASE = 'http://localhost:8000';
+} else {
+  window.MT_API_BASE = window.location.origin;
+}
+</script>
 
 <script src="js/core/constants.js"></script>
 <script src="js/core/ids.js"></script>
