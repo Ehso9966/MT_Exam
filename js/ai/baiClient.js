@@ -13,6 +13,16 @@ MT.BaiClient = (function () {
 
   function t(key) { return MT.Utils.t(key); }
 
+  function safeJson(res) {
+    var ct = res.headers.get('content-type') || '';
+    if (ct.indexOf('application/json') !== -1) {
+      return res.json();
+    }
+    return res.text().then(function (text) {
+      throw new Error(text || 'Non-JSON response from server');
+    });
+  }
+
   function getCustomKey() {
     return localStorage.getItem(MT.Constants.STORAGE_KEYS.apiKey) || '';
   }
@@ -54,7 +64,7 @@ MT.BaiClient = (function () {
       return fetch(url, { method: 'GET', headers: headers, signal: controller.signal })
         .then(function (res) {
           clearTimeout(timer);
-          return res.json().then(function (body) {
+          return safeJson(res).then(function (body) {
             if (!res.ok) throw new Error('HTTP ' + res.status);
             var modelName = '';
             if (body && body.data && body.data.length > 0) modelName = body.data[0].id || '';
@@ -73,7 +83,7 @@ MT.BaiClient = (function () {
     return fetch(url, { method: 'GET', signal: controller.signal })
       .then(function (res) {
         clearTimeout(timer);
-        return res.json().then(function (body) {
+        return safeJson(res).then(function (body) {
           if (!res.ok) {
             if (body && body.code && MT.AIErrors && MT.AIErrors.ErrorCodes) {
               throw MT.AIErrors.AIError(body.code, body.message || t('error.generic'), body.detail || null);
@@ -118,7 +128,7 @@ MT.BaiClient = (function () {
       return fetch(url, { method: 'POST', headers: headers, body: JSON.stringify(body), signal: controller.signal })
         .then(function (res) {
           clearTimeout(timer);
-          return res.json().then(function (data) {
+          return safeJson(res).then(function (data) {
             if (!res.ok) throw new Error('HTTP ' + res.status);
             return data;
           });
@@ -140,7 +150,7 @@ MT.BaiClient = (function () {
     })
       .then(function (res) {
         clearTimeout(timer);
-        return res.json().then(function (data) {
+        return safeJson(res).then(function (data) {
           if (!res.ok) {
             if (data && data.code && MT.AIErrors && MT.AIErrors.ErrorCodes) {
               throw MT.AIErrors.AIError(data.code, data.message || t('error.generic'), data.detail || null);
