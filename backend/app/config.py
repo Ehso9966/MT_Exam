@@ -32,7 +32,7 @@ class Settings(BaseSettings):
 
     # --- Sargalay upstream ---
     sargalay_api_key: str = Field(
-        ...,
+        default="",
         description="Server-side default Sargalay key (MT AI free mode). Required.",
     )
     sargalay_base_url: str = Field(
