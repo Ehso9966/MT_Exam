@@ -11,7 +11,7 @@ if str(_root) not in sys.path:
 
 try:
     from backend.app.main import app  # noqa: E402
-except Exception as exc:
+except BaseException as exc:
     _error_detail = (
         "The backend failed to start. "
         "Ensure SARGALAY_API_KEY is set in your Vercel environment variables. "
@@ -19,6 +19,8 @@ except Exception as exc:
     )
 
     async def app(scope, receive, send):  # noqa: D103
+        if scope["type"] == "lifespan":
+            return
         if scope["type"] == "http":
             body = json.dumps({"error": "backend_startup_failure", "detail": _error_detail}).encode()
             await send({
@@ -30,5 +32,3 @@ except Exception as exc:
                 "type": "http.response.body",
                 "body": body,
             })
-        else:
-            await send({"type": "http.response.body", "body": b""})
