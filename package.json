@@ -1,4 +1,8 @@
 {
   "name": "mt-exam",
-  "private": true
+  "private": true,
+  "scripts": {
+    "lint": "echo \"No linter configured\" && exit 0",
+    "typecheck": "echo \"No type checker configured\" && exit 0"
+  }
 }
