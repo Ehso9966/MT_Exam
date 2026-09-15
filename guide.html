@@ -20,53 +20,59 @@
 <meta name="theme-color" content="#4C9A50">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/app.css">
 <link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/landing.css">
 <style>
-.static-page { max-width: 900px; margin: 0 auto; padding: 32px 20px 56px; }
+.static-page { max-width: 1000px; margin: 0 auto; padding: 48px 24px 72px; }
 #app.app-shell { height: auto; }
-.static-hero { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 32px 28px; margin-bottom: 20px; }
-.static-hero h1 { font-size: 1.9rem; color: var(--color-primary-deep); margin-bottom: 8px; }
-.static-hero p { margin: 0; color: var(--color-text-muted); }
-.static-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius); box-shadow: var(--shadow); padding: 24px 28px; margin-bottom: 20px; }
-.static-card h2 { font-size: 1.25rem; color: var(--color-primary-deep); margin-bottom: 10px; }
+.static-hero { background: var(--color-primary-pale); border: 1px solid var(--color-border); border-radius: var(--radius-feature); padding: 32px 28px; margin-bottom: 24px; }
+.static-hero h1 { font-size: 2.1rem; color: var(--color-heading); margin-bottom: 8px; }
+.static-hero p { margin: 0; color: var(--color-text); font-size: 1.02rem; }
+.static-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-card); box-shadow: var(--shadow-card); padding: 24px 28px; margin-bottom: 20px; }
+.static-card h2 { font-size: 1.3rem; color: var(--color-heading); margin-bottom: 10px; }
 .static-card ol, .static-card ul { margin: 0; padding-left: 20px; }
 .static-card li { margin-bottom: 8px; line-height: 1.6; }
-.static-note { background: var(--color-warn-bg); border: 1px solid var(--color-warn-fill); border-radius: var(--radius-sm); padding: 12px 16px; font-size: .9rem; }
-.static-banner { background: var(--color-primary-light); border: 1px solid var(--color-primary); border-radius: var(--radius-sm); padding: 14px 18px; text-align: center; }
+.static-note { background: var(--color-warn-bg); border: 1px solid var(--color-warn-fill); border-radius: var(--radius); padding: 12px 16px; font-size: .9rem; }
+.static-banner { background: var(--color-primary-soft); border: 1px solid var(--color-primary); border-radius: var(--radius); padding: 14px 18px; text-align: center; }
 .static-banner a { font-weight: 700; text-decoration: none; }
 </style>
 </head>
 <body>
 <div class="app-shell" id="app">
-  <header class="app-header">
-    <div class="logo" aria-label="MT Exam Studio">
+  <header class="app-header" id="appHeader">
+    <a class="logo" href="index.html" aria-label="MT Exam Studio">
       <span class="logo-mt">MT</span>
       <span class="logo-exam">EXAM</span>
-    </div>
+    </a>
+    <nav class="header-nav" aria-label="Primary">
+      <a class="nav-link" href="index.html" data-i18n="nav.home">Home</a>
+      <a class="nav-link" href="index.html#app" data-i18n="nav.workspace">Workspace</a>
+      <a class="nav-link" href="features.html" data-i18n="nav.features">Features</a>
+      
+    </nav>
     <div class="spacer"></div>
     <div class="header-actions">
-      <a class="btn sm" href="index.html" data-i18n="ui.openApp" data-i18n-title="ui.openApp" title="Open MT Exam app">▶ Open App</a>
-      <a class="btn sm secondary" href="features.html" data-i18n="footer.features" data-i18n-title="footer.features" title="MT Exam features">Features</a>
-      <button class="btn sm secondary" id="btnPageLang" data-i18n="ui.langToggle">မြန်မာ / EN</button>
+      <button class="lang-chip" id="btnPageLang" data-i18n="ui.langToggle">မြန်မာ / EN</button>
+      <a class="btn sm" href="index.html#app" data-i18n="ui.openApp" data-i18n-title="ui.openApp" title="Open MT Exam app">Open App</a>
     </div>
   </header>
 </div>
 
 <main class="static-page">
-  <div class="static-hero">
+  <div class="static-hero" data-reveal>
     <h1 data-i18n="guide.pageTitle">How to Use MT Exam</h1>
     <p data-i18n="guide.hero">Create a professional မေးခွန်းစာရွက် (exam paper) in just a few minutes.</p>
   </div>
 
-  <div class="static-card">
+  <div class="static-card" data-reveal data-reveal-delay="40">
     <h2 data-i18n="guide.step1Title">Step 1 — Open the app</h2>
     <p data-i18n="guide.step1Body">Open the MT Exam app. Everything runs in your browser — no sign-up or installation needed.</p>
   </div>
 
-  <div class="static-card">
+  <div class="static-card" data-reveal data-reveal-delay="40">
     <h2 data-i18n="guide.step2Title">Step 2 — Set up your exam</h2>
     <ol>
       <li data-i18n="guide.step2l1">Type the file name of your paper.</li>
@@ -75,7 +81,7 @@
     </ol>
   </div>
 
-  <div class="static-card">
+  <div class="static-card" data-reveal data-reveal-delay="40">
     <h2 data-i18n="guide.step3Title">Step 3 — Add questions</h2>
     <ul>
       <li data-i18n="guide.step3l1">Type manually: Write each question by hand.</li>
@@ -84,21 +90,21 @@
     </ul>
   </div>
 
-  <div class="static-card">
+  <div class="static-card" data-reveal data-reveal-delay="40">
     <h2 data-i18n="guide.step4Title">Step 4 — Check with validation</h2>
     <p data-i18n="guide.step4Body">The status bar shows a live check of marks, numbering, and question completeness. Fix any warnings before printing.</p>
   </div>
 
-  <div class="static-card">
+  <div class="static-card" data-reveal data-reveal-delay="40">
     <h2 data-i18n="guide.step5Title">Step 5 — Print or save as PDF</h2>
     <p data-i18n="guide.step5Body">Use the Print button. The A4 stylesheet includes Padauk and Pyidaungsu Myanmar fonts, so your paper prints correctly. Save drafts in your browser or export/import JSON.</p>
   </div>
 
-  <div class="static-card">
+  <div class="static-card" data-reveal data-reveal-delay="40">
     <div class="static-note" data-i18n="guide.note">⚠️ Your exam content stays in your browser — nothing is uploaded. If you use AI OCR, your API key is sent directly from the browser, so avoid using a shared or valuable key.</div>
   </div>
 
-  <div class="static-banner">
+  <div class="static-banner" data-reveal>
     <a href="index.html" data-i18n="guide.cta">Start creating your exam paper free →</a>
   </div>
 </main>
@@ -117,6 +123,7 @@
 <script src="js/core/utils.js"></script>
 <script src="js/core/events.js"></script>
 <script src="js/core/i18n.js"></script>
+<script src="js/ui/reveal.js"></script>
 <script>
 MT.I18n.init();
 MT.I18n.applyDOM();

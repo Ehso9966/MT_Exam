@@ -14,6 +14,13 @@
     padding: 0;
   }
 
+  /* Always print reveal-on-scroll content fully visible */
+  html.js-reveal [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
   .app-header, .app-sidebar,
   .main-topbar, .status-strip, .editor-panel,
   .modal-overlay, .toast-container, .loading-overlay,

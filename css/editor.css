@@ -18,7 +18,7 @@
   font-size: .9rem;
   line-height: 1.55;
 }
-.question-editor .qe-textarea:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(26,95,142,.12); }
+.question-editor .qe-textarea:focus { outline: none; border-color: var(--color-primary); box-shadow: var(--shadow-focus); }
 
 .question-editor .qe-options { margin-top: 8px; }
 .question-editor .qe-option {
@@ -277,7 +277,7 @@
   resize: vertical;
   font-family: var(--font-myanmar);
 }
-.popup-editor-textarea:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(26,95,142,.12); }
+.popup-editor-textarea:focus { outline: none; border-color: var(--color-primary); box-shadow: var(--shadow-focus); }
 .popup-editor-empty-hint {
   margin-top: 4px;
   font-size: .75rem;

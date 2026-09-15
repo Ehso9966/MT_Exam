@@ -217,6 +217,8 @@ MT.CropFlow = (function () {
     gif.className = 'crop-guide-gif';
     gif.src = 'assets/toul/image_crop_tour.gif';
     gif.alt = 'crop guide';
+    gif.loading = 'lazy';
+    gif.decoding = 'async';
     guide.appendChild(gif);
 
     const actions = document.createElement('div');

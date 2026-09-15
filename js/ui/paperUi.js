@@ -784,11 +784,12 @@ MT.PaperUi = (function () {
         '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
         '<title>' + title + '</title>' +
         '<style>' +
-        'body{margin:0;background:#e5e7eb;font-family:sans-serif}' +
-        '.bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:12px;padding:10px 16px;background:#1a5f8e;color:#fff}' +
+        'body{margin:0;background:#EEF2F0;font-family:Inter,"Noto Sans Myanmar",sans-serif}' +
+        '.bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:12px;padding:12px 20px;background:#0B5D35;color:#fff}' +
         '.bar b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
-        '.bar button{padding:8px 18px;border:0;border-radius:8px;background:#fff;color:#1a5f8e;font-weight:700;font-size:14px;cursor:pointer}' +
-        '.page{background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.2);margin:16px auto;width:' + pxW + 'px;max-width:94vw}' +
+        '.bar button{padding:8px 18px;border:0;border-radius:12px;background:#168A4A;color:#fff;font-weight:700;font-size:14px;cursor:pointer}' +
+        '.bar button:hover{background:#0B5D35}' +
+        '.page{background:#fff;box-shadow:0 10px 30px rgba(15,50,30,.12);margin:16px auto;width:' + pxW + 'px;max-width:94vw}' +
         '.page img{display:block;width:100%;height:auto}' +
         '@media print{@page{size:' + pageSize + ';margin:0}html,body{background:#fff;margin:0}.bar{display:none}' +
         '.page{box-shadow:none;margin:0;max-width:none;width:' + pxW + 'px;height:' + pxH + 'px;overflow:hidden;page-break-after:always}' +

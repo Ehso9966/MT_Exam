@@ -28,22 +28,77 @@ MT Exam Studio သည် လက်ရေးစာများ သို့မဟ
 - **MT AI / Sargalay Backend** (`http://localhost:8000`) — server-side key, Python FastAPI
 - Padauk / Pyidaungsu မြန်မာဖောင့်များ
 
-## တပ်ဆင်အသုံးပြုခြင်း
+## စတင်အသုံးပြုခြင်း / Getting Started
 
-1. ဤဖိုင်တွဲကို ကွန်ပျူတာသို့ ကူးယူပါ (သို့မဟုတ် download လုပ်ပါ)။
-2. `index.html` ကို browser ဖြင့် ဖွင့်ပါ (double-click)။
-3. **🔑 AI ဆက်တင်** ကိုနှိပ်၍ backend/.env တွင် SARGALAY_API_KEY ကို ထည့်ပါ။
-4. စာမေးပွဲကို စတင်ရေးသားပါ။
+ဤဖိုင်တွဲကို ကွန်ပျူတာသို့ ကူးယူပါ (Clone သို့မဟုတ် download)။ ထို့နောက် နည်းလမ်း နှစ်မျိုးဖြင့် စတင်နိုင်သည် —
 
-> ⚠️ **သတိပြုရန်:** API သော့ကို server မှ တိုက်ရိုက်ပို့သည်။
-> မျှဝေထားသော စက်တွင် အဖိုးတန်/မျှဝေသုံး key ကို မသုံးပါနှင့်။
+### ၁။ Frontend ချည်းသာ (Quick preview — AI မလို)
 
-## MT AI / Sargalay Backend
+ကိုယ်တိုင် မေးခွန်းရိုက်ပြီး စာရွက်ထုတ်ရန် အတွက် backend မလိုပါ။ static server နှင့် ဖွင့်ပေးရုံဖြစ်သည်။
 
-- Endpoint: `POST /api/chat` (proxy to Sargalay)
-- Test connection: `GET /api/test`
+```bash
+# Windows (python အလုပ်မလုပ်ပါက py သုံးပါ):
+python serve.py 8080
+# သို့မဟုတ်:
+py serve.py 8080
+
+# macOS / Linux:
+python3 serve.py 8080
+```
+
+ထို့နောက် browser ဖွင့်၍ **http://localhost:8080** သို့ သွားပါ။
+
+> ⚠️ **`index.html` ကို double-click မဖွင့်ပါနှင့်။** `file://` ဖြင့် ဖွင့်ချိန်တွင် `index.html` က API လိပ်စာကို မှန်ကန်စွာ မှတ်သား၍ မရသောကြောင့် AI အင်္ဂါရပ်များ ရပ်တန့်မည်။ HTTP server မှတစ်ဆင့် ဖွင့်ကာ `localhost`/`127.0.0.1` ဖြင့်သုံးရန် လိုအပ်သည်။
+
+### ၂။ Backend ပါထည့် (Full setup — AI OCR / Batch Crop အပါအဝင်)
+
+AI အင်္ဂါရပ်များကို သုံးလိုပါက **FastAPI backend** ကို port `8000` တွင် ဦးစွာ run ရသည်။
+
+**PowerShell (Windows) အတွက် တစ်ခါတည်း အကုန်လုပ်နည်း:**
+```powershell
+cd backend
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+copy .env.example .env          # .env တွင် SARGALAY_API_KEY ထည့်ပြီး save လုပ်ပါ
+uvicorn app.main:app --reload --port 8000
+```
+
+**Command Prompt (Windows):** `.\.venv\Scripts\Activate.ps1` အစား `.\.venv\Scripts\activate` သုံးပါ။
+
+**macOS / Linux:**
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env            # .env တွင် SARGALAY_API_KEY ထည့်ပြီး save လုပ်ပါ
+uvicorn app.main:app --reload --port 8000
+```
+
+**`.env` ဖိုင်တွင် ထည့်ရမည့် အရေးကြီးသော ကုဒ်:**
+```env
+SARGALAY_API_KEY=sk-paste-your-real-key-here
+```
+> ⚠️ **`.env` ကို commit ဘယ်တော့မှ မလုပ်ပါနှင့်။** ဤဖိုင်ကို `.gitignore` ထဲတွင် ထည့်ထားပြီးဖြစ်သည်။ Docker/backup ဖြင့် မျှဝေမည်ဆိုလျှင် key ပါသွားမည်ကို သတိပြုပါ။
+
+**အတည်ပြုရန်:** browser တွင် **http://localhost:8000/api/health** ဖွင့်ပါ —
+```json
+{"status":"ok","server_key_configured":true,"model":"deepseek-v4-flash-vision-exp"}
+```
+ထို့နောက် frontend **http://localhost:8080** ကို refresh လုပ်၍ AI OCR / Batch Crop ကို သုံးနိုင်သည်။
+
+> ⚠️ **Port အသုံးပြုမှု:** Backend သည် port `8000` ကို အသုံးပြုသောကြောင့် frontend ကို port `8080` (သို့မဟုတ် `8000` မဟုတ်သော အခြား port) ဖြင့် ဖွင့်ရသည်။ `serve.py` ၏ default port မှာ `8000` ဖြစ်၍ backend နှင့် ဆင်မည့်အတွက် ကွဲပြားသော port ပေးရန် လိုအပ်သည်။
+
+### ဘာကြောင့် backend လိုအပ်သလဲ (Why a backend?)
+
+AI အင်္ဂါရပ်များသည် Sargalay API သို့ တိုက်ရိုက်မသွားဘဲ ဒေသခံ **FastAPI proxy** မှတစ်ဆင့် သွားသည်။ သို့ဖြင့် ပုဂ္ဂလိက API key သည် browser bundle တွင် ပို့စရာ မလိုတော့ဘဲ **server ထဲတွင်သာ** ရှိနေသည်။
+
+- Backend endpoint: `POST /api/chat` (proxy to Sargalay), `GET /api/health`, `GET /api/test`
 - Authentication: `Authorization: Bearer <key>`
-- DeepSeek vision model: `deepseek-v4-flash-vision-exp` (model list တွင် စစ်ဆေးပါ)
+- DeepSeek vision model: `deepseek-v4-flash-vision-exp`
+
+ပိုမိုသော ကွန်ဖစ်ဂျူရေးရှင်း (timeouts, CORS, image-token cap, mode) အတွက် [`backend/README.md`](backend/README.md) ကိုဖတ်ပါ။
 
 ## ဖိုင်ဖွဲ့စည်းပုံ
 
@@ -78,45 +133,8 @@ MT-Exam-Studio/
 - [x] Phase 9: Save system
 - [x] Phase 10: Print/PDF
 
-## Backend Setup (Sargalay proxy)
+## Deployed backend သုံးရန် / Pointing to a deployed backend
 
-The frontend now talks to a local **FastAPI** proxy instead of calling the
-Sargalay backend API, so the project key never ships in the
-browser bundle.
-
-### 1. Get a Sargalay API key
-Create one in your Sargalay dashboard. Treat it like a password.
-
-### 2. Create `backend/.env`
-```bash
-cd backend
-cp .env.example .env        # Windows: copy .env.example .env
-```
-Edit `backend/.env` and paste your real key:
-```env
-SARGALAY_API_KEY=sk-paste-your-real-key-here
-```
-
-> ⚠️ **Never commit this file.** `backend/.env` is in `.gitignore` already.
-> Verify with: `git check-ignore backend/.env` (should print the path).
-
-### 3. Install + run
-```bash
-python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# macOS / Linux:
-source .venv/bin/activate
-
-pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
-```
-
-### 4. Verify
-- `http://localhost:8000/api/health` → `{"status":"ok","server_key_configured":true,"model":"deepseek-v4-flash-vision-exp"}`
-- Open `index.html` in the browser — AI features (OCR, batch crop) now flow through the local backend.
-
-### Pointing the frontend at a deployed backend
 Edit `index.html` (the `window.MT_API_BASE` line near the top of the
 `<script>` block) or set `window.MT_API_BASE = 'https://your-backend.example.com'`
 before `js/ai/baiClient.js` loads.

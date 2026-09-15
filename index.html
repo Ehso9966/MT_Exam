@@ -98,15 +98,16 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Pyidaungsu:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+<link rel="stylesheet" href="css/tokens.css">
 <link rel="stylesheet" href="css/app.css">
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/components.css">
 <link rel="stylesheet" href="css/editor.css">
 <link rel="stylesheet" href="css/preview.css">
 <link rel="stylesheet" href="css/paperui.css">
+<link rel="stylesheet" href="css/landing.css">
 <link rel="stylesheet" href="css/tour.css">
 <link rel="stylesheet" href="css/print.css">
 </head>
@@ -115,62 +116,151 @@
 
 <!-- ===== SEO / landing content ===== -->
 <section class="seo-section" id="seoContent">
-  <div class="seo-hero">
-    <div class="seo-lang-row">
-      <button type="button" class="lang-toggle-btn" id="btnSeoLang" data-i18n="ui.langToggle">မြန်မာ / EN</button>
+
+  <!-- Landing header -->
+  <header class="landing-header">
+    <a class="logo" href="#" aria-label="MT Exam Studio">
+      <span class="logo-mt">MT</span><span class="logo-exam">EXAM</span>
+    </a>
+    <nav class="header-nav" aria-label="Primary">
+      <a class="nav-link" href="#" id="landingNavHome" data-i18n="nav.home">Home</a>
+      <a class="nav-link" href="#app" id="landingNavWorkspace" data-i18n="nav.workspace">Workspace</a>
+      <a class="nav-link" href="features.html" data-i18n="nav.features">Features</a>
+      
+    </nav>
+    <div class="spacer"></div>
+    <div class="header-actions">
+      <button type="button" class="lang-chip" id="btnSeoLang" data-i18n="ui.langToggle">မြန်မာ / EN</button>
+      <a class="btn" href="#app" data-i18n="seo.ctaStart">စတင်အသုံးပြုမည်</a>
     </div>
-    <h1 data-i18n="seo.h1">MT Exam — မြန်မာကျောင်းဆရာ/ဆရာမများအတွက် စာမေးပွဲစာရွက် ဖန်တီးမှု</h1>
-    <p class="seo-tagline" data-i18n="seo.tagline">အခမဲ့ အွန်လိုင်း မေးခွန်းစာရွက် ဖန်တီးမှုကိရိယာ</p>
-    <p data-i18n="seo.intro">MT Exam သည် မြန်မာကျောင်းဆရာ/ဆရာမများအတွက် အခမဲ့ browser-based စာမေးပွဲစာရွက် ဖန်တီးကိရိယာတစ်ခုဖြစ်သည်။ လက်ရေးစာများ သို့မဟုတ် ဓာတ်ပုံမှ မေးခွန်းများကို လှပသော format ရှိသည့် ပုံနှိပ်နိုင်သော မေးခွန်းစာရွက်အဖြစ် မိနစ်ပိုင်းအတွင်း ပြောင်းလဲပေးနိုင်သည် — install လုပ်စရာ မလိုပါ။</p>
-    <div class="seo-cta">
-      <a class="btn" href="#app" data-i18n="seo.ctaStart">အခမဲ့ စတင်ဖန်တီးမည်</a>
-      <a class="btn secondary" href="features.html" data-i18n="seo.ctaFeatures">အင်္ဂါရပ်အားလုံး ကြည့်ရန်</a>
-      <a class="btn ghost" href="guide.html" data-i18n="seo.ctaGuide">အသုံးပြုနည်း</a>
+  </header>
+
+  <!-- Hero -->
+  <div class="landing-hero">
+    <div class="hero-copy" data-reveal>
+      <p class="hero-eyebrow" data-i18n="landing.eyebrow">MT EXAM</p>
+      <h1 class="hero-title" data-i18n="landing.heroTitle">စာမေးပွဲမေးခွန်းတွေကို ပိုလွယ်ကူမြန်ဆန်စွာ ပြင်ဆင်ဖန်တီးပါ</h1>
+      <p class="hero-sub" data-i18n="landing.heroSub">မေးခွန်းများဖန်တီးခြင်း၊ ပုံမှစာဖတ်ခြင်း၊ သင်္ချာညီမျှခြင်းများနှင့် PDF ထုတ်ခြင်းကို တစ်နေရာတည်းမှာ လွယ်ကူစွာလုပ်ဆောင်နိုင်ပါတယ်။</p>
+      <div class="seo-cta">
+        <a class="btn lg" href="#app" data-i18n="seo.ctaStart">စတင်အသုံးပြုမည်</a>
+        <a class="btn secondary lg" href="guide.html" data-i18n="seo.ctaGuide">အသုံးပြုနည်းကြည့်မည်</a>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true" data-reveal data-reveal-delay="120">
+      <div class="hv-paper">
+        <div class="hv-line hv-title"></div>
+        <div class="hv-line hv-short"></div>
+        <div class="hv-q"><span class="hv-num">1</span><span class="hv-line"></span><span class="hv-num hv-marks">2</span></div>
+        <div class="hv-q"><span class="hv-num">2</span><span class="hv-line"></span><span class="hv-num hv-marks">3</span></div>
+        <div class="hv-q"><span class="hv-num">3</span><span class="hv-line"></span><span class="hv-num hv-marks">1</span></div>
+        <div class="hv-q"><span class="hv-num">4</span><span class="hv-line hv-tall"></span><span class="hv-num hv-marks">4</span></div>
+      </div>
     </div>
   </div>
 
-  <div class="seo-features">
-    <h2 data-i18n="seo.featuresTitle">အဓိကအင်္ဂါရပ်များ</h2>
-    <ul class="seo-list">
-      <li data-i18n="seo.f1">AI OCR — ဓာတ်ပုံမှ မေးခွန်းများကို ထုတ်ယူခြင်း</li>
-      <li data-i18n="seo.f2">မေးခွန်းအမျိုးအစားများ — MCQ, မှန်/မှား, အတိုဖြေ, အသေးစိတ်ဖြေ, သင်္ချာ</li>
-      <li data-i18n="seo.f3">KaTeX သင်္ချာ — LaTeX ပုံသေနည်းများ လှပစွာ render</li>
-      <li data-i18n="seo.f4">စစ်ဆေးမှုစနစ် — အမှတ်၊ နံပါတ်စဉ်၊ မေးခွန်းများ အလိုအလျောက် စစ်ဆေးခြင်း</li>
-      <li data-i18n="seo.f5">ပုံနှိပ်/PDF — Padauk နှင့် Pyidaungsu မြန်မာဖောင့်များ ပါဝင်သော A4 print stylesheet</li>
-      <li data-i18n="seo.f6">ကိုယ်ရေးလုံခြုံမှု — သင့် စာမေးပွဲ မေးခွန်းများသည် သင့် browser ထဲတွင်သာ ရှိပြီး မည်သည့်နေရာသို့မျှ upload မလုပ်ပါ</li>
-    </ul>
+  <!-- Features -->
+  <div class="landing-features" data-reveal>
+    <div class="landing-section-head">
+      <h2 data-i18n="landing.featuresTitle">အဓိကအင်္ဂါရပ်များ</h2>
+      <p data-i18n="landing.featuresIntro">စာမေးပွဲစာရွက်တစ်ခုလုံးကို နေရာတစ်ခုတည်းမှာ ဖန်တီးနိုင်ပါတယ်။</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature-card" data-reveal>
+        <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="2" width="18" height="20" rx="2"/><path d="M7 6 L17 6 M7 11 L17 11 M7 16 L17 16"/></svg></span>
+        <h3 data-i18n="landing.f1Title">AI OCR</h3>
+        <p data-i18n="landing.f1Body">မေးခွန်းပုံများထဲမှ စာသားများကို အလိုအလျောက်ဖတ်ယူနိုင်ပါတယ်။</p>
+      </div>
+      <div class="feature-card" data-reveal data-reveal-delay="60">
+        <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="12" r="3"/><circle cx="18" cy="7" r="3"/><circle cx="18" cy="17" r="3"/><circle cx="12" cy="12" r="3"/></svg></span>
+        <h3 data-i18n="landing.f2Title">မေးခွန်းအမျိုးအစားများ</h3>
+        <p data-i18n="landing.f2Body">MCQ၊ မှန်/မှား၊ အတိုဖြေ၊ အဆင့်လိုက်ဖြေရှင်းချက်နှင့် အခြားမေးခွန်းများကို ဖန်တီးနိုင်ပါတယ်။</p>
+      </div>
+      <div class="feature-card" data-reveal data-reveal-delay="120">
+        <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 14 L8 8 L12 14 L16 6 L20 12 L12 20"/><circle cx="12" cy="10" r="2"/></svg></span>
+        <h3 data-i18n="landing.f3Title">Math &amp; KaTeX</h3>
+        <p data-i18n="landing.f3Body">သင်္ချာညီမျှခြင်းများကို ရှင်းလင်းတိကျစွာ ထည့်သွင်းနိုင်ပါတယ်။</p>
+      </div>
+      <div class="feature-card" data-reveal data-reveal-delay="180">
+        <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="9" height="12" rx="1"/><path d="M15 5 L21 5 M15 11 L21 11 M15 17 L21 17"/></svg></span>
+        <h3 data-i18n="landing.f4Title">ပုံနှင့် PDF</h3>
+        <p data-i18n="landing.f4Body">မေးခွန်းများကို ပုံများမှ ထည့်သွင်းပြီး PDF အဖြစ် ထုတ်ယူနိုင်ပါတယ်။</p>
+      </div>
+      <div class="feature-card" data-reveal data-reveal-delay="240">
+        <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 8 L8 8 M8 8 L8 6 M8 6 L14 6 M14 6 L14 8 M14 8 L20 8"/><rect x="3" y="11" width="18" height="10" rx="2"/></svg></span>
+        <h3 data-i18n="landing.f5Title">သိမ်းဆည်းခြင်း</h3>
+        <p data-i18n="landing.f5Body">သင့်အလုပ်များကို Draft အဖြစ် သိမ်းဆည်းပြီး နောက်မှ ဆက်လက်ပြင်ဆင်နိုင်ပါတယ်။</p>
+      </div>
+      <div class="feature-card" data-reveal data-reveal-delay="300">
+        <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 5 L19 5 M5 12 L19 12 M5 19 L19 19"/><path d="M7 5 L7 19" stroke="#168A4A" stroke-width="2.4"/><path d="M9 8 L14 8 M9 12 L16 12 M11 16 L16 16" stroke="#168A4A" stroke-width="1.8"/></svg></span>
+        <h3 data-i18n="landing.f6Title">အတည်ပြုစစ်ဆေးခြင်း</h3>
+        <p data-i18n="landing.f6Body">ထုတ်ဝေမည့်မေးခွန်းများကို မထုတ်မီ အလွယ်တကူ စစ်ဆေးနိုင်ပါတယ်။</p>
+      </div>
+    </div>
   </div>
 
-  <div class="seo-faq">
-    <h2 data-i18n="seo.faqTitle">မေးလေ့ရှိသော မေးခွန်းများ</h2>
-    <h3 data-i18n="seo.q1">MT Exam ဆိုတာဘာလဲ?</h3>
-    <p data-i18n="seo.a1">MT Exam သည် မြန်မာကျောင်းဆရာ/ဆရာမများအတွက် အခမဲ့ browser-based စာမေးပွဲစာရွက် ဖန်တီးကိရိယာဖြစ်သည်။ AI OCR၊ သင်္ချာပုံသေနည်းများနှင့် စစ်ဆေးမှုစနစ်များဖြင့် စာမေးပွဲစာရွက်များကို ဖန်တီး၊ ဖော်မတ်ပြုပြင်၊ ပုံနှိပ်နိုင်သည်။</p>
-    <h3 data-i18n="seo.q2">MT Exam အခမဲ့လား?</h3>
-    <p data-i18n="seo.a2">ဟုတ်ကဲ့။ MT Exam သည် လုံးဝ အခမဲ့ဖြစ်သည်။ AI OCR အင်္ဂါရပ်ကို သုံးလိုပါက ကိုယ်ပိုင် B.AI API သော့တစ်ခုသာ လိုအပ်ပါသည်။</p>
-    <h3 data-i18n="seo.q3">ဘာမှ တပ်ဆင်ရန် လိုအပ်ပါသလား?</h3>
-    <p data-i18n="seo.a3">မလိုပါ။ MT Exam သည် သင့် browser ထဲတွင်သာ အလုပ်လုပ်ပါသည်။ ဝဘ်ဆိုက်ကို ဖွင့်ပြီး စာမေးပွဲစာရွက် စတင်ဖန်တီးနိုင်ပါသည်။</p>
-    <h3 data-i18n="seo.q4">သင်္ချာပုံသေနည်းများ ရိုက်ထည့်နိုင်ပါသလား?</h3>
-    <p data-i18n="seo.a4">ရနိုင်ပါသည်။ MT Exam သည် LaTeX သင်္ချာပုံသေနည်းများအတွက် KaTeX rendering ကို ထောက်ပံ့ပေးပါသည်။ သင့်မေးခွန်းများထဲတွင် equations များ တိုက်ရိုက်ထည့်နိုင်ပါသည်။</p>
-    <h3 data-i18n="seo.q5">MT Exam သည် မြန်မာဘာသာဖြင့် အလုပ်လုပ်ပါသလား?</h3>
-    <p data-i18n="seo.a5">အလုပ်လုပ်ပါသည်။ MT Exam သည် Padauk နှင့် Pyidaungsu ဖောင့်များ၊ မြန်မာနံပါတ်ပုံစံများ အပါအဝင် ပြည့်စုံသော မြန်မာဘာသာစကား ထောက်ပံ့မှုရှိပါသည်။</p>
+  <!-- About -->
+  <div class="landing-about" data-reveal>
+    <h2 data-i18n="landing.aboutTitle">MT Exam ဆိုတာဘာလဲ?</h2>
+    <p data-i18n="landing.aboutBody">MT Exam သည် ဆရာ၊ ဆရာမများနှင့် သင်ကြားရေးအတွက် မေးခွန်းစာရွက်များကို လွယ်ကူမြန်ဆန်စွာ ဖန်တီး၊ ပြင်ဆင်၊ စစ်ဆေးပြီး PDF ထုတ်နိုင်ရန် ရည်ရွယ်ထားသော browser-based exam tool တစ်ခုဖြစ်ပါတယ်။</p>
+  </div>
+
+  <!-- FAQ -->
+  <div class="landing-faq" data-reveal>
+    <div class="landing-section-head">
+      <h2 data-i18n="landing.faqTitle">မေးလေ့ရှိသော မေးခွန်းများ</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item" data-reveal>
+        <button type="button" class="faq-question" aria-expanded="false" data-i18n="landing.q1">MT Exam ဆိုတာဘာလဲ?</button>
+        <div class="faq-answer"><p data-i18n="landing.a1">MT Exam သည် ဆရာ/ဆရာမများအတွက် browser-based မေးခွန်းစာရွက် ဖန်တီးကိရိယာဖြစ်ပြီး၊ AI OCR၊ သင်္ချာညီမျှခြင်းနှင့် PDF ထုတ်ခြင်းကို ထောက်ပံ့ပေးပါတယ်။</p></div>
+      </div>
+      <div class="faq-item" data-reveal data-reveal-delay="60">
+        <button type="button" class="faq-question" aria-expanded="false" data-i18n="landing.q2">App ကို install လုပ်ဖို့လိုပါသလား?</button>
+        <div class="faq-answer"><p data-i18n="landing.a2">မလိုပါဘူး။ Browser ကနေ တိုက်ရိုက်အသုံးပြုနိုင်ပါတယ်။</p></div>
+      </div>
+      <div class="faq-item" data-reveal data-reveal-delay="60">
+        <button type="button" class="faq-question" aria-expanded="false" data-i18n="landing.q3">AI OCR ကို ဘယ်လိုအသုံးပြုရမလဲ?</button>
+        <div class="faq-answer"><p data-i18n="landing.a3">မေးခွန်းပုံကို ထည့်သွင်းပြီး AI OCR ဖြင့် စာသားအဖြစ် ပြောင်းလဲနိုင်ပါတယ်။</p></div>
+      </div>
+      <div class="faq-item" data-reveal data-reveal-delay="60">
+        <button type="button" class="faq-question" aria-expanded="false" data-i18n="landing.q4">PDF ထုတ်လို့ရပါသလား?</button>
+        <div class="faq-answer"><p data-i18n="landing.a4">ရပါတယ်။ A4 format အပါအဝင် သတ်မှတ်ထားတဲ့ print layout ဖြင့် PDF ထုတ်နိုင်ပါတယ်။</p></div>
+      </div>
+      <div class="faq-item" data-reveal data-reveal-delay="60">
+        <button type="button" class="faq-question" aria-expanded="false" data-i18n="landing.q5">မေးခွန်းတွေကို သိမ်းထားလို့ရပါသလား?</button>
+        <div class="faq-answer"><p data-i18n="landing.a5">ရပါတယ်။ Draft အဖြစ် သိမ်းဆည်းပြီး နောက်မှ ပြန်လည်ပြင်ဆင်နိုင်ပါတယ်။</p></div>
+      </div>
+    </div>
   </div>
 </section>
 
 <div class="app-shell" id="app">
 
   <!-- ===== Header ===== -->
-  <header class="app-header">
-    <div class="logo" aria-label="MT Exam Studio">
+  <header class="app-header" id="appHeader">
+    <button type="button" class="logo" aria-label="MT Exam Studio">
       <span class="logo-mt">MT</span>
       <span class="logo-exam">EXAM</span>
-    </div>
+    </button>
+    <nav class="header-nav" aria-label="Primary">
+      <a class="nav-link" href="#" id="navHome" data-i18n="nav.home">Home</a>
+      <a class="nav-link" href="#app" id="navWorkspace" data-i18n="nav.workspace">Workspace</a>
+      <a class="nav-link" href="features.html" data-i18n="nav.features">Features</a>
+      
+      <div class="nav-quick-actions" aria-label="Quick actions">
+        <button type="button" class="nav-link nav-quick" data-quick="import" data-i18n-title="ui.open" aria-label="Open exam">📂 <span data-i18n="ui.open">Open</span></button>
+        <button type="button" class="nav-link nav-quick" data-quick="download" data-i18n-title="ui.download" aria-label="Download">📥 <span data-i18n="ui.download">Download</span></button>
+        <button type="button" class="nav-link nav-quick" data-quick="help" data-i18n-title="ui.help" aria-label="How to use">❓ <span data-i18n="ui.help">Help</span></button>
+      </div>
+    </nav>
     <div class="spacer"></div>
-    <div class="header-actions">
+<div class="header-actions">
+      <button class="icon-btn" id="btnImportJson" data-i18n-title="ui.open" title="Open" aria-label="Open exam"><span class="btn-icon" aria-hidden="true">📂</span><span class="btn-label" data-i18n="ui.open">Open</span></button>
+      <button class="icon-btn" id="btnDownload" data-i18n-title="ui.download" title="Download" aria-label="Download"><span class="btn-icon" aria-hidden="true">📥</span><span class="btn-label" data-i18n="ui.download">Download</span></button>
+      <button class="icon-btn" id="btnHelp" data-i18n-title="ui.help" title="How to Use" aria-label="How to use"><span class="btn-icon" aria-hidden="true">❓</span><span class="btn-label" data-i18n="ui.helpLabel">Help</span></button>
+      <button class="lang-chip" id="btnLangToggle" data-i18n="ui.langToggle" title="Language" aria-label="Language">မြန်မာ / EN</button>
       <button class="btn sm" id="btnNewExam" data-i18n="ui.new" title="New" aria-label="New exam">🆕</button>
-      <button class="btn sm secondary" id="btnImportJson" data-i18n="ui.open" title="Open" aria-label="Open exam">📂</button>
-      <button class="btn sm" id="btnDownload" data-i18n="ui.download" title="Download" aria-label="Download">📥</button>
-      <button class="btn sm" id="btnHelp" data-i18n="ui.help" data-i18n-title="ui.help" title="How to Use" aria-label="How to use">အသုံးပြုနည်း</button>
-      <button class="btn sm secondary" id="btnLangToggle" data-i18n="ui.langToggle" title="Language" aria-label="Language">မြန်မာ / EN</button>
+      <button class="icon-btn nav-toggle" id="btnNavMenu" aria-label="Menu" aria-expanded="false">☰</button>
     </div>
   </header>
 
@@ -190,6 +280,7 @@
       <div class="main-topbar">
         <div class="doc-title">
           <input type="text" id="inpDocTitle" data-i18n-placeholder="ui.filenamePlaceholder" placeholder="သိမ်းမည့် ဖိုင်အမည် ရိုက်ပါ…">
+          <span class="save-status" id="saveStatus" data-state="saved"><span class="dot"></span><span id="saveStatusText" data-i18n="ui.saved">သိမ်းဆည်းပြီး</span></span>
         </div>
         <div class="mt-row">
           <span class="badge neutral" id="badgeQuestionCount">မေးခွန်း ၀</span>
@@ -222,21 +313,16 @@
       <footer class="app-footer">
         <div class="app-footer-brand">
           <div class="app-footer-logo"><span class="logo-mt">MT</span><span class="logo-exam">EXAM</span></div>
-          <p class="app-footer-tagline" data-i18n="footer.tagline">Empowering Myanmar Teachers with Quick Exam Formatting</p>
-          <p class="app-footer-note" data-i18n="footer.devNote">Crafted with ❤️ for Myanmar teachers</p>
-          <a class="app-footer-feedback" id="footerFeedback" href="https://t.me/Mt_Exam" target="_blank" rel="noopener"></a>
-        </div>
-        <div class="app-footer-support">
-          <button type="button" class="app-footer-btn" id="footerSupportBtn" data-i18n="footer.support">☕ Support this tool</button>
+          <p class="app-footer-tagline" data-i18n="footer.tagline">မေးခွန်းစာရွက်များကို လွယ်ကူစွာ ဖန်တီးပြီး PDF ထုတ်ပါ။</p>
         </div>
         <div class="app-footer-links">
           <a href="features.html" data-i18n="footer.features">Features</a>
           <a href="guide.html" data-i18n="footer.guide">How to Use</a>
-          <a href="https://t.me/Mt_Exam" target="_blank" rel="noopener">Telegram</a>
+          <button type="button" class="app-footer-btn" id="footerSupportBtn" data-i18n="footer.support">Support</button>
         </div>
         <div class="app-footer-legal">
-          <p class="app-footer-copy">© <span id="footerYear">2026</span> <span data-i18n="footer.copyright">MT Exam Studio — Built for Education</span></p>
-          <p class="app-footer-privacy" data-i18n="footer.privacy">Your exam content stays in your browser — nothing is uploaded.</p>
+          <p class="app-footer-copy">© <span id="footerYear">2026</span> <span data-i18n="footer.copyright">MT Exam Studio</span></p>
+          <a class="app-footer-feedback" id="footerFeedback" href="https://t.me/Mt_Exam" target="_blank" rel="noopener" data-i18n="footer.telegram">Telegram</a>
         </div>
       </footer>
     </main>
@@ -247,8 +333,8 @@
 <div id="modalRoot"></div>
 <div id="toastRoot" class="toast-container"></div>
 
-<!-- Floating action button -->
-<button id="btnFab" class="fab" data-i18n-aria="ui.add" data-i18n-title="ui.add" aria-label="Add" title="Add">➕</button>
+<!-- Floating action button (mobile quick-add only, contextual) -->
+<button id="btnFab" class="fab" data-i18n-aria="ui.add" data-i18n-title="ui.add" aria-label="Add" title="Add" aria-hidden="true">＋</button>
 
 <!-- Scripts -->
 <script>
@@ -302,6 +388,7 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
 <script src="js/core/numberStyles.js"></script>
 <script src="js/core/events.js"></script>
 <script src="js/core/i18n.js"></script>
+<script src="js/ui/reveal.js"></script>
 <script src="js/core/state.js"></script>
 <script src="js/models/questionModel.js"></script>
 <script src="js/models/examModel.js"></script>
@@ -332,6 +419,7 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
 <script src="js/editor/questionPopupEditor.js"></script>
 <script src="js/ui/sectionPopup.js"></script>
 <script src="js/ui/examSectionsPopup.js"></script>
+<script src="js/ui/accordion.js"></script>
 <script src="js/ui/tour.js"></script>
 <script src="js/ui/paperUi.js"></script>
 <script src="js/app.js"></script>

@@ -39,6 +39,7 @@ MT.App = (function () {
     MT.PaperUi.init();
     render();
     reveal();
+    if (MT.Accordion) MT.Accordion.init();
     window.addEventListener('error', function () { reveal(); });
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(function () { render(); });
@@ -74,21 +75,100 @@ MT.App = (function () {
   }
 
   /* ---------- Landing (SEO) vs App mode toggle ---------- */
+  function updateNavActive() {
+    var inLanding = document.body.classList.contains('seo-mode');
+    var set = function (id, on) {
+      var link = document.getElementById(id);
+      if (link) link.classList.toggle('active', on);
+    };
+    set('landingNavHome', inLanding);
+    set('landingNavWorkspace', !inLanding);
+    set('navHome', inLanding);
+    set('navWorkspace', !inLanding);
+  }
+
   function applyMode() {
     const inApp = window.location.hash === '#app';
     document.body.classList.toggle('seo-mode', !inApp);
+    updateNavActive();
   }
 
   function showApp() {
-    document.body.classList.remove('seo-mode');
-    try { history.replaceState(null, '', '#app'); } catch (e) {}
-    render();
+    if (!document.body.classList.contains('seo-mode')) return;
+    if (document.body.classList.contains('transitioning')) return;
+    var landing = document.querySelector('.seo-section');
+    var appShell = document.querySelector('.app-shell');
+    if (!landing || !appShell) return;
+
+    document.body.classList.add('transitioning');
+    landing.classList.add('transitioning-out');
+
+    requestAnimationFrame(function () {
+      landing.style.opacity = '0';
+      landing.style.transform = 'translateY(20px)';
+    });
+
+    setTimeout(function () {
+      document.body.classList.remove('seo-mode');
+      landing.classList.remove('transitioning-out');
+      landing.style.opacity = '';
+      landing.style.transform = '';
+
+      appShell.classList.add('transitioning-in');
+      requestAnimationFrame(function () {
+        appShell.style.opacity = '1';
+        appShell.style.transform = 'none';
+      });
+
+      setTimeout(function () {
+        appShell.classList.remove('transitioning-in');
+        appShell.style.opacity = '';
+        appShell.style.transform = '';
+        document.body.classList.remove('transitioning');
+        try { history.replaceState(null, '', '#app'); } catch (e) {}
+        updateNavActive();
+        render();
+      }, 400);
+    }, 300);
   }
 
   function showLanding() {
-    document.body.classList.add('seo-mode');
-    try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch (e) {}
-    MT.I18n.applyDOM();
+    if (document.body.classList.contains('seo-mode')) return;
+    if (document.body.classList.contains('transitioning')) return;
+    var landing = document.querySelector('.seo-section');
+    var appShell = document.querySelector('.app-shell');
+    if (!landing || !appShell) return;
+
+    document.body.classList.add('transitioning');
+    appShell.classList.add('transitioning-out');
+
+    requestAnimationFrame(function () {
+      appShell.style.opacity = '0';
+      appShell.style.transform = 'translateY(20px)';
+    });
+
+    setTimeout(function () {
+      document.body.classList.add('seo-mode');
+      appShell.classList.remove('transitioning-out');
+      appShell.style.opacity = '';
+      appShell.style.transform = '';
+
+      landing.classList.add('transitioning-in');
+      requestAnimationFrame(function () {
+        landing.style.opacity = '1';
+        landing.style.transform = 'none';
+      });
+
+      setTimeout(function () {
+        landing.classList.remove('transitioning-in');
+        landing.style.opacity = '';
+        landing.style.transform = '';
+        document.body.classList.remove('transitioning');
+        try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch (e) {}
+        updateNavActive();
+        MT.I18n.applyDOM();
+      }, 400);
+    }, 300);
   }
 
   function bindModeToggle() {
@@ -99,7 +179,16 @@ MT.App = (function () {
         showApp();
       });
     }
-    var logo = document.querySelector('.logo');
+    // Any header/link pointing at "#app" should enter the workspace.
+    Array.prototype.forEach.call(document.querySelectorAll('.landing-header a[href="#app"], .header-nav a[href="#app"]'), function (a) {
+      a.addEventListener('click', function (e) {
+        if (document.body.classList.contains('seo-mode')) {
+          e.preventDefault();
+          showApp();
+        }
+      });
+    });
+    var logo = document.querySelector('.app-header .logo');
     if (logo) {
       logo.addEventListener('click', function () {
         if (document.body.classList.contains('seo-mode')) return;
@@ -122,21 +211,9 @@ MT.App = (function () {
         reGuard();
         return;
       }
-      // On the preview (no modal) → confirm exit.
-      MT.Dialogs.confirm({
-        title: t('ui.exitApp'),
-        message: t('ui.exitAppMsg'),
-        okText: t('ui.exit'),
-        cancelText: t('ui.cancel'),
-        okClass: 'danger'
-      }).then(function (ok) {
-        if (ok) {
-          if (window.Android && window.Android.exit) { window.Android.exit(); }
-          else { try { window.close(); } catch (e) {} }
-        } else {
-          reGuard();
-        }
-      });
+      // On the preview (no modal) → exit directly.
+      if (window.Android && window.Android.exit) { window.Android.exit(); }
+      else { try { window.close(); } catch (e) {} }
     });
     window.addEventListener('pageshow', function (e) {
       if (e.persisted) reGuard();
@@ -170,6 +247,59 @@ MT.App = (function () {
       MT.I18n.toggle();
       render();
       MT.I18n.applyDOM();
+    });
+
+    // Mobile nav drawer toggle
+    const navMenu = $('btnNavMenu');
+    if (navMenu) {
+      navMenu.addEventListener('click', function () {
+        const header = document.getElementById('appHeader');
+        if (!header) return;
+        const open = header.classList.toggle('nav-open');
+        navMenu.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      document.addEventListener('click', function (e) {
+        const header = document.getElementById('appHeader');
+        if (header && header.classList.contains('nav-open') && !header.contains(e.target)) {
+          header.classList.remove('nav-open');
+          navMenu.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    // Header nav links (app mode)
+    const navHome = $('navHome');
+    if (navHome) {
+      navHome.addEventListener('click', function (e) {
+        if (!document.body.classList.contains('seo-mode')) {
+          e.preventDefault();
+          showLanding();
+        }
+      });
+    }
+    const navWorkspace = $('navWorkspace');
+    if (navWorkspace) {
+      navWorkspace.addEventListener('click', function (e) {
+        e.preventDefault();
+        showApp();
+      });
+    }
+
+    // Mobile drawer quick actions (route to the hidden header buttons, then close drawer)
+    Array.prototype.forEach.call(document.querySelectorAll('.nav-quick'), function (b) {
+      b.addEventListener('click', function () {
+        var target = {
+          'import': 'btnImportJson',
+          'download': 'btnDownload',
+          'help': 'btnHelp'
+        }[b.getAttribute('data-quick')];
+        var el = target ? document.getElementById(target) : null;
+        if (el) el.click();
+        var header = document.getElementById('appHeader');
+        if (header) header.classList.remove('nav-open');
+        var nm = document.getElementById('btnNavMenu');
+        if (nm) nm.setAttribute('aria-expanded', 'false');
+      });
     });
 
     $('btnNewExam').addEventListener('click', function () {
@@ -225,10 +355,10 @@ MT.App = (function () {
       const tgImg = document.createElement('img');
       tgImg.src = 'assets/icons/Tg_icon.png';
       tgImg.alt = 'Telegram';
-      tgImg.style.cssText = 'width:16px;height:16px;vertical-align:middle;margin-right:3px';
-      feedback.appendChild(document.createTextNode(t('footer.feedback') + ' ('));
-      feedback.appendChild(tgImg);
-      feedback.appendChild(document.createTextNode('https://t.me/Mt_Exam) ' + t('footer.feedbackAfter')));
+      tgImg.loading = 'lazy';
+      tgImg.decoding = 'async';
+      tgImg.style.cssText = 'width:14px;height:14px;vertical-align:middle;margin-right:3px';
+      feedback.prepend(tgImg);
     }
   }
 
@@ -292,6 +422,8 @@ MT.App = (function () {
     const qr = document.createElement('img');
     qr.id = 'supportQr';
     qr.alt = 'QR';
+    qr.loading = 'lazy';
+    qr.decoding = 'async';
     qr.src = 'assets/QR receive/kpay_qr.png';
     qrWrap.appendChild(qr);
 
@@ -317,6 +449,8 @@ MT.App = (function () {
       const img = document.createElement('img');
       img.src = icon;
       img.alt = label;
+      img.loading = 'lazy';
+      img.decoding = 'async';
       const span = document.createElement('span');
       span.textContent = label;
       btn.appendChild(img);
@@ -521,9 +655,29 @@ MT.App = (function () {
       if (bq) bq.textContent = MT.I18n.t('ui.sectionCount') + ' ' + digits(MT.ExamModel.questionCount(exam));
       var bm = document.getElementById('badgeTotalMarks');
       if (bm) bm.textContent = MT.I18n.t('section.marks') + ' ' + digits(MT.ExamModel.examTotalMarks(exam));
+
+      updateSaveStatus(exam);
     } catch (e) {
       console.error('[render]', e);
     }
+  }
+
+  /* Save / draft indicator — compares current state against the stored draft. */
+  function updateSaveStatus(exam) {
+    const el = document.getElementById('saveStatus');
+    const txt = document.getElementById('saveStatusText');
+    if (!el) return;
+    let saved = false;
+    try {
+      const draft = MT.Storage.LocalDraft.load();
+      if (draft) {
+        saved = JSON.stringify(draft) === JSON.stringify(exam);
+      }
+    } catch (e) { /* no draft yet */ }
+    el.classList.remove('saved', 'unsaved', 'saving');
+    el.classList.add(saved ? 'saved' : 'unsaved');
+    el.setAttribute('data-state', saved ? 'saved' : 'unsaved');
+    if (txt) txt.textContent = saved ? t('ui.saved') : t('ui.unsaved');
   }
 
   function applyPaperScale(settings) {

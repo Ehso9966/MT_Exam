@@ -1,33 +1,45 @@
 /* MT Exam Studio — paperui.css (paper-centered editing UI) */
 
-/* ---- App main background (soft & clean) ---- */
+/* ---- App main background (soft canvas for the paper) ---- */
 .app-main {
-  background: linear-gradient(180deg, #f8fafc, #eef2f6);
+  background-color: #EEF2F0;
+  background-image:
+    radial-gradient(1000px 560px at 50% -10%, rgba(22, 138, 74, 0.12), transparent 65%),
+    linear-gradient(var(--bg-grid-work) 1px, transparent 1px),
+    linear-gradient(90deg, var(--bg-grid-work) 1px, transparent 1px),
+    linear-gradient(180deg, var(--bg-pastel), #FFFFFF 30%, #EEF2F0);
+  background-size: 100% 100%,
+                   var(--bg-grid-size) var(--bg-grid-size),
+                   var(--bg-grid-size) var(--bg-grid-size),
+                   100% 100%;
   padding-bottom: 96px;
 }
 
-/* ---- Floating Action Button ---- */
+/* ---- Floating Action Button (mobile quick-add, contextual) ---- */
 .fab {
   position: fixed;
   right: 20px;
   bottom: 24px;
-  width: 52px;
-  height: 52px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   border: 0;
-  background: var(--color-primary-dark);
+  background: var(--color-primary);
   color: #fff;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   line-height: 1;
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 18px rgba(76,154,80,.4);
+  box-shadow: 0 8px 24px rgba(15, 50, 30, 0.22);
   cursor: pointer;
   z-index: 500;
-  transition: all .25s ease;
+  transition: background var(--duration-fast) var(--ease), transform var(--duration-fast) var(--ease);
 }
-.fab:hover { background: var(--color-primary-deep); transform: translateY(-2px); }
+@media (max-width: 640px) {
+  .fab { display: flex; }
+}
+.fab:hover { background: var(--color-primary-dark); transform: translateY(-2px); }
 .fab:active { transform: translateY(1px); }
 
 .fab-menu { display: flex; flex-direction: column; gap: 8px; }
@@ -36,21 +48,21 @@
   text-align: left;
   padding: 11px 14px;
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   background: var(--color-surface);
   color: var(--color-text);
   font-weight: 600;
   font-size: .88rem;
   cursor: pointer;
   font-family: inherit;
-  transition: all .25s ease;
+  transition: all var(--duration-fast) var(--ease);
 }
-.fab-option:hover { background: var(--color-primary-light); border-color: var(--color-primary); }
+.fab-option:hover { background: var(--color-primary-soft); border-color: var(--color-primary); }
 
-/* ---- Page size bar (above paper) ---- */
+/* ---- Page size selector — compact segmented control, A4 default ---- */
 .page-size-bar {
   width: 100%;
-  max-width: 900px;
+  max-width: var(--container-sm);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -59,24 +71,26 @@
   margin-bottom: 10px;
 }
 .page-size-chips {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  flex-wrap: wrap;
+  display: inline-flex;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 12px;
+  background: var(--color-primary-pale);
+  border: 1px solid var(--color-border);
 }
 .page-size-bar .chip {
-  padding: 5px 14px;
-  border-radius: 20px;
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
+  padding: 7px 14px;
+  border-radius: 9px;
+  border: 0;
+  background: transparent;
   color: var(--color-text-muted);
   font-weight: 600;
-  font-size: .78rem;
+  font-size: .82rem;
   cursor: pointer;
-  transition: .15s;
+  transition: background var(--duration-fast) var(--ease), color var(--duration-fast) var(--ease);
 }
-.page-size-bar .chip:hover { border-color: var(--color-primary); color: var(--color-primary); }
-.page-size-bar .chip.active { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+.page-size-bar .chip:hover { background: var(--color-primary-soft); color: var(--color-primary-dark); }
+.page-size-bar .chip.active { background: var(--color-primary); color: #fff; box-shadow: 0 1px 6px rgba(22,138,74,.25); }
 
 /* ---- Page spacing (Content density) stepper ---- */
 .stepper {
@@ -88,8 +102,8 @@
   overflow: hidden;
 }
 .stepper-btn {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border: 0;
   background: transparent;
   color: var(--color-primary-dark);
@@ -105,7 +119,7 @@
 }
 .stepper-btn:first-child { border-right: 1px solid var(--color-border); }
 .stepper-btn:last-child { border-left: 1px solid var(--color-border); }
-.stepper-btn:hover { background: var(--color-primary-light); color: var(--color-primary); }
+.stepper-btn:hover { background: var(--color-primary-soft); color: var(--color-primary); }
 .stepper-btn:active { background: var(--color-primary); color: #fff; }
 .stepper-btn:disabled { opacity: .4; cursor: default; }
 .stepper-btn:disabled:hover { background: transparent; color: var(--color-primary-dark); }
@@ -114,7 +128,7 @@
   height: 12px;
   margin: 0 3px;
   border-radius: 6px;
-  background: var(--color-bg);
+  background: var(--color-primary-pale);
   overflow: hidden;
   position: relative;
 }
@@ -158,9 +172,9 @@
   margin-top: 48px;
   text-align: center;
   padding: 36px 20px;
-  border: 2px dashed var(--color-border);
+  border: 2px dashed var(--color-border-strong);
   border-radius: 16px;
-  background: #fbfdfb;
+  background: var(--color-primary-pale);
 }
 .paper-empty-state .empty-emoji { font-size: 3rem; line-height: 1; }
 .paper-empty-state .empty-title {
@@ -354,7 +368,7 @@
 .section-popup-row.section-popup-row-dragging { opacity: .5; border-style: dashed; }
 .section-popup-row.section-popup-row-dragover {
   border: 2px solid var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(26, 95, 142, .25);
+  box-shadow: 0 0 0 2px var(--color-primary);
 }
 .sp-empty { padding: 24px 8px; font-size: .85rem; }
 
@@ -571,7 +585,7 @@
 }
 .support-copy-btn:hover {
   background: var(--color-primary-deep);
-  box-shadow: 0 3px 8px rgba(76,154,80,.35);
+  box-shadow: 0 3px 8px rgba(22,138,74,.35);
 }
 .support-copy-btn:active { transform: translateY(1px); }
 .support-qr {
@@ -619,7 +633,7 @@
   background: var(--color-primary);
   border-color: var(--color-primary-deep);
   color: #fff;
-  box-shadow: 0 3px 8px rgba(76,154,80,.35);
+  box-shadow: 0 3px 8px rgba(22,138,74,.35);
 }
 .support-note {
   display: flex;
@@ -807,13 +821,13 @@ button.section-num:hover, button.sp-num:hover { filter: brightness(.94); }
 .exs-popup { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 14px; overflow: hidden; }
 .exs-list { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
 /* Section type colours — same type = same group colour */
-.st-mcq { --sec: #1A5F8E; --sec-bg: #E8F0FE; --sec-dark: #14527A; }
-.st-tf { --sec: #4C9A50; --sec-bg: #EAF8EC; --sec-dark: #3F8A43; }
-.st-short { --sec: #E07B39; --sec-bg: #FFF3E8; --sec-dark: #C65F22; }
-.st-long { --sec: #7A5AC9; --sec-bg: #F1EBFB; --sec-dark: #5B3FA8; }
-.st-math { --sec: #D64545; --sec-bg: #FDEBEB; --sec-dark: #B03030; }
-.st-section_a { --sec: #0E8A84; --sec-bg: #E4F6F5; --sec-dark: #0B6E69; }
-.st-blank { --sec: #B07CC6; --sec-bg: #F6EDFA; --sec-dark: #8E5DA8; }
+.st-mcq { --sec: #2F6F8F; --sec-bg: #E8F0FE; --sec-dark: #245874; }
+.st-tf { --sec: #168A4A; --sec-bg: #E8F7EE; --sec-dark: #0B5D35; }
+.st-short { --sec: #C97A3E; --sec-bg: #FBF1E6; --sec-dark: #A85F28; }
+.st-long { --sec: #7C6BB0; --sec-bg: #F1EBFB; --sec-dark: #645396; }
+.st-math { --sec: #C65B5B; --sec-bg: #FDEBEB; --sec-dark: #A64343; }
+.st-section_a { --sec: #2E7D6B; --sec-bg: #E4F6F5; --sec-dark: #236356; }
+.st-blank { --sec: #A48AB4; --sec-bg: #F6EDFA; --sec-dark: #866C99; }
 
 .exs-section {
   border-radius: 12px;
@@ -899,7 +913,7 @@ button.section-num:hover, button.sp-num:hover { filter: brightness(.94); }
 .exs-qrow.open .exs-qrow-chevron { color: var(--sec, var(--color-primary)); }
 .exs-qrow:hover { background: var(--sec-bg, transparent); }
 .exs-qrow.section-popup-row-dragging { opacity: .6; border-style: dashed; transform: scale(1.02); box-shadow: 0 6px 18px rgba(0,0,0,.16); }
-.exs-qrow.section-popup-row-dragover { background: var(--sec-bg, transparent); box-shadow: 0 0 0 2px rgba(26,95,142,.25); }
+.exs-qrow.section-popup-row-dragover { background: var(--sec-bg, transparent); box-shadow: 0 0 0 2px var(--color-primary); }
 .exs-add-q { display: flex; justify-content: flex-end; }
 .exs-add-q .btn {
   width: 100%;

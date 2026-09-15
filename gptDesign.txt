@@ -1,0 +1,1557 @@
+OpenCode — World-Class UI/UX Re-engineering Prompt
+
+> Role: You are a senior product designer, UX architect, visual designer, and frontend lead. Re-engineer the entire MT Exam frontend shown in the provided screenshots.
+
+Important: Do not copy the first screenshot's NayoPay branding, logo, wording, illustrations, or identity. Use it only as a visual/style reference for its clean, premium, modern, green, visual-first aesthetic.
+
+The remaining screenshots represent the current MT Exam product that needs to be redesigned.
+
+
+
+
+---
+
+1. PRIMARY DESIGN DIRECTION
+
+Transform the current MT Exam interface from a basic, information-heavy, generic web application into a:
+
+Modern educational SaaS
+
+Premium productivity tool
+
+Clean Burmese-first interface
+
+Green/emerald visual identity
+
+Mobile-first responsive application
+
+Calm, trustworthy, intelligent, professional
+
+Highly visual but not decorative or cluttered
+
+
+Visual reference philosophy
+
+Take inspiration from the first screenshot's:
+
+Strong green branding
+
+Large visual hierarchy
+
+Generous whitespace
+
+Soft rounded surfaces
+
+Minimal navigation
+
+Large confident typography
+
+Subtle shadows
+
+Fluid composition
+
+Clear CTA hierarchy
+
+Soft green backgrounds
+
+Modern editorial/product-design feel
+
+
+Do not reproduce the exact composition of the reference advertisement.
+
+
+---
+
+2. COLOR SYSTEM
+
+Replace the current basic green styling with a carefully constructed premium green system.
+
+Primary
+
+Primary Emerald:       #168A4A
+Primary Dark:          #0B5D35
+Primary Deep Forest:   #06452A
+Primary Soft:         #E8F7EE
+Primary Pale:         #F3FBF6
+
+Supporting colors
+
+Page Background:       #F7F9F8
+Surface:               #FFFFFF
+Surface Green:         #F0F8F3
+Border:                #DCE9E1
+Border Strong:         #C6DCCF
+
+Heading:               #10261B
+Body Text:             #53635A
+Muted Text:            #87958D
+
+Success:               #168A4A
+Warning:               #D99A24
+Error:                 #C94A4A
+
+Rules
+
+Never use excessive saturated green.
+
+Green should communicate action, identity and success, not fill every surface.
+
+Use deep forest green for high-contrast headings/important controls.
+
+Use pale green for selected states and information blocks.
+
+Keep most of the page white or near-white.
+
+Avoid gradients unless extremely subtle.
+
+Maintain WCAG-accessible contrast.
+
+
+
+---
+
+3. TYPOGRAPHY
+
+The current interface feels visually weak partly because typography is too small and dense.
+
+Use a modern Burmese-compatible font stack.
+
+Recommended direction
+
+Use:
+
+Noto Sans Myanmar for Burmese
+
+Inter or equivalent modern sans-serif for Latin/English
+
+Proper font fallback for mixed Burmese/English content
+
+
+Typography scale
+
+Display:       40–48px / 1.1 / 700
+H1:            32–40px / 1.2 / 700
+H2:            24–30px / 1.3 / 700
+H3:            18–22px / 1.4 / 650
+Body:          15–16px / 1.65
+Small:         13–14px / 1.5
+Caption:       12px / 1.4
+
+On mobile:
+
+Display:       30–36px
+H1:            26–30px
+H2:            21–24px
+Body:          14–16px
+
+Typography rules
+
+Do not make Burmese explanatory text tiny.
+
+Increase line-height for Burmese.
+
+Avoid long uninterrupted paragraphs.
+
+Break information into scannable sections.
+
+Use bold only for meaningful hierarchy.
+
+Avoid ALL-CAPS styling for Burmese content.
+
+
+
+---
+
+4. GLOBAL LAYOUT
+
+Replace the rigid stacked-card structure with a modern responsive layout system.
+
+Desktop
+
+Use:
+
+Maximum content width: 1180–1280px
+Page horizontal padding: 32–48px
+Grid gap: 20–28px
+Section gap: 48–72px
+
+Use a responsive 12-column grid where appropriate.
+
+Tablet
+
+Padding: 24px
+Grid: 2 columns where useful
+
+Mobile
+
+Padding: 16px
+Grid: 1 column
+Cards: full width
+
+Never allow content to become cramped.
+
+
+---
+
+5. HEADER / NAVIGATION
+
+The current green header should be redesigned into a sophisticated product navigation bar.
+
+Desktop header
+
+Height: approximately 68–76px
+
+White or very pale green surface
+
+Bottom border: extremely subtle
+
+MT EXAM logo on the left
+
+Primary navigation in the middle/right
+
+Language selector
+
+Help/about access
+
+One primary action only
+
+
+Avoid filling the header with multiple green pill buttons.
+
+Logo
+
+Create a cleaner visual treatment:
+
+MT EXAM
+
+"MT" can use deep forest green
+
+"EXAM" can use emerald green
+
+Strong but minimal wordmark
+
+No unnecessary decorative elements
+
+
+Navigation hierarchy
+
+Primary:
+
+Home
+
+Exam / Workspace
+
+Features
+
+Help
+
+
+Secondary:
+
+Language
+
+About
+
+
+Do not show every possible action simultaneously.
+
+
+---
+
+6. HOMEPAGE / LANDING PAGE
+
+The existing screenshot currently presents a collection of rectangular information cards.
+
+Replace this with a proper landing-page hierarchy.
+
+Hero section
+
+Create a large, spacious hero.
+
+Suggested structure:
+
+Eyebrow
+
+> MT EXAM
+
+
+
+Headline
+
+> စာမေးပွဲမေးခွန်းတွေကို ပိုလွယ်ကူမြန်ဆန်စွာ ပြင်ဆင်ဖန်တီးပါ
+
+
+
+Supporting copy
+
+> မေးခွန်းများဖန်တီးခြင်း၊ ပုံမှစာဖတ်ခြင်း၊ သင်္ချာညီမျှခြင်းများနှင့် PDF ထုတ်ခြင်းကို တစ်နေရာတည်းမှာ လွယ်ကူစွာလုပ်ဆောင်နိုင်ပါတယ်။
+
+
+
+Primary CTA:
+
+> စတင်အသုံးပြုမည်
+
+
+
+Secondary CTA:
+
+> အသုံးပြုနည်းကြည့်မည်
+
+
+
+Hero visual
+
+Instead of a huge amount of text, show a polished product preview/card representing the exam editor.
+
+Use:
+
+Soft green background shape
+
+Floating but static-looking UI preview
+
+Very subtle depth
+
+No excessive floating icons
+
+
+
+---
+
+7. FEATURE SECTION
+
+The current feature list should become a modern responsive grid.
+
+Create 6 feature cards maximum.
+
+Feature 1
+
+AI OCR
+
+> မေးခွန်းပုံများထဲမှ စာသားများကို အလိုအလျောက်ဖတ်ယူနိုင်ပါတယ်။
+
+
+
+Feature 2
+
+မေးခွန်းအမျိုးအစားများ
+
+> MCQ၊ မှန်/မှား၊ အတိုဖြေ၊ အဆင့်လိုက်ဖြေရှင်းချက်နှင့် အခြားမေးခွန်းများကို ဖန်တီးနိုင်ပါတယ်။
+
+
+
+Feature 3
+
+Math & KaTeX
+
+> သင်္ချာညီမျှခြင်းများကို ရှင်းလင်းတိကျစွာ ထည့်သွင်းနိုင်ပါတယ်။
+
+
+
+Feature 4
+
+ပုံနှင့် PDF
+
+> မေးခွန်းများကို ပုံများမှ ထည့်သွင်းပြီး PDF အဖြစ် ထုတ်ယူနိုင်ပါတယ်။
+
+
+
+Feature 5
+
+သိမ်းဆည်းခြင်း
+
+> သင့်အလုပ်များကို Draft အဖြစ် သိမ်းဆည်းပြီး နောက်မှ ဆက်လက်ပြင်ဆင်နိုင်ပါတယ်။
+
+
+
+Feature 6
+
+အတည်ပြုစစ်ဆေးခြင်း
+
+> ထုတ်ဝေမည့်မေးခွန်းများကို မထုတ်မီ အလွယ်တကူ စစ်ဆေးနိုင်ပါတယ်။
+
+
+
+Card design
+
+Background: #FFFFFF
+Border: 1px solid #E1ECE5
+Radius: 20px
+Padding: 24–28px
+Shadow: very subtle
+
+On hover:
+
+Translate Y: -3px
+
+Slight shadow increase
+
+Icon/background becomes pale green
+
+
+Do not use giant emoji icons.
+
+Use a consistent minimalist icon system.
+
+
+---
+
+8. "ABOUT MT EXAM" SECTION
+
+The current "MT Exam အကြောင်း" section contains too much dense explanatory text.
+
+Replace it with a concise editorial layout.
+
+Left
+
+Large heading:
+
+> MT Exam ဆိုတာဘာလဲ?
+
+
+
+Right
+
+Short explanation:
+
+> MT Exam သည် ဆရာ၊ ဆရာမများနှင့် သင်ကြားရေးအတွက် မေးခွန်းစာရွက်များကို လွယ်ကူမြန်ဆန်စွာ ဖန်တီး၊ ပြင်ဆင်၊ စစ်ဆေးပြီး PDF ထုတ်နိုင်ရန် ရည်ရွယ်ထားသော browser-based exam tool တစ်ခုဖြစ်ပါတယ်။
+
+
+
+Keep this section short.
+
+No giant paragraph.
+
+
+---
+
+9. FAQ SECTION
+
+The current FAQ is too dense.
+
+Replace it with an accordion system.
+
+Example:
+
+MT Exam ဆိုတာဘာလဲ?
+
+Short answer hidden until expanded.
+
+App ကို install လုပ်ဖို့လိုပါသလား?
+
+> မလိုပါဘူး။ Browser ကနေ တိုက်ရိုက်အသုံးပြုနိုင်ပါတယ်။
+
+
+
+AI OCR ကို ဘယ်လိုအသုံးပြုရမလဲ?
+
+> မေးခွန်းပုံကို ထည့်သွင်းပြီး AI OCR ဖြင့် စာသားအဖြစ် ပြောင်းလဲနိုင်ပါတယ်။
+
+
+
+PDF ထုတ်လို့ရပါသလား?
+
+> ရပါတယ်။ A4 format အပါအဝင် သတ်မှတ်ထားတဲ့ print layout ဖြင့် PDF ထုတ်နိုင်ပါတယ်။
+
+
+
+မေးခွန်းတွေကို သိမ်းထားလို့ရပါသလား?
+
+> ရပါတယ်။ Draft အဖြစ် သိမ်းဆည်းပြီး နောက်မှ ပြန်လည်ပြင်ဆင်နိုင်ပါတယ်။
+
+
+
+Only one accordion item should expand at a time unless there is a strong UX reason otherwise.
+
+
+---
+
+10. EXAM EDITOR / WORKSPACE
+
+The screenshot showing the exam workspace needs a major redesign.
+
+The current interface has:
+
+Large empty areas
+
+Excessive controls
+
+Sidebar imbalance
+
+Too many visible actions
+
+Old-fashioned rectangular controls
+
+
+Redesign it as a professional document editor.
+
+
+---
+
+Desktop editor structure
+
+┌─────────────────────────────────────────────┐
+│ Header / document title / primary actions   │
+├───────────────┬─────────────────────────────┤
+│ Question      │                              │
+│ Navigator     │        Document Canvas       │
+│               │                              │
+│ + Add         │                              │
+│ Questions     │                              │
+│               │                              │
+│ Question 1    │                              │
+│ Question 2    │                              │
+│ Question 3    │                              │
+└───────────────┴─────────────────────────────┘
+
+Sidebar
+
+Width:
+
+240–280px
+
+Use:
+
+Document title
+
+Question count
+
+Add question
+
+Question list
+
+Selected question state
+
+
+Do not place every tool into the sidebar.
+
+
+---
+
+11. QUESTION CREATION UX
+
+The current "မေးခွန်းများ..." area should become much cleaner.
+
+Primary button:
+
+> မေးခွန်းထည့်မည်
+
+
+
+
+When clicked, show a lightweight modal.
+
+Question types:
+
+MCQ
+
+မှန် / မှား
+
+အတိုဖြေ
+
+အရှည်ဖြေ
+
+သင်္ချာမေးခွန်း
+
+
+Use a 2-column card selection on desktop and 1-column on mobile.
+
+Each option should have:
+
+Icon
+
+Name
+
+One-line explanation
+
+
+
+---
+
+12. TOOLBAR
+
+Do not display every possible control permanently.
+
+Use progressive disclosure.
+
+Primary toolbar:
+
+Add
+Text
+Image
+Equation
+Question Type
+Preview
+
+Advanced controls go inside:
+
+> More
+
+
+
+or a contextual popover.
+
+This dramatically reduces visual clutter.
+
+
+---
+
+13. PAPER / DOCUMENT CANVAS
+
+The screenshot currently shows a large blank document area.
+
+Turn it into a convincing paper/document workspace.
+
+Canvas
+
+Background: #EEF2F0
+Paper: #FFFFFF
+Paper radius: 4–8px
+Paper shadow: subtle
+
+Desktop paper:
+
+A4 proportions
+max-width around 794px
+
+Keep generous internal margins.
+
+The paper should visually resemble a real examination sheet.
+
+
+---
+
+14. PAGE SIZE SELECTOR
+
+Current:
+
+> A4 / A5 / Letter / Legal
+
+
+
+Redesign as a compact segmented control.
+
+Default:
+
+> A4
+
+
+
+Other formats appear as secondary options.
+
+Avoid large buttons for every page format.
+
+
+---
+
+15. SAVE / DRAFT STATE
+
+Current save functionality should become much more understandable.
+
+Show a tiny status indicator near the document title:
+
+> ✓ သိမ်းဆည်းပြီး
+
+
+
+or
+
+> သိမ်းဆည်းနေသည်…
+
+
+
+or
+
+> မသိမ်းရသေးပါ
+
+
+
+Avoid large "save" buttons everywhere.
+
+Autosave when appropriate.
+
+
+---
+
+16. PDF EXPORT
+
+PDF export should be one of the strongest actions.
+
+Primary action:
+
+> PDF ထုတ်မည်
+
+
+
+Secondary:
+
+> Preview
+
+
+
+Avoid multiple competing green buttons.
+
+PDF export controls can appear in a clean modal:
+
+PDF ထုတ်မည်
+
+Paper size
+
+Orientation
+
+Include answer key
+
+Page numbers
+
+Preview
+
+Export
+
+
+
+---
+
+17. AI OCR UX
+
+The existing AI OCR functionality should feel like a premium feature rather than a generic upload box.
+
+Create an elegant upload state:
+
+မေးခွန်းပုံထည့်ပါ
+
+> ပုံကို ထည့်သွင်းပြီး စာသားအဖြစ် အလိုအလျောက်ပြောင်းလဲပါ။
+
+
+
+CTA:
+
+> ပုံရွေးမည်
+
+
+
+Drag-and-drop area on desktop.
+
+After upload:
+
+1. Image preview
+
+
+2. Processing indicator
+
+
+3. Extracted text
+
+
+4. User confirmation
+
+
+5. Insert into document
+
+
+
+Do not expose technical/API terminology to normal users.
+
+
+---
+
+18. REMOVE FROM CURRENT UI
+
+Aggressively declutter the interface.
+
+Remove or hide:
+
+Unnecessary floating plus buttons
+
+Duplicate CTA buttons
+
+Repeated "MT Exam" blocks
+
+Redundant explanatory paragraphs
+
+Excessive green rectangular buttons
+
+Decorative floating elements that don't improve usability
+
+Repeated navigation controls
+
+Empty cards with little information
+
+Excessive borders
+
+Technical implementation details visible to end users
+
+Server/API terminology from user-facing UI
+
+Long FAQ answers
+
+Redundant footer content
+
+Repeated install/download messaging
+
+
+Important
+
+The screenshots show a floating "+" button in the lower-right corner.
+
+Remove it unless it is genuinely necessary for mobile quick-add functionality.
+
+If retained on mobile, convert it into a proper accessible FAB:
+
+56px
+
+one clear action
+
+subtle shadow
+
+only visible when contextual
+
+
+
+---
+
+19. BURMESE COPY CLEANUP
+
+The existing screenshots contain several areas where the Burmese feels machine-translated, awkward, overly technical, or unnecessarily verbose.
+
+Rewrite user-facing copy into natural, concise Myanmar Burmese.
+
+General rule
+
+Do not write:
+
+> Feature description + implementation explanation + technical explanation + marketing statement
+
+
+
+Instead:
+
+> One clear benefit.
+
+
+
+Use conversational but professional Burmese.
+
+
+---
+
+20. CONTENT LANGUAGE RULE
+
+Keep technical product names in English where appropriate:
+
+AI OCR
+
+PDF
+
+KaTeX
+
+Browser
+
+Draft
+
+JSON
+
+
+But don't expose developer-oriented concepts unless necessary.
+
+For example, instead of exposing:
+
+> server-side key managed by your institution
+
+
+
+Use a user-facing explanation such as:
+
+> AI OCR အသုံးပြုနိုင်ရန် သတ်မှတ်ထားသော စနစ်အတိုင်း ချိတ်ဆက်အသုံးပြုနိုင်ပါတယ်။
+
+
+
+Technical configuration should belong in an admin/settings interface.
+
+
+---
+
+21. FOOTER
+
+Current footer is visually oversized relative to its importance.
+
+Replace with a compact footer.
+
+Include only:
+
+MT EXAM
+
+မေးခွန်းစာရွက်များကို လွယ်ကူစွာ ဖန်တီးပြီး PDF ထုတ်ပါ။
+
+© 2026 MT Exam Studio
+
+Optional:
+
+Help
+
+Privacy
+
+Contact
+
+
+Nothing else.
+
+
+---
+
+22. CARD SYSTEM
+
+Create a unified design language.
+
+Standard card
+
+Radius: 18–22px
+Padding: 24px
+Border: 1px solid #E1ECE5
+Background: #FFFFFF
+Shadow: 0 8px 30px rgba(15, 50, 30, 0.06)
+
+Small card
+
+Radius: 14–16px
+Padding: 16–20px
+
+Large feature card
+
+Radius: 24px
+Padding: 28–36px
+
+Avoid every section looking like a separate boxed rectangle.
+
+Some sections should exist directly on the page background.
+
+
+---
+
+23. BUTTON SYSTEM
+
+Create only three button levels.
+
+Primary
+
+Emerald filled:
+
+> စတင်အသုံးပြုမည်
+
+
+
+Secondary
+
+White/transparent with green border:
+
+> Preview
+
+
+
+Tertiary
+
+Text-only:
+
+> အသေးစိတ်ကြည့်မည် →
+
+
+
+Buttons:
+
+Height: 44–48px
+Horizontal padding: 18–22px
+Radius: 12–14px
+Font weight: 600
+
+For primary hero CTA, allow approximately 52px height.
+
+Never use 5–10 competing primary green buttons in one viewport.
+
+
+---
+
+24. INPUTS
+
+Modernize all inputs.
+
+Height: 44–48px
+Radius: 12px
+Border: #DCE9E1
+Background: #FFFFFF
+
+Focus state:
+
+Green border
+
+Very subtle green focus ring
+
+
+Do not use heavy black outlines.
+
+
+---
+
+25. MODALS
+
+All pop-ups should feel lightweight and modern.
+
+Modal
+
+Width: 420–620px depending on purpose
+Radius: 20–24px
+Padding: 24–32px
+Background: white
+Shadow: large but soft
+
+Overlay:
+
+rgba(10, 30, 20, 0.35)
+
+Opening animation
+
+opacity: 0 → 1
+transform: translateY(8px) → translateY(0)
+duration: 180–240ms
+easing: ease-out
+
+Closing
+
+Use the reverse animation.
+
+Never use dramatic zooms, bouncing, or slow animations.
+
+
+---
+
+26. ANIMATION SYSTEM
+
+Animations must communicate state rather than decorate the application.
+
+Standard transition
+
+150–200ms
+ease-out
+
+Card hover
+
+translateY(-2px)
+shadow slightly increases
+
+Button hover
+
+Small brightness/elevation change.
+
+Modal
+
+Fade + 8px slide.
+
+Accordion
+
+Smooth height + opacity transition.
+
+Page transition
+
+Very subtle:
+
+opacity 0 → 1
+translateY 4px → 0
+
+Avoid excessive motion.
+
+
+---
+
+27. LAZY LOADING
+
+Implement proper lazy loading throughout the application.
+
+Images
+
+Use lazy loading for non-critical images.
+
+Reserve image dimensions before loading to prevent layout shift.
+
+Use lightweight placeholders.
+
+Avoid loading every visual asset on initial page load.
+
+
+Feature illustrations/icons
+
+Load only when needed.
+
+Application screens
+
+Do not preload heavy editor/PDF/OCR functionality unnecessarily on the landing page.
+
+Use route-level/code splitting where supported.
+
+
+---
+
+28. LOADING STATES
+
+Never leave large blank white spaces while content loads.
+
+Use elegant skeleton states.
+
+Example:
+
+rounded rectangle skeleton
+soft opacity pulse
+
+Keep skeletons subtle and aligned with final layout.
+
+For AI OCR:
+
+Show:
+
+> ပုံကို စစ်ဆေးနေပါတယ်…
+
+
+
+with a lightweight progress indicator.
+
+
+---
+
+29. RESPONSIVE DESIGN
+
+The current product must be redesigned mobile-first.
+
+Mobile header
+
+Use:
+
+MT EXAM logo
+
+language selector
+
+menu button
+
+
+Do not squeeze desktop navigation into mobile.
+
+Mobile editor
+
+Convert sidebar into:
+
+Bottom sheet
+
+Drawer
+
+Question selector
+
+
+The document canvas should remain the visual focus.
+
+Mobile cards
+
+One column.
+
+Mobile buttons
+
+Important actions can become full width where appropriate.
+
+
+---
+
+30. ACCESSIBILITY
+
+Implement:
+
+Semantic HTML
+
+Keyboard navigation
+
+Visible focus states
+
+Accessible labels
+
+Proper button/input semantics
+
+ARIA only where necessary
+
+Sufficient contrast
+
+Touch targets at least ~44px
+
+Reduced-motion support
+
+
+Do not rely solely on green/red colors to communicate status.
+
+
+---
+
+31. DESIGN TOKENS
+
+Create a centralized design-token system for:
+
+Colors
+
+Typography
+
+Spacing
+
+Radius
+
+Shadows
+
+Transitions
+
+Breakpoints
+
+
+Do not scatter arbitrary CSS values throughout components.
+
+Suggested spacing scale:
+
+4
+8
+12
+16
+20
+24
+32
+40
+48
+64
+80
+96
+
+
+---
+
+32. COMPONENT TARGETS TO REFACTOR
+
+Refactor or recreate the following components based on the existing application structure:
+
+AppShell
+Header
+Logo
+Navigation
+LanguageSwitcher
+HeroSection
+FeatureGrid
+FeatureCard
+AboutSection
+FAQ
+FAQItem
+Footer
+
+ExamWorkspace
+WorkspaceHeader
+QuestionSidebar
+QuestionList
+QuestionItem
+QuestionEditor
+QuestionTypeSelector
+EditorToolbar
+DocumentCanvas
+PaperPreview
+PageSizeSelector
+SaveStatus
+PreviewPanel
+PDFExportModal
+OCRUpload
+OCRProcessingState
+OCRResult
+AddQuestionModal
+SettingsPanel
+Toast
+Modal
+LoadingSkeleton
+
+If the existing codebase uses different names, map these concepts to the existing architecture rather than unnecessarily duplicating components.
+
+
+---
+
+33. UX ARCHITECTURE
+
+The application should follow this hierarchy:
+
+LANDING
+   ↓
+START EXAM
+   ↓
+EXAM WORKSPACE
+   ↓
+CREATE QUESTIONS
+   ↓
+EDIT / REVIEW
+   ↓
+PREVIEW
+   ↓
+EXPORT PDF
+
+Every screen should have one obvious next action.
+
+Do not make users search through multiple buttons to understand what to do.
+
+
+---
+
+34. VISUAL HIERARCHY
+
+Every viewport should answer these questions immediately:
+
+1. Where am I?
+
+Clear page/document title.
+
+2. What can I do?
+
+One obvious primary action.
+
+3. What is important?
+
+Large heading + meaningful visual hierarchy.
+
+4. What should I do next?
+
+Strong CTA or contextual action.
+
+If an element does not answer one of these questions, consider removing it.
+
+
+---
+
+35. WHAT THE FINAL PRODUCT SHOULD FEEL LIKE
+
+The final interface should feel closer to a polished modern SaaS/productivity application than an educational utility website.
+
+Desired qualities:
+
+Premium
+
+Clean
+
+Calm
+
+Trustworthy
+
+Intelligent
+
+Modern
+
+Burmese-friendly
+
+Fast
+
+Spacious
+
+Purposeful
+
+
+Avoid:
+
+Old-school admin dashboard appearance
+
+Excessive green
+
+Excessive rounded rectangles
+
+Emoji-heavy UI
+
+Giant borders
+
+Dense paragraphs
+
+Tiny Burmese text
+
+Too many buttons
+
+Floating clutter
+
+Excessive shadows
+
+Over-animation
+
+Generic Bootstrap-like layouts
+
+
+
+---
+
+36. REFERENCE IMAGE INTERPRETATION
+
+Use the first provided image as the visual inspiration for:
+
+Green tonal balance
+
+Large typography
+
+Premium whitespace
+
+Soft green background
+
+Strong visual hierarchy
+
+Minimal UI
+
+Modern rounded shapes
+
+Calm visual rhythm
+
+
+Use the other provided screenshots as the source of truth for:
+
+Existing MT Exam functionality
+
+Existing information architecture
+
+Current pages
+
+Current exam editor
+
+Current OCR/PDF/KaTeX functionality
+
+Existing user flows
+
+
+Do not remove working functionality merely because its current UI is unattractive. Redesign the presentation and interaction.
+
+
+---
+
+37. IMPLEMENTATION PRIORITY
+
+Execute the redesign in this order:
+
+Phase 1 — Design foundation
+
+Color system
+
+Typography
+
+Spacing
+
+Radius
+
+Shadows
+
+Buttons
+
+Inputs
+
+Responsive breakpoints
+
+
+Phase 2 — Global shell
+
+Header
+
+Navigation
+
+Footer
+
+Mobile navigation
+
+
+Phase 3 — Landing page
+
+Hero
+
+Feature grid
+
+About
+
+FAQ
+
+CTA
+
+
+Phase 4 — Exam workspace
+
+Sidebar
+
+Document canvas
+
+Toolbar
+
+Question editor
+
+Question creation
+
+
+Phase 5 — Advanced workflows
+
+AI OCR
+
+Preview
+
+PDF export
+
+Save/Draft
+
+Validation
+
+
+Phase 6 — Polish
+
+Loading states
+
+Animations
+
+Lazy loading
+
+Accessibility
+
+Mobile optimization
+
+Empty states
+
+Error states
+
+
+
+---
+
+38. FINAL QUALITY BAR
+
+Before considering the redesign complete, visually inspect every major screen at:
+
+1440px desktop
+1280px desktop
+1024px tablet
+768px tablet
+390px mobile
+360px mobile
+
+Check specifically for:
+
+Burmese text wrapping
+
+Button overflow
+
+Card width
+
+Header crowding
+
+Editor usability
+
+Sidebar behavior
+
+Modal positioning
+
+PDF preview proportions
+
+Touch targets
+
+Horizontal scrolling
+
+Excessive whitespace
+
+Visual hierarchy
+
+
+The result should look intentionally designed, not like a collection of redesigned components.
+
+Final instruction to OpenCode
+
+Do not simply recolor the existing application. Re-architect the visual hierarchy and interaction model.
+
+The goal is a complete frontend transformation: preserve the application's useful functionality while replacing the current dense, rectangular, generic interface with a premium emerald-green educational SaaS experience inspired by the visual quality of the first reference image.
+
+Prioritize simplicity, hierarchy, whitespace, natural Burmese copy, accessibility, responsive behavior, and a clear user journey over adding more UI elements.

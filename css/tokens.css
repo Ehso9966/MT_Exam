@@ -1,0 +1,124 @@
+/* MT Exam Studio — tokens.css
+   Centralized design-token system (colors, typography, spacing, radius,
+   shadows, motion, layout, breakpoints). Load this BEFORE app.css. */
+
+:root {
+  /* ---------- Brand / emerald palette ---------- */
+  --color-primary: #168A4A;        /* Primary Emerald */
+  --color-primary-dark: #0B5D35;   /* Primary Dark */
+  --color-primary-deep: #06452A;   /* Deep Forest */
+  --color-primary-soft: #E8F7EE;   /* Soft green (selected / info) */
+  --color-primary-pale: #F3FBF6;   /* Pale green tint */
+  --color-primary-light: #E8F7EE;  /* Alias kept for existing components */
+  --color-accent: #168A4A;
+
+  /* ---------- Surfaces & borders ---------- */
+  --color-bg: #F7F9F8;             /* Page background */
+  --color-surface: #FFFFFF;
+  --color-surface-alt: #F0F8F3;    /* Surface green */
+  --color-border: #DCE9E1;
+  --color-border-strong: #C6DCCF;
+
+  /* ---------- Page background texture ---------- */
+  --bg-pastel: #EDF7EF;                 /* soft pastel green (gradient top) */
+  --bg-grid: rgba(83, 99, 90, 0.08);    /* faint light-gray grid line */
+  --bg-grid-work: rgba(83, 99, 90, 0.05); /* dimmer grid behind the editor */
+  --bg-grid-size: 32px;
+
+  /* ---------- Text ---------- */
+  --color-heading: #10261B;
+  --color-text: #53635A;
+  --color-text-muted: #87958D;
+
+  /* ---------- Feedback ---------- */
+  --color-ok: #168A4A;
+  --color-ok-bg: #E8F7EE;
+  --color-warn: #D99A24;
+  --color-warn-fill: #F6D97A;
+  --color-warn-bg: #FFF9E3;
+  --color-error: #C94A4A;
+  --color-error-fill: #F29A9A;
+  --color-error-bg: #FFF0F0;
+  --color-info: #0F766E;
+  --color-info-light: #E8F0FE;
+
+  /* ---------- Typography ---------- */
+  --font-latin: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-myanmar: 'Noto Sans Myanmar', 'Padauk', 'Pyidaungsu', 'Myanmar Text', sans-serif;
+  --font-body: 'Inter', 'Noto Sans Myanmar', 'Padauk', 'Pyidaungsu', 'Myanmar Text', sans-serif;
+  --font-mono: 'SF Mono', 'Cascadia Code', Consolas, monospace;
+
+  /* Type scale (desktop) */
+  --text-display: clamp(2rem, 3rem, 3.25rem);   /* 32–52px */
+  --text-h1: clamp(1.5rem, 2rem, 2.4rem);       /* 24–38px */
+  --text-h2: clamp(1.25rem, 1.5rem, 1.85rem);   /* 20–30px */
+  --text-h3: 1.18rem;                            /* ~19px */
+  --text-body: 1rem;                             /* 16px */
+  --text-small: .875rem;                         /* 14px */
+  --text-caption: .78rem;                        /* 12.5px */
+
+  /* ---------- Spacing scale ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 48px;
+  --space-10: 64px;
+  --space-11: 80px;
+  --space-12: 96px;
+  --spacing: 16px;
+
+  /* ---------- Radius ---------- */
+  --radius: 12px;          /* Controls / inputs */
+  --radius-sm: 8px;
+  --radius-card: 20px;
+  --radius-card-sm: 16px;
+  --radius-feature: 24px;
+  --radius-pill: 999px;
+
+  /* ---------- Shadows ---------- */
+  --shadow: 0 1px 3px rgba(15, 50, 30, 0.06);
+  --shadow-card: 0 8px 30px rgba(15, 50, 30, 0.06);
+  --shadow-lg: 0 16px 48px rgba(15, 50, 30, 0.18);
+  --shadow-focus: 0 0 0 3px rgba(22, 138, 74, 0.16);
+
+  /* ---------- Motion ---------- */
+  --duration-fast: 150ms;
+  --duration: 200ms;
+  --duration-slow: 240ms;
+  --ease: ease-out;
+  --ease-enter: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ---------- Layout ---------- */
+  --content-max: 1240px;
+  --content-pad: 40px;         /* Desktop horizontal page padding */
+  --container-sm: 900px;       /* Editor / paper surface width */
+  --grid-gap: 24px;
+  --section-gap: 64px;
+  --header-h: 64px;
+
+  /* ---------- Breakpoints ---------- */
+  --bp-tablet: 1024px;
+  --bp-mobile: 640px;
+}
+
+/* ===== Base typography ===== */
+html { font-size: 16px; }
+
+h1, h2, h3, h4, h5 { color: var(--color-heading); }
+
+::selection { background: var(--color-primary-soft); }
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Respect reduced-motion preferences globally */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
