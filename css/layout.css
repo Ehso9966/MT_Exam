@@ -74,6 +74,25 @@
   }
 }
 
+/* Hamburger menu icon (CSS-based) */
+.hamburger {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: currentColor;
+  position: relative;
+}
+.hamburger::before, .hamburger::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+}
+.hamburger::before { top: -6px; }
+.hamburger::after { top: 6px; }
+
 /* Icon buttons (subtle) */
 .app-header .icon-btn {
   width: 36px;
@@ -93,7 +112,14 @@
 .app-header .icon-btn:hover { background: var(--color-primary-soft); color: var(--color-primary-dark); }
 .app-header .icon-btn:active { transform: translateY(1px); }
 
-/* Desktop: header action buttons show text labels, not emoji icons */
+/* Icon button image sizing */
+.app-header .icon-btn .btn-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
+
+/* Desktop: header action buttons show text labels, not icon images */
 .app-header .header-actions .icon-btn:not(.nav-toggle) {
   width: auto;
   padding: 0 10px;
@@ -133,9 +159,6 @@
   border-radius: 8px;
 }
 
-/* Quick actions only live inside the mobile nav drawer */
-.nav-quick-actions { display: none; }
-
 /* ===== Mobile header nav drawer ===== */
 .app-header .nav-toggle { display: none; }
 @media (max-width: 900px) {
@@ -161,23 +184,16 @@
   .app-header .header-actions { gap: 4px; }
   .app-header .icon-btn { width: 38px; height: 38px; }
 
-  /* Icons move into the drawer; keep the row calm: logo + lang + New + menu */
-  .app-header .header-actions .icon-btn:not(.nav-toggle) { display: none; }
-
-  /* Drawer quick actions: icon + label rows separated from nav links */
-  .nav-quick-actions {
-    display: block;
-    margin: 4px 0;
-    padding: 8px 0;
-    border-top: 1px solid var(--color-border);
+  /* On mobile: show icon images, hide text labels */
+  .app-header .header-actions .icon-btn:not(.nav-toggle) {
+    width: 38px;
+    padding: 0;
+    gap: 0;
+    font-size: 0;
+    font-weight: 400;
   }
-  .nav-quick-actions .nav-link {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: .9rem;
-  }
-  .nav-quick-actions .nav-link span { flex: 1; text-align: left; }
+  .app-header .header-actions .icon-btn:not(.nav-toggle) .btn-icon { display: flex; }
+  .app-header .header-actions .icon-btn:not(.nav-toggle) .btn-label { display: none; }
 }
 
 @media (max-width: 640px) {

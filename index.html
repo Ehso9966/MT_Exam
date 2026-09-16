@@ -118,7 +118,7 @@
 <section class="seo-section" id="seoContent">
 
   <!-- Landing header -->
-  <header class="landing-header">
+  <header class="landing-header" id="landingHeader">
     <a class="logo" href="#" aria-label="MT Exam Studio">
       <span class="logo-mt">MT</span><span class="logo-exam">EXAM</span>
     </a>
@@ -126,12 +126,14 @@
       <a class="nav-link" href="#" id="landingNavHome" data-i18n="nav.home">Home</a>
       <a class="nav-link" href="#app" id="landingNavWorkspace" data-i18n="nav.workspace">Workspace</a>
       <a class="nav-link" href="features.html" data-i18n="nav.features">Features</a>
-      
+      <button type="button" class="lang-chip" id="btnSeoLang" data-i18n="ui.langToggle">မြန်မာ / EN</button>
     </nav>
     <div class="spacer"></div>
     <div class="header-actions">
-      <button type="button" class="lang-chip" id="btnSeoLang" data-i18n="ui.langToggle">မြန်မာ / EN</button>
       <a class="btn" href="#app" data-i18n="seo.ctaStart">စတင်အသုံးပြုမည်</a>
+      <button class="icon-btn nav-toggle" id="btnLandingNavMenu" aria-label="Menu" aria-expanded="false">
+        <span class="hamburger"></span>
+      </button>
     </div>
   </header>
 
@@ -246,21 +248,26 @@
       <a class="nav-link" href="#" id="navHome" data-i18n="nav.home">Home</a>
       <a class="nav-link" href="#app" id="navWorkspace" data-i18n="nav.workspace">Workspace</a>
       <a class="nav-link" href="features.html" data-i18n="nav.features">Features</a>
-      
-      <div class="nav-quick-actions" aria-label="Quick actions">
-        <button type="button" class="nav-link nav-quick" data-quick="import" data-i18n-title="ui.open" aria-label="Open exam">📂 <span data-i18n="ui.open">Open</span></button>
-        <button type="button" class="nav-link nav-quick" data-quick="download" data-i18n-title="ui.download" aria-label="Download">📥 <span data-i18n="ui.download">Download</span></button>
-        <button type="button" class="nav-link nav-quick" data-quick="help" data-i18n-title="ui.help" aria-label="How to use">❓ <span data-i18n="ui.help">Help</span></button>
-      </div>
+      <button class="lang-chip nav-link" id="btnLangToggle" data-i18n="ui.langToggle" title="Language" aria-label="Language">မြန်မာ / EN</button>
     </nav>
     <div class="spacer"></div>
-<div class="header-actions">
-      <button class="icon-btn" id="btnImportJson" data-i18n-title="ui.open" title="Open" aria-label="Open exam"><span class="btn-icon" aria-hidden="true">📂</span><span class="btn-label" data-i18n="ui.open">Open</span></button>
-      <button class="icon-btn" id="btnDownload" data-i18n-title="ui.download" title="Download" aria-label="Download"><span class="btn-icon" aria-hidden="true">📥</span><span class="btn-label" data-i18n="ui.download">Download</span></button>
-      <button class="icon-btn" id="btnHelp" data-i18n-title="ui.help" title="How to Use" aria-label="How to use"><span class="btn-icon" aria-hidden="true">❓</span><span class="btn-label" data-i18n="ui.helpLabel">Help</span></button>
-      <button class="lang-chip" id="btnLangToggle" data-i18n="ui.langToggle" title="Language" aria-label="Language">မြန်မာ / EN</button>
+    <div class="header-actions">
+      <button class="icon-btn" id="btnImportJson" data-i18n-title="ui.open" title="Open" aria-label="Open exam">
+        <img src="assets/icons/open_icon.png" class="btn-icon" alt="" aria-hidden="true">
+        <span class="btn-label" data-i18n="ui.open">Open</span>
+      </button>
+      <button class="icon-btn" id="btnDownload" data-i18n-title="ui.download" title="Download" aria-label="Download">
+        <img src="assets/icons/download_icon.png" class="btn-icon" alt="" aria-hidden="true">
+        <span class="btn-label" data-i18n="ui.download">Download</span>
+      </button>
+      <button class="icon-btn" id="btnHelp" data-i18n-title="ui.help" title="How to Use" aria-label="How to use">
+        <img src="assets/icons/HowToUse_icon.png" class="btn-icon" alt="" aria-hidden="true">
+        <span class="btn-label" data-i18n="ui.helpLabel">Help</span>
+      </button>
       <button class="btn sm" id="btnNewExam" data-i18n="ui.new" title="New" aria-label="New exam">🆕</button>
-      <button class="icon-btn nav-toggle" id="btnNavMenu" aria-label="Menu" aria-expanded="false">☰</button>
+      <button class="icon-btn nav-toggle" id="btnNavMenu" aria-label="Menu" aria-expanded="false">
+        <span class="hamburger"></span>
+      </button>
     </div>
   </header>
 

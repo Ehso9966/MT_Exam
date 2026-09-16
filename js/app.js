@@ -267,6 +267,24 @@ MT.App = (function () {
       });
     }
 
+    // Landing mobile nav drawer toggle
+    const landingNavMenu = document.getElementById('btnLandingNavMenu');
+    if (landingNavMenu) {
+      landingNavMenu.addEventListener('click', function () {
+        const header = document.getElementById('landingHeader');
+        if (!header) return;
+        const open = header.classList.toggle('nav-open');
+        landingNavMenu.setAttribute('aria-expanded', open ? 'true' : 'false');
+      });
+      document.addEventListener('click', function (e) {
+        const header = document.getElementById('landingHeader');
+        if (header && header.classList.contains('nav-open') && !header.contains(e.target)) {
+          header.classList.remove('nav-open');
+          landingNavMenu.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
     // Header nav links (app mode)
     const navHome = $('navHome');
     if (navHome) {
@@ -284,23 +302,6 @@ MT.App = (function () {
         showApp();
       });
     }
-
-    // Mobile drawer quick actions (route to the hidden header buttons, then close drawer)
-    Array.prototype.forEach.call(document.querySelectorAll('.nav-quick'), function (b) {
-      b.addEventListener('click', function () {
-        var target = {
-          'import': 'btnImportJson',
-          'download': 'btnDownload',
-          'help': 'btnHelp'
-        }[b.getAttribute('data-quick')];
-        var el = target ? document.getElementById(target) : null;
-        if (el) el.click();
-        var header = document.getElementById('appHeader');
-        if (header) header.classList.remove('nav-open');
-        var nm = document.getElementById('btnNavMenu');
-        if (nm) nm.setAttribute('aria-expanded', 'false');
-      });
-    });
 
     $('btnNewExam').addEventListener('click', function () {
       MT.Dialogs.confirm({
