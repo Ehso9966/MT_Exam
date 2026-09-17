@@ -454,8 +454,8 @@
 @media (hover: none) {
   .q-row .q-actions { opacity: 1; }
   .q-row .q-actions .btn { min-width: 44px; min-height: 44px; }
-  .btn { min-height: 48px; }
-  .btn.sm { min-height: 48px; }
+  .btn { min-height: 32px; }
+  .btn.sm { min-height: 32px; }
   .math-toolbar .math-btn { min-height: 44px; }
 }
 
