@@ -268,7 +268,7 @@ MT.App = (function () {
     }
 
     // Landing mobile nav drawer toggle
-    const landingNavMenu = document.getElementById('btnLandingNavMenu');
+    const landingNavMenu = $('btnLandingNavMenu');
     if (landingNavMenu) {
       landingNavMenu.addEventListener('click', function () {
         const header = document.getElementById('landingHeader');

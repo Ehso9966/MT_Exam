@@ -114,6 +114,7 @@
 
 /* Icon button image sizing */
 .app-header .icon-btn .btn-icon {
+  display: block;
   width: 20px;
   height: 20px;
   object-fit: contain;
@@ -153,7 +154,7 @@
   border-color: var(--color-border-strong);
 }
 .app-header .header-actions .btn.sm {
-  height: 32px;
+  height: 36px;
   padding: 0 10px;
   font-size: .78rem;
   border-radius: 8px;
@@ -192,7 +193,7 @@
     font-size: 0;
     font-weight: 400;
   }
-  .app-header .header-actions .icon-btn:not(.nav-toggle) .btn-icon { display: flex; }
+  .app-header .header-actions .icon-btn:not(.nav-toggle) .btn-icon { display: block; }
   .app-header .header-actions .icon-btn:not(.nav-toggle) .btn-label { display: none; }
 }
 
