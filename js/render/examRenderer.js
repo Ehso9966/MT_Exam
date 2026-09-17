@@ -5,10 +5,88 @@ function hasInlineMath(text) {
   return t.indexOf('$') >= 0 || t.indexOf('\\(') >= 0 || t.indexOf('\\[') >= 0;
 }
 
+// Convert common Unicode math symbols to LaTeX commands so ensureMathDelimiters()
+// can wrap them in $...$ for KaTeX rendering.
+function normalizeUnicodeMath(text) {
+  var t = String(text || '');
+  if (!t) return t;
+  // Already has delimiters — leave alone
+  if (/\$|\\\(|\\\[/.test(t)) return t;
+
+  // Handle √ specially: needs to consume the next token into \sqrt{...}
+  t = t.replace(/√\s*\(([^)]+)\)/g, '\\sqrt{$1}');
+  t = t.replace(/√\s*(\d+(?:\.\d+)?)/g, '\\sqrt{$1}');
+  t = t.replace(/√\s*([a-zA-Z])/g, '\\sqrt{$1}');
+
+  var MAP = [
+    ['∫', '\\int '],
+    ['∬', '\\iint '],
+    ['∮', '\\oint '],
+    ['∑', '\\sum '],
+    ['∏', '\\prod '],
+    ['∞', '\\infty'],
+    ['π', '\\pi'],
+    ['θ', '\\theta'],
+    ['α', '\\alpha'],
+    ['β', '\\beta'],
+    ['γ', '\\gamma'],
+    ['δ', '\\delta'],
+    ['ε', '\\epsilon'],
+    ['ζ', '\\zeta'],
+    ['η', '\\eta'],
+    ['κ', '\\kappa'],
+    ['λ', '\\lambda'],
+    ['μ', '\\mu'],
+    ['ν', '\\nu'],
+    ['ξ', '\\xi'],
+    ['ρ', '\\rho'],
+    ['σ', '\\sigma'],
+    ['τ', '\\tau'],
+    ['φ', '\\phi'],
+    ['χ', '\\chi'],
+    ['ψ', '\\psi'],
+    ['ω', '\\omega'],
+    ['±', '\\pm'],
+    ['×', '\\times'],
+    ['÷', '\\div'],
+    ['≤', '\\leq'],
+    ['≥', '\\geq'],
+    ['≠', '\\neq'],
+    ['≈', '\\approx'],
+    ['≡', '\\equiv'],
+    ['∼', '\\sim'],
+    ['→', '\\rightarrow'],
+    ['←', '\\leftarrow'],
+    ['⇒', '\\Rightarrow'],
+    ['⇐', '\\Leftarrow'],
+    ['∀', '\\forall'],
+    ['∃', '\\exists'],
+    ['¬', '\\neg'],
+    ['∂', '\\partial'],
+    ['∇', '\\nabla'],
+    ['∈', '\\in'],
+    ['∉', '\\notin'],
+    ['⊂', '\\subset'],
+    ['⊃', '\\supset'],
+    ['⊆', '\\subseteq'],
+    ['⊇', '\\supseteq'],
+    ['∪', '\\cup'],
+    ['∩', '\\cap'],
+    ['∅', '\\emptyset'],
+    ['°', '^{\\circ}'],
+    ['′', '\\prime'],
+    ['…', '\\ldots']
+  ];
+  MAP.forEach(function (pair) {
+    t = t.split(pair[0]).join(pair[1]);
+  });
+  return t;
+}
+
 // Wrap bare LaTeX commands (e.g. \vec{a}, \frac{a}{b}, \tan \phi, \sum_{i=1}^{n})
 // in $...$ so KaTeX displays them, even when the AI did not add delimiters.
 function ensureMathDelimiters(text) {
-  var t = String(text || '');
+  var t = normalizeUnicodeMath(text);
   if (!t || /\$|\\\(|\\\[/.test(t)) return t;
   var MATH_CMDS = 'vec|overrightarrow|frac|dfrac|tfrac|sqrt|cbrt|pi|theta|alpha|beta|gamma|delta|' +
     'epsilon|varepsilon|zeta|eta|iota|kappa|lambda|mu|nu|xi|rho|sigma|tau|upsilon|phi|varphi|chi|psi|omega|' +
