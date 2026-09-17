@@ -127,7 +127,7 @@ MT.Modal = (function () {
           current = null;
           currentOpts = null;
         }
-      }, 200);
+      }, 240);
     } else if (onDone) {
       onDone();
     }

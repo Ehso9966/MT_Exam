@@ -57,7 +57,12 @@ MT.Toast = (function () {
   }
 
   function dismiss(toast) {
-    if (toast.parentNode) toast.parentNode.removeChild(toast);
+    if (toast._closing) return;
+    toast._closing = true;
+    toast.classList.add('closing');
+    setTimeout(function () {
+      if (toast.parentNode) toast.parentNode.removeChild(toast);
+    }, 250);
   }
 
   function success(message, opts) { return show(message, Object.assign({ type: 'success' }, opts || {})); }

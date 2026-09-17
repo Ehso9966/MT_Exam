@@ -62,6 +62,12 @@
   width: 100%;
   max-width: 640px;
   max-height: 92vh;
+  transform: translateY(100%);
+  opacity: 0;
+}
+.modal-overlay.open .modal-box.sheet {
+  transform: translateY(0);
+  opacity: 1;
 }
 .sheet-handle {
   display: none;
@@ -258,6 +264,12 @@
 @keyframes toastSlide {
   from { transform: translateY(-20px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+.toast.closing {
+  animation: toastSlideOut .25s ease-in forwards;
+}
+@keyframes toastSlideOut {
+  to { transform: translateY(-20px); opacity: 0; }
 }
 
 /* Loading spinner */

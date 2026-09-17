@@ -46,10 +46,14 @@ MT.Tour = (function () {
   }
 
   function teardown() {
-    if (root && root.parentNode) root.parentNode.removeChild(root);
-    root = null;
-    highlight = null;
-    tooltip = null;
+    if (!root) return;
+    root.classList.add('tour-closing');
+    setTimeout(function () {
+      if (root && root.parentNode) root.parentNode.removeChild(root);
+      root = null;
+      highlight = null;
+      tooltip = null;
+    }, 300);
   }
 
   function getEl(step) {
@@ -57,26 +61,30 @@ MT.Tour = (function () {
   }
 
   function renderTooltip(step) {
-    var html = '';
-    html += '<button type="button" class="tour-close" aria-label="' + t('tour.close') + '">✕</button>';
-    html += '<div class="tour-step">' + t('tour.stepCount', { current: String(current + 1), total: String(STEPS.length) }) + '</div>';
-    html += '<div class="tour-title">' + t(step.titleKey) + '</div>';
-    html += '<div class="tour-body">' + t(step.bodyKey) + '</div>';
-    html += '<div class="tour-actions">';
-    html += '<button type="button" class="btn ghost" id="tourSkipBtn">' + t('tour.skip') + '</button>';
-    html += '<button type="button" class="btn" id="tourNextBtn">' + (current >= STEPS.length - 1 ? t('tour.done') : t('tour.next')) + '</button>';
-    html += '</div>';
-    tooltip.innerHTML = html;
+    tooltip.style.opacity = '0';
+    setTimeout(function () {
+      var html = '';
+      html += '<button type="button" class="tour-close" aria-label="' + t('tour.close') + '">✕</button>';
+      html += '<div class="tour-step">' + t('tour.stepCount', { current: String(current + 1), total: String(STEPS.length) }) + '</div>';
+      html += '<div class="tour-title">' + t(step.titleKey) + '</div>';
+      html += '<div class="tour-body">' + t(step.bodyKey) + '</div>';
+      html += '<div class="tour-actions">';
+      html += '<button type="button" class="btn ghost" id="tourSkipBtn">' + t('tour.skip') + '</button>';
+      html += '<button type="button" class="btn" id="tourNextBtn">' + (current >= STEPS.length - 1 ? t('tour.done') : t('tour.next')) + '</button>';
+      html += '</div>';
+      tooltip.innerHTML = html;
 
-    var close = tooltip.querySelector('.tour-close');
-    var skip = tooltip.querySelector('#tourSkipBtn');
-    var next = tooltip.querySelector('#tourNextBtn');
-    if (close) close.addEventListener('click', function (e) { e.stopPropagation(); stop(); });
-    if (skip) skip.addEventListener('click', function (e) { e.stopPropagation(); stop(); });
-    if (next) next.addEventListener('click', function (e) {
-      e.stopPropagation();
-      if (current >= STEPS.length - 1) stop(); else go(current + 1);
-    });
+      var close = tooltip.querySelector('.tour-close');
+      var skip = tooltip.querySelector('#tourSkipBtn');
+      var next = tooltip.querySelector('#tourNextBtn');
+      if (close) close.addEventListener('click', function (e) { e.stopPropagation(); stop(); });
+      if (skip) skip.addEventListener('click', function (e) { e.stopPropagation(); stop(); });
+      if (next) next.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (current >= STEPS.length - 1) stop(); else go(current + 1);
+      });
+      tooltip.style.opacity = '';
+    }, 200);
   }
 
   function place(step) {

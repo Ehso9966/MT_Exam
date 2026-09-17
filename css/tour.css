@@ -38,6 +38,7 @@
   padding: 16px 16px 12px;
   color: var(--color-text);
   font-family: var(--font-body);
+  transition: opacity .2s ease;
 }
 .tour-tooltip .tour-close {
   position: absolute;
@@ -82,3 +83,8 @@
   margin-top: 12px;
 }
 .tour-tooltip .tour-actions .btn { min-height: 34px; }
+
+.tour-root.tour-closing {
+  opacity: 0;
+  transition: opacity .3s ease;
+}
