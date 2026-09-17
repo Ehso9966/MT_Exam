@@ -242,7 +242,7 @@ MT.App = (function () {
   function bindHeader() {
     const $ = function (id) { return document.getElementById(id); };
 
-    const langBtn = $('btnLangToggle');
+    const langBtn = $('btnSeoLang');
     if (langBtn) langBtn.addEventListener('click', function () {
       MT.I18n.toggle();
       render();
