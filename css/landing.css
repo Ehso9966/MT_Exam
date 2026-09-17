@@ -373,9 +373,6 @@ body::after {
 @media (max-width: 640px) {
   .landing-header { padding: 0 16px; height: 64px; gap: 10px; }
 
-  /* Show hamburger on mobile */
-  .landing-header .nav-toggle { display: inline-flex; }
-
   /* Nav becomes a dropdown drawer */
   .landing-header .header-nav {
     position: absolute;

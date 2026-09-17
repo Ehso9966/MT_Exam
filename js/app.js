@@ -267,24 +267,6 @@ MT.App = (function () {
       });
     }
 
-    // Landing mobile nav drawer toggle
-    const landingNavMenu = $('btnLandingNavMenu');
-    if (landingNavMenu) {
-      landingNavMenu.addEventListener('click', function () {
-        const header = document.getElementById('landingHeader');
-        if (!header) return;
-        const open = header.classList.toggle('nav-open');
-        landingNavMenu.setAttribute('aria-expanded', open ? 'true' : 'false');
-      });
-      document.addEventListener('click', function (e) {
-        const header = document.getElementById('landingHeader');
-        if (header && header.classList.contains('nav-open') && !header.contains(e.target)) {
-          header.classList.remove('nav-open');
-          landingNavMenu.setAttribute('aria-expanded', 'false');
-        }
-      });
-    }
-
     // Header nav links (app mode)
     const navHome = $('navHome');
     if (navHome) {
