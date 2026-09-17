@@ -119,7 +119,6 @@ MT.PaperUi = (function () {
 
   /* ---------- Add-section placeholder → type picker ---------- */
   function openAddSectionModal(onDone, onClose) {
-    if (!ensureExamInfoConfirmed()) return;
     const body = document.createElement('div');
 
     function done(section) {

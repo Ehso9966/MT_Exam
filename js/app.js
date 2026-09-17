@@ -128,6 +128,12 @@ MT.App = (function () {
         try { history.replaceState(null, '', '#app'); } catch (e) {}
         updateNavActive();
         render();
+
+        if (MT.State.get().settings.examInfoConfirmed !== true) {
+          setTimeout(function () {
+            MT.PaperUi.ensureExamInfoConfirmed();
+          }, 500);
+        }
       }, 400);
     }, 300);
   }
