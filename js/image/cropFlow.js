@@ -1,7 +1,7 @@
 window.MT = window.MT || {};
 
 MT.CropFlow = (function () {
-  const CROP_MAX_TOKENS = 16384;
+  const CROP_MAX_TOKENS = 32768;
   let cropperInstance = null;
   let cropperImageUrl = null;
 

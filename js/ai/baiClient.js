@@ -8,7 +8,7 @@ MT.BaiClient = (function () {
     (typeof window !== 'undefined' && window.MT_API_BASE) ||
     'http://localhost:8000';
 
-  const MAX_TOKEN_CAP = 16384;
+  const MAX_TOKEN_CAP = 32768;
   const DEFAULT_TIMEOUT_MS = 120000;
 
   function t(key) { return MT.Utils.t(key); }
