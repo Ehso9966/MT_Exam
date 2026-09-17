@@ -1,7 +1,7 @@
 window.MT = window.MT || {};
 
 MT.CropFlow = (function () {
-  const CROP_MAX_TOKENS = 8192;
+  const CROP_MAX_TOKENS = 16384;
   let cropperInstance = null;
   let cropperImageUrl = null;
 
@@ -200,46 +200,8 @@ MT.CropFlow = (function () {
   function setupCropper(file, opts) {
     const body = document.createElement('div');
 
-    // ---- Step 1: crop tutorial guide (shown before the cropper) ----
-    const guide = document.createElement('div');
-    guide.className = 'crop-guide';
-    guide.appendChild(MT.Utils.el('p', { class: 'crop-guide-title' }, t('crop.defaultTitle')));
-
-    const status = document.createElement('div');
-    status.className = 'crop-guide-status';
-    const spinner = document.createElement('span');
-    spinner.className = 'spinner';
-    status.appendChild(spinner);
-    status.appendChild(document.createTextNode(' ' + t('crop.guideLoading')));
-    guide.appendChild(status);
-
-    const gif = document.createElement('img');
-    gif.className = 'crop-guide-gif';
-    gif.src = 'assets/toul/image_crop_tour.gif';
-    gif.alt = 'crop guide';
-    gif.loading = 'lazy';
-    gif.decoding = 'async';
-    guide.appendChild(gif);
-
-    const actions = document.createElement('div');
-    actions.className = 'crop-guide-actions';
-    const startBtn = MT.Utils.el('button', { type: 'button', class: 'btn' }, t('crop.guideStart'));
-    actions.appendChild(startBtn);
-    guide.appendChild(actions);
-    body.appendChild(guide);
-
-    gif.onload = function () {
-      status.innerHTML = '';
-      status.style.display = 'none';
-    };
-    gif.onerror = function () {
-      status.innerHTML = '';
-      status.appendChild(document.createTextNode(t('crop.guideLoadFail')));
-    };
-
-    // ---- Step 2: cropper content (hidden until Start) ----
+    // ---- Cropper content ----
     const cropWrap = document.createElement('div');
-    cropWrap.style.display = 'none';
 
     const row = document.createElement('div');
     row.style.cssText = 'display:flex;gap:12px;flex-wrap:wrap';
@@ -334,8 +296,6 @@ MT.CropFlow = (function () {
 
     cropperImageUrl = null;
     var triedBlob = false;
-    var imgReady = false;
-    var started = false;
     function tryBlob() {
       if (triedBlob || typeof file === 'string') return false;
       triedBlob = true;
@@ -346,14 +306,7 @@ MT.CropFlow = (function () {
         return true;
       } catch (e) { return false; }
     }
-    // Show the cropper (with no auto selection) once the user taps Start.
-    // Cropper is initialized only after the image has loaded so it measures
-    // the canvas at its real size.
-    function startCropper() {
-      started = true;
-      guide.style.display = 'none';
-      cropWrap.style.display = 'block';
-      if (!imgReady) { MT.Toast.warning(t('crop.openImageFirst')); return; }
+    function initCropper() {
       ensureCropperLoaded().then(function () {
         try {
           if (typeof Cropper === 'undefined') throw new Error('CROPPER_NOT_LOADED');
@@ -370,10 +323,8 @@ MT.CropFlow = (function () {
         }
       });
     }
-    startBtn.onclick = startCropper;
     imgEl.onload = function () {
-      imgReady = true;
-      if (started) startCropper();
+      initCropper();
     };
     imgEl.onerror = function () {
       if (tryBlob()) return;
