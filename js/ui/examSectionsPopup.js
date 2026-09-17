@@ -168,7 +168,7 @@ MT.ExamSectionsPopup = (function () {
   /* ---------- Section card (accordion header + optional body) ---------- */
   function renderSection(section, index, sectionNum) {
     var isOpen = expandedSection === section.id;
-    var sec = MT.Utils.el('div', { class: 'exs-section' + (isOpen ? ' open' : '') + ' st-' + section.type, draggable: 'true' });
+    var sec = MT.Utils.el('div', { class: 'exs-section' + (isOpen ? ' open' : '') + ' st-' + section.type + (section.hideTitle ? ' title-hidden' : ''), draggable: 'true' });
 
     var head = MT.Utils.el('div', { class: 'exs-header' });
     if (section.type !== 'section_a') {
@@ -194,6 +194,7 @@ MT.ExamSectionsPopup = (function () {
       e.stopPropagation();
       section.hideTitle = !section.hideTitle;
       hideTitleBtn.textContent = section.hideTitle ? t('ui.show', 'ပြ') : t('ui.hide', 'ဖျောက်');
+      sec.classList.toggle('title-hidden', section.hideTitle);
       MT.State.update(function () {});
     });
     head.appendChild(hideTitleBtn);

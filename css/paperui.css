@@ -871,6 +871,7 @@ button.section-num:hover, button.sp-num:hover { filter: brightness(.94); }
 .exs-title { flex: 1; min-width: 0; }
 .exs-count { flex-shrink: 0; font-size: .72rem; color: var(--color-text-muted); font-weight: 600; }
 .exs-hide-btn { flex-shrink: 0; }
+.exs-section.title-hidden .exs-header { background: #e0e0e0; opacity: .6; }
 .exs-del { flex-shrink: 0; }
 .exs-body {
   background: var(--color-bg);
