@@ -11,6 +11,7 @@ MT.ExamModel = (function () {
       marks: data.marks != null ? data.marks : 0,
       instruction: data.instruction || '',
       letter: data.letter || '',
+      hideTitle: data.hideTitle || false,
       questions: [],
       order: data.order || 0,
       createdAt: new Date().toISOString()

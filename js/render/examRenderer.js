@@ -268,6 +268,7 @@ MT.ExamRenderer = (function () {
   }
 
   function renderSectionTitleRow(section, settings, lang, L, index) {
+    if (section.hideTitle) return '';
     const title = sectionTitleWithIndex(section, lang, index, settings);
     if (section.type === 'section_a') {
       return '<div class="section-title-row section-a-row">' +
