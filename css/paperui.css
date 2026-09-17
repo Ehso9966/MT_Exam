@@ -870,8 +870,7 @@ button.section-num:hover, button.sp-num:hover { filter: brightness(.94); }
 }
 .exs-title { flex: 1; min-width: 0; }
 .exs-count { flex-shrink: 0; font-size: .72rem; color: var(--color-text-muted); font-weight: 600; }
-.exs-hide-btn { flex-shrink: 0; background: none; border: 0; cursor: pointer; font-size: 1rem; padding: 2px 4px; border-radius: 6px; opacity: .6; transition: opacity .15s, background .15s; }
-.exs-hide-btn:hover { opacity: 1; background: var(--color-bg); }
+.exs-hide-btn { flex-shrink: 0; }
 .exs-del { flex-shrink: 0; }
 .exs-body {
   background: var(--color-bg);

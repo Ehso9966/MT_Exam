@@ -189,13 +189,11 @@ MT.ExamSectionsPopup = (function () {
       head.appendChild(MT.Utils.el('span', { class: 'exs-count' },
         MT.Utils.toMyanmarDigits(section.questions.length) + ' 📝'));
     }
-    var hideTitleBtn = MT.Utils.el('button', { type: 'button', class: 'btn-icon exs-hide-btn', title: t('ui.hideTitle', 'ခေါင်းစဉ်ဖျောက်မည်') });
-    hideTitleBtn.innerHTML = section.hideTitle ? '👁️‍🗨️' : '👁️';
+    var hideTitleBtn = MT.Utils.el('button', { type: 'button', class: 'btn sm ghost exs-hide-btn' }, section.hideTitle ? t('ui.show', 'ပြ') : t('ui.hide', 'ဖျောက်'));
     hideTitleBtn.addEventListener('click', function (e) {
       e.stopPropagation();
       section.hideTitle = !section.hideTitle;
-      hideTitleBtn.innerHTML = section.hideTitle ? '👁️‍🗨️' : '👁️';
-      hideTitleBtn.title = section.hideTitle ? t('ui.showTitle', 'ခေါင်းစဉ်ပြမည်') : t('ui.hideTitle', 'ခေါင်းစဉ်ဖျောက်မည်');
+      hideTitleBtn.textContent = section.hideTitle ? t('ui.show', 'ပြ') : t('ui.hide', 'ဖျောက်');
       MT.State.update(function () {});
     });
     head.appendChild(hideTitleBtn);

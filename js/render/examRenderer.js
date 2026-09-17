@@ -268,15 +268,15 @@ MT.ExamRenderer = (function () {
   }
 
   function renderSectionTitleRow(section, settings, lang, L, index) {
-    if (section.hideTitle) return '';
     const title = sectionTitleWithIndex(section, lang, index, settings);
+    const hiddenClass = section.hideTitle ? ' section-title-hidden' : '';
     if (section.type === 'section_a') {
       return '<div class="section-title-row section-a-row">' +
-        '<span class="section-title section-a-title" data-section-title="' + section.id + '" title="' + t('render.clickToManage') + '">' +
+        '<span class="section-title section-a-title' + hiddenClass + '" data-section-title="' + section.id + '" title="' + t('render.clickToManage') + '">' +
         MT.Utils.escapeHtml(title) + '</span></div>';
     }
     let html = '<div class="section-title-row">';
-    html += '<span class="section-title section-title-editable" data-section-title="' + section.id + '" title="' + t('render.clickToManage') + '">' +
+    html += '<span class="section-title section-title-editable' + hiddenClass + '" data-section-title="' + section.id + '" title="' + t('render.clickToManage') + '">' +
       MT.Utils.escapeHtml(title) + '</span>';
     if (settings.showMarks !== false && section.marks) {
 html += '<span class="section-title-marks">' +

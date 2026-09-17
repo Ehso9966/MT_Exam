@@ -89,6 +89,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.paper-preview .section-title.section-title-hidden {
+  color: #999;
+  font-weight: 400;
+}
 .paper-preview .section-title-row.section-a-row {
   justify-content: center;
   text-align: center;
