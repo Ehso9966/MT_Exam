@@ -113,7 +113,9 @@
 
   /* Each on-screen page prints as one sheet */
   .paper-preview { page-break-after: always; }
-  .paper-preview:last-of-type { page-break-after: auto; }
+  #paperPreview > .preview-page-wrap:last-of-type .paper-preview {
+    page-break-after: auto;
+  }
 }
 
 .print-only { display: none; }
