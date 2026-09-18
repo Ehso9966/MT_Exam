@@ -773,39 +773,91 @@ MT.PaperUi = (function () {
   }
 
   function downloadPdf() {
-    if (typeof html2canvas === 'undefined') {
-      MT.Toast.error(t('ui.noHtml2canvas'));
+    var preview = document.getElementById('paperPreview');
+    if (!preview || !preview.querySelector('.paper-preview')) {
+      MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ'));
       return;
     }
-    if (typeof jspdf === 'undefined' && typeof window.jspdf === 'undefined') {
-      MT.Toast.error('jsPDF not loaded');
-      return;
-    }
-    const hideLoading = MT.Loading.show(t('ui.pdfPreparing', 'PDF ပြင်ဆင်နေသည်…'));
-    var canvases = [];
-    capturePages(function (c) { canvases.push(c); }).then(function (ok) {
-      hideLoading();
-      if (ok === 'nohtml2canvas') { MT.Toast.error(t('ui.noHtml2canvas')); return; }
-      if (!ok || canvases.length === 0) { MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ')); return; }
 
-      var title = getSaveName();
-      var exam = (MT.State && MT.State.get) ? MT.State.get() : null;
-      var settings = (exam && exam.settings) || {};
-      var pageSize = settings.pageSize || 'A4';
-      var ps = (MT.Constants && MT.Constants.PAGE_SIZES && MT.Constants.PAGE_SIZES[pageSize]) || MT.Constants.PAGE_SIZES.A4;
+    var title = getSaveName();
+    var exam = (MT.State && MT.State.get) ? MT.State.get() : null;
+    var settings = (exam && exam.settings) || {};
+    var pageSize = settings.pageSize || 'A4';
 
-      var jsPDFClass = (typeof jspdf !== 'undefined') ? jspdf.jsPDF : window.jspdf.jsPDF;
-      var pdf = new jsPDFClass({ orientation: ps.w > ps.h ? 'landscape' : 'portrait', unit: 'mm', format: [ps.w, ps.h] });
+    // Create a hidden iframe for native print rendering (perfect KaTeX support)
+    var iframe = document.createElement('iframe');
+    iframe.style.cssText = 'position:fixed;left:-99999px;top:0;width:0;height:0;border:0;opacity:0';
+    document.body.appendChild(iframe);
 
-      canvases.forEach(function (canvas, i) {
-        if (i > 0) pdf.addPage([ps.w, ps.h], ps.w > ps.h ? 'landscape' : 'portrait');
-        var imgData = canvas.toDataURL('image/jpeg', 0.92);
-        pdf.addImage(imgData, 'JPEG', 0, 0, ps.w, ps.h);
-      });
+    var doc = iframe.contentDocument || iframe.contentWindow.document;
+    doc.open();
+    doc.write('<!DOCTYPE html><html><head><meta charset="UTF-8">' +
+      '<title>' + MT.Utils.escapeHtml(title) + '</title>' +
+      '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">' +
+      '<style>' +
+      '@page{size:' + pageSize + ';margin:0}' +
+      'html,body{margin:0;padding:0;background:#fff;font-family:"Padauk","Pyidaungsu","Noto Sans Myanmar",sans-serif}' +
+      '.paper-preview{display:block;width:100%;padding:28px 50px;box-sizing:border-box;font-size:12pt;line-height:1.5;color:#000;background:#fff}' +
+      '.paper-preview .editable{background:transparent}' +
+      '.paper-preview .editable-empty{color:#000}' +
+      '.paper-preview .section-title-row{display:flex;justify-content:space-between;align-items:center;gap:.9em;padding-bottom:.15em;margin-bottom:.6em}' +
+      '.paper-preview .section-title{font-weight:700;font-size:.94em;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+      '.paper-preview .section-title.section-title-hidden{display:none}' +
+      '.paper-preview .section-title-marks{font-weight:600;font-size:.89em;white-space:nowrap;color:#333}' +
+      '.paper-preview .section-title-row.section-a-row{justify-content:center;text-align:center;padding:0 0 .5em;margin-bottom:0}' +
+      '.paper-preview .section-a-title{font-size:1.12em;letter-spacing:.5px}' +
+      '.paper-preview .section-instruction{font-size:.92em;margin-bottom:.45em;color:#333}' +
+      '.paper-preview .preview-question{margin-bottom:.6em;display:flex;gap:.6em;page-break-inside:avoid}' +
+      '.paper-preview .pq-number{font-weight:700;min-width:1.95em}' +
+      '.paper-preview .pq-body{flex:1}' +
+      '.paper-preview .pq-marks{font-size:.89em;font-weight:600;white-space:nowrap;color:#333}' +
+      '.paper-preview .pq-sub{display:flex;gap:.4em;margin-bottom:.15em;line-height:1.5}' +
+      '.paper-preview .pq-sub-letter{font-weight:600;white-space:nowrap}' +
+      '.paper-preview .pq-sub-text{flex:1;overflow-wrap:break-word;word-break:break-word}' +
+      '.paper-preview .pq-sub-marks{white-space:nowrap;color:#333;font-size:.9em;font-weight:600}' +
+      '.paper-preview .pq-subs{list-style:none;margin:.15em 0 0 .1em;padding:0}' +
+      '.paper-preview .pq-options{margin:.3em 0 0 2.5em}' +
+      '.paper-preview .pq-option{margin-bottom:.15em;line-height:1.5}' +
+      '.paper-preview .pq-opt-letter{font-weight:600;margin-right:.4em}' +
+      '.katex{font-size:1em!important}' +
+      '.katex-display{margin:.4em 0!important}' +
+      '.paper-preview .paper-header .sch-item{font-size:10pt}' +
+      '.paper-preview .paper-header .school-name{font-size:10.5pt}' +
+      '.paper-preview .paper-header .exam-title{font-size:17pt}' +
+      '.paper-preview .paper-header .exam-meta{font-size:10pt}' +
+      '.paper-preview .section-title{font-size:14pt}' +
+      '.paper-preview .section-title-marks{font-size:11pt}' +
+      '.paper-preview .section-instruction{font-size:11.5pt}' +
+      '.paper-preview .preview-question{font-size:12pt}' +
+      '.paper-preview .pq-options{font-size:11pt}' +
+      '.paper-preview .pq-marks{font-size:10pt}' +
+      '</style></head><body></body></html>');
+    doc.close();
 
-      pdf.save(title + '.pdf');
-      MT.Toast.success(t('ui.pdfDownloaded', 'PDF ဒေါင်းလုဒ်ပြီးပါပြီ'));
+    // Clone the paper preview into the iframe body
+    var clone = preview.cloneNode(true);
+    // Remove transforms and scaling from cloned pages
+    clone.querySelectorAll('.paper-preview').forEach(function (pg) {
+      pg.style.transform = 'none';
+      pg.style.scale = 'none';
+      pg.style.maxWidth = 'none';
     });
+    clone.querySelectorAll('.preview-page-wrap').forEach(function (w) {
+      w.style.overflow = 'visible';
+      w.style.width = 'auto';
+      w.style.height = 'auto';
+    });
+    doc.body.appendChild(clone);
+
+    // Wait for KaTeX CSS to load, then trigger print
+    setTimeout(function () {
+      iframe.contentWindow.focus();
+      iframe.contentWindow.print();
+      // Clean up iframe after print dialog closes
+      setTimeout(function () {
+        if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+      }, 1000);
+    }, 500);
   }
 
   function downloadJson() {
