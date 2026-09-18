@@ -779,118 +779,25 @@ MT.PaperUi = (function () {
       return;
     }
 
-    var title = getSaveName();
     var exam = (MT.State && MT.State.get) ? MT.State.get() : null;
     var settings = (exam && exam.settings) || {};
     var pageSize = settings.pageSize || 'A4';
 
-    // Resolve CSS variable values from the live preview
-    var firstPage = preview.querySelector('.paper-preview');
-    var mtSpacing = '1';
-    try {
-      var cs = getComputedStyle(firstPage);
-      mtSpacing = cs.getPropertyValue('--mt-spacing').trim() || '1';
-    } catch (e) { /* ignore */ }
+    // Inject @page size for the selected paper size
+    var pageStyle = document.createElement('style');
+    pageStyle.setAttribute('data-mt-print', '1');
+    pageStyle.textContent = '@media print{ @page{size:' + pageSize + ';margin:0} }';
+    document.head.appendChild(pageStyle);
 
-    // Create a hidden iframe for native print rendering (perfect KaTeX support)
-    var iframe = document.createElement('iframe');
-    iframe.style.cssText = 'position:fixed;left:-99999px;top:0;width:0;height:0;border:0;opacity:0';
-    document.body.appendChild(iframe);
-
-    var doc = iframe.contentDocument || iframe.contentWindow.document;
-    doc.open();
-    doc.write('<!DOCTYPE html><html><head><meta charset="UTF-8">' +
-      '<title>' + MT.Utils.escapeHtml(title) + '</title>' +
-      '<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">' +
-      '<style>' +
-      '@page{size:' + pageSize + ';margin:0}' +
-      'html,body{margin:0;padding:0;background:#fff;font-family:"Padauk","Pyidaungsu","Noto Sans Myanmar",sans-serif}' +
-
-      /* Paper preview base */
-      '.paper-preview{display:block;width:100%;padding:28px 50px;box-sizing:border-box;font-size:12pt;line-height:1.5;color:#000;background:#fff}' +
-      '.paper-preview .editable{background:transparent;cursor:default}' +
-      '.paper-preview .editable-empty{color:#000}' +
-
-      /* Exam header */
-      '.paper-preview .paper-header{margin-bottom:.8em}' +
-      '.paper-preview .school-line{display:flex;justify-content:space-between;align-items:center;margin-bottom:.2em}' +
-      '.paper-preview .sch-item{font-size:10pt;white-space:nowrap}' +
-      '.paper-preview .school-name{font-size:10.5pt;font-weight:600;flex:1;text-align:center;min-width:0}' +
-      '.paper-preview .exam-title{font-size:17pt;text-align:center;margin:.2em 0;font-weight:700}' +
-      '.paper-preview .exam-meta{display:flex;justify-content:center;gap:1.5em;font-size:10pt}' +
-
-      /* Section titles */
-      '.paper-preview .section-title-row{display:flex;justify-content:space-between;align-items:center;gap:.9em;padding-bottom:.15em;margin-bottom:' + mtSpacing + 'em}' +
-      '.paper-preview .section-title{font-weight:700;font-size:14pt;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
-      '.paper-preview .section-title.section-title-hidden{display:none}' +
-      '.paper-preview .section-title-marks{font-weight:600;font-size:11pt;white-space:nowrap;color:#333}' +
-      '.paper-preview .section-title-row.section-a-row{justify-content:center;text-align:center;padding:0 0 .5em;margin-bottom:0}' +
-      '.paper-preview .section-a-title{font-size:1.12em;letter-spacing:.5px}' +
-      '.paper-preview .section-instruction{font-size:11.5pt;margin-bottom:.45em;color:#333}' +
-
-      /* Questions */
-      '.paper-preview .preview-question{margin-bottom:' + (parseFloat(mtSpacing) * 0.6) + 'em;display:flex;gap:.6em;page-break-inside:avoid;font-size:12pt}' +
-      '.paper-preview .pq-number{font-weight:700;min-width:1.95em}' +
-      '.paper-preview .pq-body{flex:1}' +
-      '.paper-preview .pq-marks{font-size:10pt;font-weight:600;white-space:nowrap;color:#333}' +
-
-      /* Sub-questions */
-      '.paper-preview .pq-subs{list-style:none;margin:.15em 0 0 .1em;padding:0}' +
-      '.paper-preview .pq-sub{display:flex;gap:.4em;margin-bottom:.15em;line-height:1.5}' +
-      '.paper-preview .pq-sub-letter{font-weight:600;white-space:nowrap}' +
-      '.paper-preview .pq-sub-text{flex:1;overflow-wrap:break-word;word-break:break-word}' +
-      '.paper-preview .pq-sub-marks{white-space:nowrap;color:#333;font-size:.9em;font-weight:600}' +
-
-      /* MCQ options - flex layout */
-      '.paper-preview .pq-options{list-style:none;padding:0;margin:' + (parseFloat(mtSpacing) * 0.3) + 'em 0 0 1.5em;display:flex;flex-wrap:wrap;gap:.15em 1.35em;font-size:11pt}' +
-      '.paper-preview .pq-options li{min-width:40%}' +
-      '.paper-preview .pq-options li::before{content:counter(opt,upper-alpha) ". ";counter-increment:opt;font-weight:600}' +
-      '.paper-preview .pq-options.my li::before{content:none}' +
-      '.paper-preview .pq-options{counter-reset:opt}' +
-      '.paper-preview .pq-opt-letter{font-weight:600;margin-right:.4em}' +
-
-      /* KaTeX */
-      '.katex{font-size:1em!important}' +
-      '.katex-display{margin:.4em 0!important}' +
-
-      /* Hide UI-only elements */
-      '.add-section-slot,[data-add-section],.add-section-slot,.empty-state{display:none!important}' +
-      '</style></head><body></body></html>');
-    doc.close();
-
-    // Clone the paper preview into the iframe body
-    var clone = preview.cloneNode(true);
-
-    // Remove transforms and scaling from cloned pages
-    clone.querySelectorAll('.paper-preview').forEach(function (pg) {
-      pg.style.transform = 'none';
-      pg.style.scale = 'none';
-      pg.style.maxWidth = 'none';
-      pg.style.fontFamily = '';
-      pg.style.setProperty('--mt-spacing', mtSpacing);
-    });
-    clone.querySelectorAll('.preview-page-wrap').forEach(function (w) {
-      w.style.overflow = 'visible';
-      w.style.width = 'auto';
-      w.style.height = 'auto';
-    });
-
-    // Remove UI-only elements that should not appear in PDF
-    clone.querySelectorAll('.add-section-slot, [data-add-section], .add-section-slot, .empty-state').forEach(function (el) {
-      el.parentNode.removeChild(el);
-    });
-
-    doc.body.appendChild(clone);
-
-    // Wait for KaTeX CSS to load, then trigger print
+    // Use the browser's native print dialog — "Save as PDF" produces a
+    // pixel-perfect copy because print.css already handles every rule
+    // (hide UI, remove transforms, typography, page-breaks, etc.)
     setTimeout(function () {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-      // Clean up iframe after print dialog closes
+      window.print();
       setTimeout(function () {
-        if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+        if (pageStyle.parentNode) pageStyle.parentNode.removeChild(pageStyle);
       }, 1000);
-    }, 500);
+    }, 100);
   }
 
   function downloadJson() {
