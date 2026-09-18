@@ -44,7 +44,7 @@ class Settings(BaseSettings):
         description="Default model for chat completions.",
     )
     sargalay_max_tokens_per_image: int = Field(
-        default=384,
+        default=16384,
         ge=1,
         description="Maximum tokens allowed per document image in a chat request.",
     )
