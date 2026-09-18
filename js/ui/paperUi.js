@@ -729,16 +729,35 @@ MT.PaperUi = (function () {
           t: el.style.transform,
           w: wrap ? wrap.style.width : '',
           h: wrap ? wrap.style.height : '',
-          o: wrap ? wrap.style.overflow : ''
+          o: wrap ? wrap.style.overflow : '',
+          eh: el.style.height
         };
+        // Remove transform scaling
         el.style.transform = 'none';
         if (wrap) { wrap.style.width = ''; wrap.style.height = ''; wrap.style.overflow = 'visible'; }
+        // Inline CSS variable values so html2canvas resolves them correctly
+        try {
+          var cs = getComputedStyle(el);
+          var cssVars = ['--mt-spacing', '--paper-scale', '--qfont-size'];
+          cssVars.forEach(function (v) {
+            var val = cs.getPropertyValue(v).trim();
+            if (val) el.style.setProperty(v, val);
+          });
+        } catch (e) { /* ignore */ }
+        // Expand height to capture overflow content (long questions with sub-parts)
+        el.style.height = 'auto';
+        void el.offsetWidth;
+        // Use scrollHeight to ensure all content is included
+        var fullH = el.scrollHeight;
+        var origH = el.style.height;
+        el.style.height = fullH + 'px';
         void el.offsetWidth;
         function restore() {
           el.style.transform = orig.t;
+          el.style.height = orig.eh;
           if (wrap) { wrap.style.width = orig.w; wrap.style.height = orig.h; wrap.style.overflow = orig.o; }
         }
-        html2canvas(el, { scale: 2, backgroundColor: '#fff', useCORS: true }).then(function (c) {
+        html2canvas(el, { scale: 2, backgroundColor: '#fff', useCORS: true, height: fullH }).then(function (c) {
           restore();
           onCanvas(c, i);
           i++;
