@@ -758,57 +758,35 @@ MT.PaperUi = (function () {
       MT.Toast.error(t('ui.noHtml2canvas'));
       return;
     }
+    if (typeof jspdf === 'undefined' && typeof window.jspdf === 'undefined') {
+      MT.Toast.error('jsPDF not loaded');
+      return;
+    }
     const hideLoading = MT.Loading.show(t('ui.pdfPreparing', 'PDF ပြင်ဆင်နေသည်…'));
-    var imgs = [];
-    capturePages(function (c) { imgs.push(c.toDataURL('image/jpeg', 0.92)); }).then(function (ok) {
+    var canvases = [];
+    capturePages(function (c) { canvases.push(c); }).then(function (ok) {
       hideLoading();
       if (ok === 'nohtml2canvas') { MT.Toast.error(t('ui.noHtml2canvas')); return; }
-      if (!ok || imgs.length === 0) { MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ')); return; }
-      openPreview(imgs);
-    });
+      if (!ok || canvases.length === 0) { MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ')); return; }
 
-    function openPreview(imgs) {
       var title = getSaveName();
-      var printLabel = t('ui.print', '🖨 ပုံနှိပ်မည်');
-      // Print each captured page at exactly one physical sheet: force the
-      // chosen page size with zero margin so a full-bleed page image can never
-      // overflow onto a second (blank) sheet.
       var exam = (MT.State && MT.State.get) ? MT.State.get() : null;
       var settings = (exam && exam.settings) || {};
       var pageSize = settings.pageSize || 'A4';
-      var geo = (MT.ExamRenderer && MT.ExamRenderer.getPrintGeometry) ? MT.ExamRenderer.getPrintGeometry(pageSize, settings) : null;
-      var pxW = (geo && geo.pxW) || 794;
-      var pxH = (geo && geo.pxH) || 1123;
-      var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
-        '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-        '<title>' + title + '</title>' +
-        '<style>' +
-        'body{margin:0;background:#EEF2F0;font-family:Inter,"Noto Sans Myanmar",sans-serif}' +
-        '.bar{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:12px;padding:12px 20px;background:#0B5D35;color:#fff}' +
-        '.bar b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
-        '.bar button{padding:8px 18px;border:0;border-radius:12px;background:#168A4A;color:#fff;font-weight:700;font-size:14px;cursor:pointer}' +
-        '.bar button:hover{background:#0B5D35}' +
-        '.page{background:#fff;box-shadow:0 10px 30px rgba(15,50,30,.12);margin:16px auto;width:' + pxW + 'px;max-width:94vw}' +
-        '.page img{display:block;width:100%;height:auto}' +
-        '@media print{@page{size:' + pageSize + ';margin:0}html,body{background:#fff;margin:0}.bar{display:none}' +
-        '.page{box-shadow:none;margin:0;max-width:none;width:' + pxW + 'px;height:' + pxH + 'px;overflow:hidden;page-break-after:always}' +
-        '.page img{width:100%;height:100%;object-fit:fill}' +
-        '.page:last-child{page-break-after:auto}}' +
-        '</style></head><body>' +
-        '<div class="bar"><b>' + title + '</b><button onclick="window.print()">' + printLabel + '</button></div>';
-      imgs.forEach(function (src) {
-        html += '<div class="page"><img src="' + src + '"></div>';
+      var ps = (MT.Constants && MT.Constants.PAGE_SIZES && MT.Constants.PAGE_SIZES[pageSize]) || MT.Constants.PAGE_SIZES.A4;
+
+      var jsPDFClass = (typeof jspdf !== 'undefined') ? jspdf.jsPDF : window.jspdf.jsPDF;
+      var pdf = new jsPDFClass({ orientation: ps.w > ps.h ? 'landscape' : 'portrait', unit: 'mm', format: [ps.w, ps.h] });
+
+      canvases.forEach(function (canvas, i) {
+        if (i > 0) pdf.addPage([ps.w, ps.h], ps.w > ps.h ? 'landscape' : 'portrait');
+        var imgData = canvas.toDataURL('image/jpeg', 0.92);
+        pdf.addImage(imgData, 'JPEG', 0, 0, ps.w, ps.h);
       });
-      html += '</body></html>';
-      var win = window.open('', '_blank');
-      if (!win) {
-        MT.Toast.error(t('ui.pdfOpenFailed', 'ပုံနှိပ်ပြတင်းပေါက် ဖွင့်၍ မရပါ'));
-        return;
-      }
-      win.document.write(html);
-      win.document.close();
-      win.focus();
-    }
+
+      pdf.save(title + '.pdf');
+      MT.Toast.success(t('ui.pdfDownloaded', 'PDF ဒေါင်းလုဒ်ပြီးပါပြီ'));
+    });
   }
 
   function downloadJson() {
