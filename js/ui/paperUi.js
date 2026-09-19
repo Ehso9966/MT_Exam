@@ -741,56 +741,98 @@ MT.PaperUi = (function () {
       if (!exam) { resolve(false); return; }
       if (typeof html2canvas === 'undefined') { resolve('nohtml2canvas'); return; }
 
+      console.log('[capturePages] Starting capture, exam:', !!exam);
+
       // Build export DOM with SVG math (detached, full physical size)
       var exportDom = MT.ExamRenderer.buildExportDom(exam);
       var container = exportDom.container;
       var pageCount = exportDom.pages;
       var geo = exportDom.geo;
-      var i = 0;
-      function next() {
-        if (i >= pageCount) {
-          MT.ExamRenderer.cleanupExportDom(exportDom);
-          resolve(true);
-          return;
-        }
-        var pageWrap = container.querySelectorAll('.preview-page-wrap')[i];
-        var el = pageWrap ? pageWrap.querySelector('.paper-preview') : null;
-        if (!el) {
-          i++;
-          next();
-          return;
-        }
 
-        var w = geo.pxW;
-        var h = geo.pxH;
+      console.log('[capturePages] Export DOM built:', {pageCount, geo});
+      console.log('[capturePages] Container in DOM:', !!container.parentNode);
 
-        html2canvas(el, {
-          width: w,
-          height: h,
-          scale: 2,
-          backgroundColor: '#fff',
-          useCORS: true,
-          foreignObjectRendering: false,
-          onclone: function (clonedDoc) {
-            // No KaTeX CSS injection needed - math is already SVG
-            // Preload Myanmar fonts for cloned renderer
-            var fontLink = clonedDoc.createElement('link');
-            fontLink.rel = 'preload';
-            fontLink.href = 'https://fonts.gstatic.com/s/notosansmyanmar/v25/NotoSansMyanmar-Regular.ttf';
-            fontLink.as = 'font';
-            fontLink.crossOrigin = 'anonymous';
-            clonedDoc.head.appendChild(fontLink);
+      return new Promise(function (resolve) {
+        var i = 0;
+        function next() {
+          if (i >= pageCount) {
+            console.log('[capturePages] All pages captured, cleaning up');
+            MT.ExamRenderer.cleanupExportDom(exportDom);
+            resolve(true);
+            return;
           }
-        }).then(function (canvas) {
-          onCanvas(canvas, i);
-          i++;
-          next();
-        }).catch(function () {
-          i++;
-          next();
-        });
-      }
-      next();
+          console.log('[capturePages] Processing page', i + 1, 'of', pageCount);
+          var pageWrap = container.querySelectorAll('.preview-page-wrap')[i];
+          console.log('[capturePages] pageWrap:', !!pageWrap);
+          var el = pageWrap ? pageWrap.querySelector('.paper-preview') : null;
+          console.log('[capturePages] paper-preview element:', !!el);
+          if (!el) {
+            console.error('[capturePages] No paper-preview element for page', i);
+            i++;
+            next();
+            return;
+          }
+
+          var w = geo.pxW;
+          var h = geo.pxH;
+          console.log('[capturePages] Page dimensions:', {w, h, scale: 2});
+          
+          if (!Number.isFinite(w) || w <= 0 || !Number.isFinite(h) || h <= 0) {
+            console.error('[capturePages] Invalid dimensions:', {w, h});
+            i++;
+            next();
+            return;
+          }
+
+          // DEBUG: Log element stats before capture
+          const elRect = el.getBoundingClientRect();
+          console.log('[capturePages] Element rect:', {width: elRect.width, height: elRect.height});
+          console.log('[capturePages] Element children:', el.children?.length);
+          console.log('[capturePages] Element SVG count:', el.querySelectorAll('svg')?.length);
+
+          html2canvas(el, {
+            width: w,
+            height: h,
+            scale: 2,
+            backgroundColor: '#fff',
+            useCORS: true,
+            foreignObjectRendering: false,
+            onclone: function (clonedDoc) {
+              console.log('[capturePages] onclone called');
+              // No KaTeX CSS injection needed - math is already SVG
+              // Preload Myanmar fonts for cloned renderer
+              var fontLink = clonedDoc.createElement('link');
+              fontLink.rel = 'preload';
+              fontLink.href = 'https://fonts.gstatic.com/s/notosansmyanmar/v25/NotoSansMyanmar-Regular.ttf';
+              fontLink.as = 'font';
+              fontLink.crossOrigin = 'anonymous';
+              clonedDoc.head.appendChild(fontLink);
+            }
+          }).then(function (canvas) {
+            console.log('[capturePages] Canvas captured:', {width: canvas.width, height: canvas.height});
+            if (canvas.width === 0 || canvas.height === 0) {
+              console.error('[capturePages] CANVAS IS EMPTY (0x0)!');
+            }
+            // DEBUG: Check if canvas has content
+            const ctx = canvas.getContext('2d');
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            let nonTransparent = 0;
+            for (let j = 3; j < imageData.data.length; j += 4) {
+              if (imageData.data[j] > 0) nonTransparent++;
+            }
+            console.log('[capturePages] Non-transparent pixels:', nonTransparent, '/', imageData.data.length / 4);
+            
+            onCanvas(canvas, i);
+            i++;
+            next();
+          }).catch(function (err) {
+            console.error('[capturePages] html2canvas error:', err);
+            i++;
+            next();
+          });
+        }
+        next();
+      });
     });
   }
 
@@ -810,17 +852,22 @@ MT.PaperUi = (function () {
     var pageSize = settings.pageSize || 'A4';
     var ps = MT.Constants.PAGE_SIZES[pageSize] || MT.Constants.PAGE_SIZES.A4;
 
+    console.log('[downloadPdf] Starting PDF export, exam:', !!exam, 'pageSize:', pageSize);
     var hideLoading = MT.Loading.show(t('ui.pdfPreparing'));
     var canvases = [];
 
     preloadFonts().then(function () {
+      console.log('[downloadPdf] Fonts preloaded, starting capturePages');
       return capturePages(function (c) { canvases.push(c); });
     }).then(function (ok) {
+      console.log('[downloadPdf] capturePages returned:', ok, 'canvases:', canvases.length);
       hideLoading();
       if (!ok || canvases.length === 0) {
+        console.error('[downloadPdf] No canvases captured');
         MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ'));
         return;
       }
+      console.log('[downloadPdf] Building PDF with', canvases.length, 'canvases');
       var orientation = ps.h >= ps.w ? 'portrait' : 'landscape';
       var doc = new jspdf.jsPDF({ orientation: orientation, unit: 'mm', format: [ps.w, ps.h] });
       canvases.forEach(function (c, i) {
@@ -828,9 +875,12 @@ MT.PaperUi = (function () {
         doc.addImage(c.toDataURL('image/png'), 'PNG', 0, 0, ps.w, ps.h);
       });
       var name = getSaveName() + '.pdf';
+      console.log('[downloadPdf] Saving PDF:', name);
       doc.save(name);
+      console.log('[downloadPdf] PDF saved successfully');
       MT.Toast.success(t('ui.exportedToast', { name: name }));
-    }).catch(function () {
+    }).catch(function (err) {
+      console.error('[downloadPdf] Error:', err);
       hideLoading();
       MT.Toast.error(t('ui.noHtml2canvas'));
     });
@@ -849,18 +899,23 @@ MT.PaperUi = (function () {
       MT.Toast.error(t('ui.noHtml2canvas'));
       return;
     }
+    console.log('[downloadImage] Starting image export');
     var hideLoading = MT.Loading.show(t('ui.creatingImage'));
     var canvases = [];
 
     preloadFonts().then(function () {
+      console.log('[downloadImage] Fonts preloaded, starting capturePages');
       return capturePages(function (c) { canvases.push(c); });
     }).then(function (ok) {
+      console.log('[downloadImage] capturePages returned:', ok, 'canvases:', canvases.length);
       hideLoading();
       if (ok === 'nohtml2canvas') { MT.Toast.error(t('ui.noHtml2canvas')); return; }
       if (!ok || canvases.length === 0) {
+        console.error('[downloadImage] No canvases captured');
         MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ'));
         return;
       }
+      console.log('[downloadImage] Starting staggered PNG downloads:', canvases.length);
       var base = getSaveName();
       var names = [];
       var chain = Promise.resolve();
@@ -870,15 +925,18 @@ MT.PaperUi = (function () {
         chain = chain.then(function () {
           return new Promise(function (res) {
             setTimeout(function () {
+              console.log('[downloadImage] Downloading PNG:', name);
               c.toBlob(function (blob) { MT.Utils.download(name, blob, 'image/png'); res(); }, 'image/png');
             }, i === 0 ? 0 : 400);
           });
         });
       });
       chain.then(function () {
+        console.log('[downloadImage] All images downloaded:', names);
         MT.Toast.success(t('ui.exportedToast', { name: names.join(', ') }));
       });
-    }).catch(function () {
+    }).catch(function (err) {
+      console.error('[downloadImage] Error:', err);
       hideLoading();
       MT.Toast.error(t('ui.noHtml2canvas'));
     });

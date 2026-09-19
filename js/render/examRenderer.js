@@ -594,6 +594,7 @@ html += '<span class="section-title-marks">' +
 
   // Build export DOM (detached, full physical size, no transform) for capture.
   function buildExportDom(exam) {
+    console.log('[buildExportDom] Starting export DOM build');
     const settings = (exam && exam.settings) || MT.Constants.DEFAULT_SETTINGS;
     const pageSize = settings.pageSize || 'A4';
     const ps = MT.Constants.PAGE_SIZES[pageSize] || MT.Constants.PAGE_SIZES.A4;
@@ -601,16 +602,24 @@ html += '<span class="section-title-marks">' +
     const lang = MT.PaperLocale.getLanguage(exam.metadata.subject);
     const L = MT.PaperLocale.labels(lang);
 
+    console.log('[buildExportDom] Exam sections:', exam.sections?.length);
     const headerHtml = renderHeader(exam, lang, L);
+    console.log('[buildExportDom] Header HTML length:', headerHtml?.length);
     const units = buildUnitsSvg(exam, settings, lang, L);
+    console.log('[buildExportDom] Units built:', units?.length);
+    units.forEach((u, i) => console.log(`[buildExportDom] Unit ${i}: type=${u.type}, htmlLen=${u.html?.length}`));
     const pages = paginate(pageSize, headerHtml, units, null, settings);
+    console.log('[buildExportDom] Pages paginated:', pages?.length);
 
     const geo = getPrintGeometry(pageSize, settings);
+    console.log('[buildExportDom] Geometry:', geo);
     let html = pages.map(function (p) {
       return '<div class="preview-page-wrap" style="width:' + geo.pxW + 'px;height:' + geo.pxH + 'px">' +
         '<div class="paper-preview" style="width:' + geo.pxW + 'px;height:' + geo.pxH + 'px;padding:' + geo.pad + 'px;box-sizing:border-box;font-size:' + geo.fontSize + 'pt;--paper-scale:1;--qfont-size:' + geo.fontSize + 'pt;--mt-spacing:' + geo.spacing + ';max-width:none">' + p + '</div>' +
         '</div>';
     }).join('');
+
+    console.log('[buildExportDom] Full HTML length:', html.length);
 
     const container = document.createElement('div');
     container.innerHTML = html;
@@ -625,6 +634,31 @@ html += '<span class="section-title-marks">' +
     container.style.visibility = 'hidden';
     container.style.zIndex = '-1';
     document.body.appendChild(container);
+
+    // DEBUG: Log container stats
+    const rect = container.getBoundingClientRect();
+    console.log('[buildExportDom] Container rect:', {width: rect.width, height: rect.height, left: rect.left, top: rect.top});
+    console.log('[buildExportDom] Container scrollWidth:', container.scrollWidth, 'scrollHeight:', container.scrollHeight);
+    console.log('[buildExportDom] Container children:', container.children?.length);
+    console.log('[buildExportDom] SVG count:', container.querySelectorAll('svg')?.length);
+    console.log('[buildExportDom] Container innerText length:', container.innerText?.length);
+
+    // DEBUG: Log first SVG
+    const firstSvg = container.querySelector('svg');
+    if (firstSvg) {
+      console.log('[buildExportDom] First SVG outerHTML (first 500 chars):', firstSvg.outerHTML.slice(0, 500));
+      const svgRect = firstSvg.getBoundingClientRect();
+      console.log('[buildExportDom] First SVG rect:', svgRect);
+    } else {
+      console.log('[buildExportDom] NO SVG FOUND in export DOM');
+    }
+
+    // DEBUG: Make export DOM visible for manual inspection (temporary)
+    // container.style.visibility = 'visible';
+    // container.style.left = '0';
+    // container.style.top = '0';
+    // container.style.border = '2px solid red';
+
     return { container: container, pages: pages.length, geo: geo };
   }
 
