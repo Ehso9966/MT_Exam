@@ -712,6 +712,50 @@ MT.PaperUi = (function () {
     ], 'ui.download', 'ဒေါင်းလုဒ်', 'help.download');
   }
 
+  // Pre-fetch KaTeX CSS and all web fonts, convert to base64 data URIs so
+  // html2canvas can render KaTeX math without cross-origin font issues.
+  var _katexInlineCSS = null;
+  function preloadKatexFonts() {
+    if (_katexInlineCSS) return Promise.resolve(_katexInlineCSS);
+    return fetch('https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css')
+      .then(function (r) { return r.text(); })
+      .then(function (css) {
+        var re = /url\(([^)]+)\)/g;
+        var tasks = [];
+        var m;
+        while ((m = re.exec(css)) !== null) {
+          var raw = m[1].replace(/['"]/g, '');
+          if (raw.indexOf('data:') === 0) continue;
+          var abs = raw.charAt(0) === '/' ? 'https://cdn.jsdelivr.net' + raw
+            : 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/' + raw;
+          (function (orig, url) {
+            tasks.push(
+              fetch(url)
+                .then(function (r) { return r.blob(); })
+                .then(function (blob) {
+                  return new Promise(function (res) {
+                    var reader = new FileReader();
+                    reader.onloadend = function () { res({ orig: orig, b64: reader.result }); };
+                    reader.readAsDataURL(blob);
+                  });
+                })
+                .catch(function () { return null; })
+            );
+          })(m[0], abs);
+        }
+        return Promise.all(tasks);
+      })
+      .then(function (results) {
+        var inlined = css;
+        results.forEach(function (r) {
+          if (r) inlined = inlined.split(r.orig).join('url(' + r.b64 + ')');
+        });
+        _katexInlineCSS = inlined;
+        return inlined;
+      })
+      .catch(function () { _katexInlineCSS = ''; return ''; });
+  }
+
   // Render every on-screen preview page to a canvas at its true physical size
   // (the phone-fit transform is temporarily removed, then restored).
   // Calls onCanvas(canvas) for each page and resolves when all are done.
@@ -765,7 +809,19 @@ MT.PaperUi = (function () {
           if (wrap) { wrap.style.width = orig.w; wrap.style.height = orig.h; wrap.style.overflow = orig.o; }
           katexEls.forEach(function (k, idx) { k.style.overflow = katexOverflows[idx] || ''; });
         }
-        html2canvas(el, { scale: 2, backgroundColor: '#fff', useCORS: true, height: fullH }).then(function (c) {
+        html2canvas(el, {
+          scale: 2,
+          backgroundColor: '#fff',
+          useCORS: true,
+          height: fullH,
+          onclone: function (clonedDoc) {
+            if (!_katexInlineCSS) return;
+            var s = clonedDoc.createElement('style');
+            s.setAttribute('data-mt-katex-inline', '1');
+            s.textContent = _katexInlineCSS;
+            clonedDoc.head.appendChild(s);
+          }
+        }).then(function (c) {
           restore();
           onCanvas(c, i);
           i++;
@@ -800,35 +856,37 @@ MT.PaperUi = (function () {
     var canvases = [];
 
     setTimeout(function () {
-      capturePages(function (c) { canvases.push(c); }).then(function (ok) {
-        hideLoading();
-        if (!ok || canvases.length === 0) {
-          MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ'));
-          return;
-        }
-
-        var orientation = ps.h >= ps.w ? 'portrait' : 'landscape';
-        var doc = new jspdf.jsPDF({ orientation: orientation, unit: 'mm', format: [ps.w, ps.h] });
-
-        canvases.forEach(function (c, i) {
-          if (i > 0) doc.addPage([ps.w, ps.h], orientation);
-          var imgData = c.toDataURL('image/png');
-          var canvasAspect = c.width / c.height;
-          var pageAspect = ps.w / ps.h;
-          var imgW, imgH;
-          if (canvasAspect > pageAspect) {
-            imgW = ps.w;
-            imgH = ps.w / canvasAspect;
-          } else {
-            imgH = ps.h;
-            imgW = ps.h * canvasAspect;
+      preloadKatexFonts().then(function () {
+        capturePages(function (c) { canvases.push(c); }).then(function (ok) {
+          hideLoading();
+          if (!ok || canvases.length === 0) {
+            MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ'));
+            return;
           }
-          doc.addImage(imgData, 'PNG', 0, 0, imgW, imgH);
-        });
 
-        var name = getSaveName() + '.pdf';
-        doc.save(name);
-        MT.Toast.success(t('ui.exportedToast', { name: name }));
+          var orientation = ps.h >= ps.w ? 'portrait' : 'landscape';
+          var doc = new jspdf.jsPDF({ orientation: orientation, unit: 'mm', format: [ps.w, ps.h] });
+
+          canvases.forEach(function (c, i) {
+            if (i > 0) doc.addPage([ps.w, ps.h], orientation);
+            var imgData = c.toDataURL('image/png');
+            var canvasAspect = c.width / c.height;
+            var pageAspect = ps.w / ps.h;
+            var imgW, imgH;
+            if (canvasAspect > pageAspect) {
+              imgW = ps.w;
+              imgH = ps.w / canvasAspect;
+            } else {
+              imgH = ps.h;
+              imgW = ps.h * canvasAspect;
+            }
+            doc.addImage(imgData, 'PNG', 0, 0, imgW, imgH);
+          });
+
+          var name = getSaveName() + '.pdf';
+          doc.save(name);
+          MT.Toast.success(t('ui.exportedToast', { name: name }));
+        });
       });
     }, 50);
   }
