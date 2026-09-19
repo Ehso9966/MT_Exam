@@ -781,7 +781,7 @@ MT.PaperUi = (function () {
           scale: 2,
           backgroundColor: '#fff',
           useCORS: true,
-          foreignObjectRendering: false,
+          foreignObjectRendering: true,
           onclone: function (clonedDoc) {
             // Inject KaTeX CSS and apply export-only fixes to the CLONED document
             return new Promise(function (resolve) {
