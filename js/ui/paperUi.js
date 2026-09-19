@@ -735,6 +735,13 @@ MT.PaperUi = (function () {
         // Remove transform scaling
         el.style.transform = 'none';
         if (wrap) { wrap.style.width = ''; wrap.style.height = ''; wrap.style.overflow = 'visible'; }
+        // Ensure KaTeX tall elements (vectors, matrices) aren't clipped
+        var katexEls = el.querySelectorAll('.katex-display');
+        var katexOverflows = [];
+        katexEls.forEach(function (k) {
+          katexOverflows.push(k.style.overflow);
+          k.style.overflow = 'visible';
+        });
         // Inline CSS variable values so html2canvas resolves them correctly
         try {
           var cs = getComputedStyle(el);
@@ -756,6 +763,7 @@ MT.PaperUi = (function () {
           el.style.transform = orig.t;
           el.style.height = orig.eh;
           if (wrap) { wrap.style.width = orig.w; wrap.style.height = orig.h; wrap.style.overflow = orig.o; }
+          katexEls.forEach(function (k, idx) { k.style.overflow = katexOverflows[idx] || ''; });
         }
         html2canvas(el, { scale: 2, backgroundColor: '#fff', useCORS: true, height: fullH }).then(function (c) {
           restore();
@@ -791,26 +799,38 @@ MT.PaperUi = (function () {
     var hideLoading = MT.Loading.show(t('ui.pdfPreparing'));
     var canvases = [];
 
-    capturePages(function (c) { canvases.push(c); }).then(function (ok) {
-      hideLoading();
-      if (!ok || canvases.length === 0) {
-        MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ'));
-        return;
-      }
+    setTimeout(function () {
+      capturePages(function (c) { canvases.push(c); }).then(function (ok) {
+        hideLoading();
+        if (!ok || canvases.length === 0) {
+          MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ'));
+          return;
+        }
 
-      var orientation = ps.h >= ps.w ? 'portrait' : 'landscape';
-      var doc = new jspdf.jsPDF({ orientation: orientation, unit: 'mm', format: [ps.w, ps.h] });
+        var orientation = ps.h >= ps.w ? 'portrait' : 'landscape';
+        var doc = new jspdf.jsPDF({ orientation: orientation, unit: 'mm', format: [ps.w, ps.h] });
 
-      canvases.forEach(function (c, i) {
-        if (i > 0) doc.addPage([ps.w, ps.h], orientation);
-        var imgData = c.toDataURL('image/png');
-        doc.addImage(imgData, 'PNG', 0, 0, ps.w, ps.h);
+        canvases.forEach(function (c, i) {
+          if (i > 0) doc.addPage([ps.w, ps.h], orientation);
+          var imgData = c.toDataURL('image/png');
+          var canvasAspect = c.width / c.height;
+          var pageAspect = ps.w / ps.h;
+          var imgW, imgH;
+          if (canvasAspect > pageAspect) {
+            imgW = ps.w;
+            imgH = ps.w / canvasAspect;
+          } else {
+            imgH = ps.h;
+            imgW = ps.h * canvasAspect;
+          }
+          doc.addImage(imgData, 'PNG', 0, 0, imgW, imgH);
+        });
+
+        var name = getSaveName() + '.pdf';
+        doc.save(name);
+        MT.Toast.success(t('ui.exportedToast', { name: name }));
       });
-
-      var name = getSaveName() + '.pdf';
-      doc.save(name);
-      MT.Toast.success(t('ui.exportedToast', { name: name }));
-    });
+    }, 50);
   }
 
   function downloadJson() {
