@@ -786,6 +786,13 @@ MT.PaperUi = (function () {
           katexOverflows.push(k.style.overflow);
           k.style.overflow = 'visible';
         });
+        // Override KaTeX internal overflow:hidden so scrollHeight measures full bracket height
+        var katexInternalEls = el.querySelectorAll('.vlist, .vlist > span, .pstrut, .stretchy, .base');
+        var katexInternalOverflows = [];
+        katexInternalEls.forEach(function (k) {
+          katexInternalOverflows.push(k.style.overflow);
+          k.style.overflow = 'visible';
+        });
         // Inline CSS variable values so html2canvas resolves them correctly
         try {
           var cs = getComputedStyle(el);
@@ -799,7 +806,7 @@ MT.PaperUi = (function () {
         el.style.height = 'auto';
         void el.offsetWidth;
         // Use scrollHeight to ensure all content is included
-        var fullH = el.scrollHeight;
+        var fullH = el.scrollHeight + 60;
         var origH = el.style.height;
         el.style.height = fullH + 'px';
         void el.offsetWidth;
@@ -808,11 +815,13 @@ MT.PaperUi = (function () {
           el.style.height = orig.eh;
           if (wrap) { wrap.style.width = orig.w; wrap.style.height = orig.h; wrap.style.overflow = orig.o; }
           katexEls.forEach(function (k, idx) { k.style.overflow = katexOverflows[idx] || ''; });
+          katexInternalEls.forEach(function (k, idx) { k.style.overflow = katexInternalOverflows[idx] || ''; });
         }
         html2canvas(el, {
           scale: 2,
           backgroundColor: '#fff',
           useCORS: true,
+          foreignObjectRendering: true,
           height: fullH,
           onclone: function (clonedDoc) {
             if (!_katexInlineCSS) return;
