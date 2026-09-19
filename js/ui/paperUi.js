@@ -712,55 +712,17 @@ MT.PaperUi = (function () {
     ], 'ui.download', 'ဒေါင်းလုဒ်', 'help.download');
   }
 
-  // Pre-fetch KaTeX CSS and all web fonts, convert to base64 data URIs so
-  // html2canvas can render KaTeX math without cross-origin font issues.
-  var _katexInlineCSS = null;
-  function preloadKatexFonts() {
-    if (_katexInlineCSS) return Promise.resolve(_katexInlineCSS);
-    return fetch('https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css')
-      .then(function (r) { return r.text(); })
-      .then(function (css) {
-        var re = /url\(([^)]+)\)/g;
-        var tasks = [];
-        var m;
-        while ((m = re.exec(css)) !== null) {
-          var raw = m[1].replace(/['"]/g, '');
-          if (raw.indexOf('data:') === 0) continue;
-          var abs = raw.charAt(0) === '/' ? 'https://cdn.jsdelivr.net' + raw
-            : 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/' + raw;
-          (function (orig, url) {
-            tasks.push(
-              fetch(url)
-                .then(function (r) { return r.blob(); })
-                .then(function (blob) {
-                  return new Promise(function (res) {
-                    var reader = new FileReader();
-                    reader.onloadend = function () { res({ orig: orig, b64: reader.result }); };
-                    reader.readAsDataURL(blob);
-                  });
-                })
-                .catch(function () { return null; })
-            );
-          })(m[0], abs);
-        }
-        return Promise.all(tasks);
-      })
-      .then(function (results) {
-        var inlined = css;
-        results.forEach(function (r) {
-          if (r) inlined = inlined.split(r.orig).join('url(' + r.b64 + ')');
-        });
-        _katexInlineCSS = inlined;
-        return inlined;
-      })
-      .catch(function () { _katexInlineCSS = ''; return ''; });
+  // Wait for all web fonts (including KaTeX) to finish loading.
+  function preloadFonts() {
+    if (document.fonts && document.fonts.ready) return document.fonts.ready;
+    return Promise.resolve();
   }
 
-  // Render every on-screen preview page to a canvas at its true physical size
-  // (the phone-fit transform is temporarily removed, then restored).
-  // Calls onCanvas(canvas) for each page and resolves when all are done.
+  // Render every preview page to a canvas at its true physical size.
+  // Uses foreignObjectRendering so the browser's native layout engine
+  // handles KaTeX table layout, vertical-align, and font rendering.
   function capturePages(onCanvas) {
-    const pages = document.querySelectorAll('#paperPreview .paper-preview');
+    var pages = document.querySelectorAll('#paperPreview .paper-preview');
     return new Promise(function (resolve) {
       if (!pages.length) { resolve(false); return; }
       if (typeof html2canvas === 'undefined') { resolve('nohtml2canvas'); return; }
@@ -769,70 +731,44 @@ MT.PaperUi = (function () {
         if (i >= pages.length) { resolve(true); return; }
         var el = pages[i];
         var wrap = el.closest('.preview-page-wrap');
-        var orig = {
-          t: el.style.transform,
-          w: wrap ? wrap.style.width : '',
-          h: wrap ? wrap.style.height : '',
-          o: wrap ? wrap.style.overflow : '',
-          eh: el.style.height
-        };
-        // Remove transform scaling
+
+        // Save original styles for restore
+        var origTransform = el.style.transform;
+        var origWrapOverflow = wrap ? wrap.style.overflow : '';
+        var origWrapWidth = wrap ? wrap.style.width : '';
+        var origWrapHeight = wrap ? wrap.style.height : '';
+
+        // Remove screen-fit scaling so element is at full physical size
         el.style.transform = 'none';
-        if (wrap) { wrap.style.width = ''; wrap.style.height = ''; wrap.style.overflow = 'visible'; }
-        // Ensure KaTeX tall elements (vectors, matrices) aren't clipped
-        var katexEls = el.querySelectorAll('.katex-display');
-        var katexOverflows = [];
-        katexEls.forEach(function (k) {
-          katexOverflows.push(k.style.overflow);
-          k.style.overflow = 'visible';
-        });
-        // Override KaTeX internal overflow:hidden so scrollHeight measures full bracket height
-        var katexInternalEls = el.querySelectorAll('.vlist, .vlist > span, .pstrut, .stretchy, .base');
-        var katexInternalOverflows = [];
-        katexInternalEls.forEach(function (k) {
-          katexInternalOverflows.push(k.style.overflow);
-          k.style.overflow = 'visible';
-        });
-        // Inline CSS variable values so html2canvas resolves them correctly
-        try {
-          var cs = getComputedStyle(el);
-          var cssVars = ['--mt-spacing', '--paper-scale', '--qfont-size'];
-          cssVars.forEach(function (v) {
-            var val = cs.getPropertyValue(v).trim();
-            if (val) el.style.setProperty(v, val);
-          });
-        } catch (e) { /* ignore */ }
-        // Expand height to capture overflow content (long questions with sub-parts)
-        el.style.height = 'auto';
-        void el.offsetWidth;
-        // Use scrollHeight to ensure all content is included
-        var fullH = el.scrollHeight + 60;
-        var origH = el.style.height;
-        el.style.height = fullH + 'px';
-        void el.offsetWidth;
-        function restore() {
-          el.style.transform = orig.t;
-          el.style.height = orig.eh;
-          if (wrap) { wrap.style.width = orig.w; wrap.style.height = orig.h; wrap.style.overflow = orig.o; }
-          katexEls.forEach(function (k, idx) { k.style.overflow = katexOverflows[idx] || ''; });
-          katexInternalEls.forEach(function (k, idx) { k.style.overflow = katexInternalOverflows[idx] || ''; });
+        if (wrap) {
+          wrap.style.overflow = 'visible';
+          wrap.style.width = el.style.width || '';
+          wrap.style.height = el.style.height || '';
         }
+
+        // Read the declared full-page dimensions
+        var w = parseInt(el.style.width, 10) || el.offsetWidth;
+        var h = parseInt(el.style.height, 10) || el.offsetHeight;
+
+        function restore() {
+          el.style.transform = origTransform;
+          if (wrap) {
+            wrap.style.overflow = origWrapOverflow;
+            wrap.style.width = origWrapWidth;
+            wrap.style.height = origWrapHeight;
+          }
+        }
+
         html2canvas(el, {
-          scale: 2,
+          width: w,
+          height: h,
+          scale: 1,
           backgroundColor: '#fff',
           useCORS: true,
-          foreignObjectRendering: true,
-          height: fullH,
-          onclone: function (clonedDoc) {
-            if (!_katexInlineCSS) return;
-            var s = clonedDoc.createElement('style');
-            s.setAttribute('data-mt-katex-inline', '1');
-            s.textContent = _katexInlineCSS;
-            clonedDoc.head.appendChild(s);
-          }
-        }).then(function (c) {
+          foreignObjectRendering: true
+        }).then(function (canvas) {
           restore();
-          onCanvas(c, i);
+          onCanvas(canvas, i);
           i++;
           next();
         }).catch(function () {
@@ -864,46 +800,33 @@ MT.PaperUi = (function () {
     var hideLoading = MT.Loading.show(t('ui.pdfPreparing'));
     var canvases = [];
 
-    setTimeout(function () {
-      preloadKatexFonts().then(function () {
-        capturePages(function (c) { canvases.push(c); }).then(function (ok) {
-          hideLoading();
-          if (!ok || canvases.length === 0) {
-            MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ'));
-            return;
-          }
-
-          var orientation = ps.h >= ps.w ? 'portrait' : 'landscape';
-          var doc = new jspdf.jsPDF({ orientation: orientation, unit: 'mm', format: [ps.w, ps.h] });
-
-          canvases.forEach(function (c, i) {
-            if (i > 0) doc.addPage([ps.w, ps.h], orientation);
-            var imgData = c.toDataURL('image/png');
-            var canvasAspect = c.width / c.height;
-            var pageAspect = ps.w / ps.h;
-            var imgW, imgH;
-            if (canvasAspect > pageAspect) {
-              imgW = ps.w;
-              imgH = ps.w / canvasAspect;
-            } else {
-              imgH = ps.h;
-              imgW = ps.h * canvasAspect;
-            }
-            doc.addImage(imgData, 'PNG', 0, 0, imgW, imgH);
-          });
-
-          var name = getSaveName() + '.pdf';
-          doc.save(name);
-          MT.Toast.success(t('ui.exportedToast', { name: name }));
-        });
+    preloadFonts().then(function () {
+      return capturePages(function (c) { canvases.push(c); });
+    }).then(function (ok) {
+      hideLoading();
+      if (!ok || canvases.length === 0) {
+        MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ'));
+        return;
+      }
+      var orientation = ps.h >= ps.w ? 'portrait' : 'landscape';
+      var doc = new jspdf.jsPDF({ orientation: orientation, unit: 'mm', format: [ps.w, ps.h] });
+      canvases.forEach(function (c, i) {
+        if (i > 0) doc.addPage([ps.w, ps.h], orientation);
+        doc.addImage(c.toDataURL('image/png'), 'PNG', 0, 0, ps.w, ps.h);
       });
-    }, 50);
+      var name = getSaveName() + '.pdf';
+      doc.save(name);
+      MT.Toast.success(t('ui.exportedToast', { name: name }));
+    }).catch(function () {
+      hideLoading();
+      MT.Toast.error(t('ui.noHtml2canvas'));
+    });
   }
 
   function downloadJson() {
     if (!MT.Storage || !MT.Storage.ExportJson) return;
-    const exam = MT.State.get();
-    const name = getSaveName() + '.json';
+    var exam = MT.State.get();
+    var name = getSaveName() + '.json';
     MT.Storage.ExportJson.exportExam(exam, name);
     MT.Toast.success(t('ui.exportedToast', { name: name }));
   }
@@ -913,16 +836,20 @@ MT.PaperUi = (function () {
       MT.Toast.error(t('ui.noHtml2canvas'));
       return;
     }
-    const hideLoading = MT.Loading.show(t('ui.creatingImage'));
+    var hideLoading = MT.Loading.show(t('ui.creatingImage'));
     var canvases = [];
-    capturePages(function (c) { canvases.push(c); }).then(function (ok) {
+
+    preloadFonts().then(function () {
+      return capturePages(function (c) { canvases.push(c); });
+    }).then(function (ok) {
       hideLoading();
       if (ok === 'nohtml2canvas') { MT.Toast.error(t('ui.noHtml2canvas')); return; }
-      if (!ok || canvases.length === 0) { MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ')); return; }
-      // Export one PNG per page instead of a single very tall image.
+      if (!ok || canvases.length === 0) {
+        MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ'));
+        return;
+      }
       var base = getSaveName();
       var names = [];
-      // Stagger the downloads so mobile browsers don't block the 2nd+ ones.
       var chain = Promise.resolve();
       canvases.forEach(function (c, i) {
         var name = base + (canvases.length > 1 ? '-' + (i + 1) : '') + '.png';
@@ -938,6 +865,9 @@ MT.PaperUi = (function () {
       chain.then(function () {
         MT.Toast.success(t('ui.exportedToast', { name: names.join(', ') }));
       });
+    }).catch(function () {
+      hideLoading();
+      MT.Toast.error(t('ui.noHtml2canvas'));
     });
   }
 
