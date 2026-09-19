@@ -716,7 +716,22 @@ MT.PaperUi = (function () {
   function preloadFonts() {
     var fontReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
     var cdnReady = (window.MT_CDN && window.MT_CDN.load) ? window.MT_CDN.load() : Promise.resolve();
-    return Promise.all([fontReady, cdnReady]);
+    
+    // Explicitly load required KaTeX fonts
+    var katexFonts = [
+      '16px KaTeX_Main',
+      '16px KaTeX_Math',
+      '16px KaTeX_Size1',
+      '16px KaTeX_Size2',
+      '16px KaTeX_Size3',
+      '16px KaTeX_Size4',
+      '16px KaTeX_AMS'
+    ];
+    var katexReady = Promise.all(katexFonts.map(function (f) {
+      return document.fonts.load(f).catch(function () {});
+    }));
+    
+    return Promise.all([fontReady, cdnReady, katexReady]);
   }
 
   // Render every preview page to a canvas at its true physical size.
@@ -751,14 +766,6 @@ MT.PaperUi = (function () {
         var w = parseInt(el.style.width, 10) || el.offsetWidth;
         var h = parseInt(el.style.height, 10) || el.offsetHeight;
 
-        // Ensure KaTeX internal elements don't clip during native render
-        var katexInternalEls = el.querySelectorAll('.vlist, .vlist > span, .pstrut, .stretchy, .base');
-        var katexInternalOverflows = [];
-        katexInternalEls.forEach(function (k) {
-          katexInternalOverflows.push(k.style.overflow);
-          k.style.overflow = 'visible';
-        });
-
         function restore() {
           el.style.transform = origTransform;
           if (wrap) {
@@ -766,9 +773,6 @@ MT.PaperUi = (function () {
             wrap.style.width = origWrapWidth;
             wrap.style.height = origWrapHeight;
           }
-          katexInternalEls.forEach(function (k, idx) {
-            k.style.overflow = katexInternalOverflows[idx] || '';
-          });
         }
 
         html2canvas(el, {
@@ -779,18 +783,27 @@ MT.PaperUi = (function () {
           useCORS: true,
           foreignObjectRendering: false,
           onclone: function (clonedDoc) {
-            // Inject KaTeX CSS so math renders in cloned document
-            var link = clonedDoc.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css';
-            clonedDoc.head.appendChild(link);
-            // Preload Myanmar fonts
-            var fontLink = clonedDoc.createElement('link');
-            fontLink.rel = 'preload';
-            fontLink.href = 'https://fonts.gstatic.com/s/notosansmyanmar/v25/NotoSansMyanmar-Regular.ttf';
-            fontLink.as = 'font';
-            fontLink.crossOrigin = 'anonymous';
-            clonedDoc.head.appendChild(fontLink);
+            // Inject KaTeX CSS and apply export-only fixes to the CLONED document
+            return new Promise(function (resolve) {
+              var link = clonedDoc.createElement('link');
+              link.rel = 'stylesheet';
+              link.href = 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css';
+              link.onload = function () {
+                // Apply KaTeX overflow protection to CLONED document after CSS loads
+                var els = clonedDoc.querySelectorAll('.vlist, .vlist > span, .pstrut, .stretchy, .base');
+                els.forEach(function (el) { el.style.overflow = 'visible'; });
+                resolve();
+              };
+              link.onerror = function () { resolve(); };
+              clonedDoc.head.appendChild(link);
+              // Preload Myanmar fonts
+              var fontLink = clonedDoc.createElement('link');
+              fontLink.rel = 'preload';
+              fontLink.href = 'https://fonts.gstatic.com/s/notosansmyanmar/v25/NotoSansMyanmar-Regular.ttf';
+              fontLink.as = 'font';
+              fontLink.crossOrigin = 'anonymous';
+              clonedDoc.head.appendChild(fontLink);
+            });
           }
         }).then(function (canvas) {
           restore();
