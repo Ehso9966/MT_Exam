@@ -778,26 +778,39 @@ MT.PaperUi = (function () {
       MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ'));
       return;
     }
+    if (typeof html2canvas === 'undefined' || typeof jspdf === 'undefined') {
+      MT.Toast.error(t('ui.noHtml2canvas'));
+      return;
+    }
 
     var exam = (MT.State && MT.State.get) ? MT.State.get() : null;
     var settings = (exam && exam.settings) || {};
     var pageSize = settings.pageSize || 'A4';
+    var ps = MT.Constants.PAGE_SIZES[pageSize] || MT.Constants.PAGE_SIZES.A4;
 
-    // Inject @page size for the selected paper size
-    var pageStyle = document.createElement('style');
-    pageStyle.setAttribute('data-mt-print', '1');
-    pageStyle.textContent = '@media print{ @page{size:' + pageSize + ';margin:0} }';
-    document.head.appendChild(pageStyle);
+    var hideLoading = MT.Loading.show(t('ui.pdfPreparing'));
+    var canvases = [];
 
-    // Use the browser's native print dialog — "Save as PDF" produces a
-    // pixel-perfect copy because print.css already handles every rule
-    // (hide UI, remove transforms, typography, page-breaks, etc.)
-    setTimeout(function () {
-      window.print();
-      setTimeout(function () {
-        if (pageStyle.parentNode) pageStyle.parentNode.removeChild(pageStyle);
-      }, 1000);
-    }, 100);
+    capturePages(function (c) { canvases.push(c); }).then(function (ok) {
+      hideLoading();
+      if (!ok || canvases.length === 0) {
+        MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ'));
+        return;
+      }
+
+      var orientation = ps.h >= ps.w ? 'portrait' : 'landscape';
+      var doc = new jspdf.jsPDF({ orientation: orientation, unit: 'mm', format: [ps.w, ps.h] });
+
+      canvases.forEach(function (c, i) {
+        if (i > 0) doc.addPage([ps.w, ps.h], orientation);
+        var imgData = c.toDataURL('image/png');
+        doc.addImage(imgData, 'PNG', 0, 0, ps.w, ps.h);
+      });
+
+      var name = getSaveName() + '.pdf';
+      doc.save(name);
+      MT.Toast.success(t('ui.exportedToast', { name: name }));
+    });
   }
 
   function downloadJson() {
