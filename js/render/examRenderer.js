@@ -496,5 +496,143 @@ html += '<span class="section-title-marks">' +
     }
   }
 
-  return { renderExam, renderQuestion, renderHeader, renderSectionTitleRow, renderSectionInstruction, buildUnits, hasInlineMath, ensureMathDelimiters, editableSpan, getPrintGeometry, paginate };
+  /* ---------- Export-only rendering (SVG math for reliable PDF/PNG) ---------- */
+  function renderQuestionSvg(q, sectionId, settings, lang) {
+    const L = MT.PaperLocale.labels(lang || 'my');
+    const hasSubs = q.subQuestions && q.subQuestions.length > 0;
+    const qStyleId = (settings && settings.questionNumberStyle) || 'arabic';
+    const numText = MT.NumberStyles.display(q.number, qStyleId, lang);
+    let html = '';
+    html += '<div class="preview-question' + (q.type === 'tf' ? ' tf' : '') + '" data-qid="' + q.id + '" data-section-id="' + sectionId + '">';
+    html += '<span class="pq-number">' + numText + '</span>';
+    html += '<div class="pq-body">';
+    if (q.subQuestions && q.subQuestions.length > 0) {
+      html += renderSubQuestionsSvg(q.subQuestions, settings && settings.subQuestionNumberStyle, lang, settings);
+    } else {
+      var extractedOptions = null;
+      var extractedStem = null;
+      if (q.type === 'mcq' && (!q.options || q.options.length === 0)) {
+        var extracted = MT.ResponseParser.extractInlineOptions(q.text);
+        if (extracted && extracted.options.length >= 2) {
+          extractedOptions = extracted.options;
+          extractedStem = extracted.stem;
+        }
+      }
+      var displayText = ensureMathDelimiters(extractedStem || q.text);
+      html += '<span class="pq-text">' + MT.MathRenderer.renderTextWithMathSvg(displayText) + '</span>';
+
+      if (q.latex && q.latex.length > 0 && !hasInlineMath(displayText)) {
+        q.latex.forEach(function (l) {
+          html += MT.MathRenderer.renderBlockSvg(l);
+        });
+      }
+
+      var displayOptions = q.type === 'mcq' ? ((q.options && q.options.length > 0) ? q.options : extractedOptions) : null;
+      if (displayOptions && displayOptions.length > 0) {
+        var myLang = lang === 'my';
+        var myLetters = MT.ExamModel && MT.ExamModel.SECTION_LETTERS_MY;
+        html += '<ul class="pq-options' + (myLang ? ' my' : '') + '">';
+        displayOptions.forEach(function (opt, oi) {
+          html += '<li>' +
+            (myLang && myLetters[oi] ? '<span class="pq-opt-letter">' + myLetters[oi] + '.</span>' : '') +
+            MT.MathRenderer.renderTextWithMathSvg(ensureMathDelimiters(opt)) + '</li>';
+        });
+        html += '</ul>';
+      }
+
+      if (settings.showAnswerLines !== false && (q.type === 'long' || q.type === 'short' || q.type === 'math' || q.type === 'blank')) {
+        html += '<div class="answer-lines"><div class="line"></div>';
+        if (q.type === 'long') html += '<div class="line"></div>';
+        html += '</div>';
+      }
+    }
+
+    html += '</div>';
+    if (!hasSubs && settings.showMarks !== false && q.marks != null) {
+      html += '<span class="pq-marks">(' + MT.PaperLocale.formatMarks(lang, q.marks) + ')</span>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  function renderSubQuestionsSvg(subs, styleId, lang, settings) {
+    const sId = styleId || 'parenthesizedLettersLower';
+    const l = lang || 'my';
+    const showMarks = !settings || settings.showMarks !== false;
+    let html = '<ol class="pq-subs">';
+    (subs || []).forEach(function (sub, i) {
+      html += '<li class="pq-sub"><span class="pq-sub-letter">' + MT.NumberStyles.display(i + 1, sId, l) + '</span>' +
+        '<span class="pq-sub-text">' + MT.MathRenderer.renderTextWithMathSvg(ensureMathDelimiters(sub.text)) + '</span>';
+      if (showMarks && sub.marks != null) {
+        html += '<span class="pq-sub-marks">(' + MT.PaperLocale.formatMarks(l, sub.marks) + ')</span>';
+      }
+      html += '</li>';
+    });
+    html += '</ol>';
+    return html;
+  }
+
+  function renderSectionInstructionSvg(section, lang) {
+    return '<div class="section-instruction">' + MT.MathRenderer.renderTextWithMathSvg(ensureMathDelimiters(section.instruction)) + '</div>';
+  }
+
+  function buildUnitsSvg(exam, settings, lang, L) {
+    const units = [];
+    let sectionNum = 0;
+    exam.sections.forEach(function (section) {
+      const numIndex = section.type === 'section_a' ? null : sectionNum++;
+      units.push({ html: renderSectionTitleRow(section, settings, lang, L, numIndex), type: 'section' });
+      if (section.instruction) {
+        units.push({ html: renderSectionInstructionSvg(section, lang), type: 'instruction' });
+      }
+      section.questions.forEach(function (q) {
+        units.push({ html: renderQuestionSvg(q, section.id, settings, lang), type: 'question' });
+      });
+    });
+    return units;
+  }
+
+  // Build export DOM (detached, full physical size, no transform) for capture.
+  function buildExportDom(exam) {
+    const settings = (exam && exam.settings) || MT.Constants.DEFAULT_SETTINGS;
+    const pageSize = settings.pageSize || 'A4';
+    const ps = MT.Constants.PAGE_SIZES[pageSize] || MT.Constants.PAGE_SIZES.A4;
+    const ratio = ps.ratio;
+    const lang = MT.PaperLocale.getLanguage(exam.metadata.subject);
+    const L = MT.PaperLocale.labels(lang);
+
+    const headerHtml = renderHeader(exam, lang, L);
+    const units = buildUnitsSvg(exam, settings, lang, L);
+    const pages = paginate(pageSize, headerHtml, units, null, settings);
+
+    const geo = getPrintGeometry(pageSize, settings);
+    let html = pages.map(function (p) {
+      return '<div class="preview-page-wrap" style="width:' + geo.pxW + 'px;height:' + geo.pxH + 'px">' +
+        '<div class="paper-preview" style="width:' + geo.pxW + 'px;height:' + geo.pxH + 'px;padding:' + geo.pad + 'px;box-sizing:border-box;font-size:' + geo.fontSize + 'pt;--paper-scale:1;--qfont-size:' + geo.fontSize + 'pt;--mt-spacing:' + geo.spacing + ';max-width:none">' + p + '</div>' +
+        '</div>';
+    }).join('');
+
+    const container = document.createElement('div');
+    container.innerHTML = html;
+    // Set explicit dimensions on the container for capture
+    container.style.position = 'fixed';
+    container.style.left = '-99999px';
+    container.style.top = '0';
+    container.style.width = geo.pxW + 'px';
+    container.style.height = (geo.pxH * pages.length) + 'px';
+    container.style.overflow = 'visible';
+    container.style.pointerEvents = 'none';
+    container.style.visibility = 'hidden';
+    container.style.zIndex = '-1';
+    document.body.appendChild(container);
+    return { container: container, pages: pages.length, geo: geo };
+  }
+
+  function cleanupExportDom(dom) {
+    if (dom && dom.container && dom.container.parentNode) {
+      dom.container.parentNode.removeChild(dom.container);
+    }
+  }
+
+  return { renderExam, renderQuestion, renderHeader, renderSectionTitleRow, renderSectionInstruction, buildUnits, hasInlineMath, ensureMathDelimiters, editableSpan, getPrintGeometry, paginate, buildExportDom, cleanupExportDom };
 })();

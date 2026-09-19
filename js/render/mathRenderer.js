@@ -19,6 +19,48 @@ MT.MathRenderer = (function () {
     }
   }
 
+  // SVG versions for export — uses KaTeX's SVG output (supported in 0.16+)
+  function renderInlineSvg(latex) {
+    if (typeof katex === 'undefined') return latex;
+    try {
+      return katex.renderToString(latex, { throwOnError: false, displayMode: false, output: 'svg' });
+    } catch (e) {
+      return '<span class="mt-error">' + latex + '</span>';
+    }
+  }
+
+  function renderBlockSvg(latex) {
+    if (typeof katex === 'undefined') return latex;
+    try {
+      return katex.renderToString(latex, { throwOnError: false, displayMode: true, output: 'svg' });
+    } catch (e) {
+      return '<div class="mt-error">' + latex + '</div>';
+    }
+  }
+
+  // Render question text with math into SVG for export.
+  function renderTextWithMathSvg(text) {
+    var str = String(text || '');
+    if (!str) return '';
+    var re = /\$\$([\s\S]+?)\$\$|\\\[([\s\S]+?)\\\]|\$([^$\n]+?)\$|\\\(([\s\S]+?)\\\)/g;
+    var out = '';
+    var last = 0;
+    var m;
+    function esc(seg) {
+      return MT.Utils.escapeHtml(seg).replace(/\r?\n/g, '<br>');
+    }
+    while ((m = re.exec(str)) !== null) {
+      out += esc(str.slice(last, m.index));
+      if (m[1] !== undefined) out += renderBlockSvg(m[1]);
+      else if (m[2] !== undefined) out += renderBlockSvg(m[2]);
+      else if (m[3] !== undefined) out += looksLikeMath(m[3]) ? renderInlineSvg(m[3]) : esc(m[3]);
+      else if (m[4] !== undefined) out += renderInlineSvg(m[4]);
+      last = re.lastIndex;
+    }
+    out += esc(str.slice(last));
+    return out;
+  }
+
   function renderAllInElement(el) {
     if (typeof renderMathInElement !== 'undefined') {
       try {
@@ -65,5 +107,5 @@ MT.MathRenderer = (function () {
     return /\\|\^|_|\{/.test(s);
   }
 
-  return { renderInline, renderBlock, renderAllInElement, renderTextWithMath, looksLikeMath };
+  return { renderInline, renderBlock, renderAllInElement, renderTextWithMath, looksLikeMath, renderInlineSvg, renderBlockSvg, renderTextWithMathSvg };
 })();

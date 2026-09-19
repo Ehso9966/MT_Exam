@@ -734,46 +734,35 @@ MT.PaperUi = (function () {
     return Promise.all([fontReady, cdnReady, katexReady]);
   }
 
-  // Render every preview page to a canvas at its true physical size.
-  // Uses native html2canvas renderer (scale: 2) with onclone to inject
-  // KaTeX CSS and fonts into the cloned document, avoiding foreignObjectRendering issues.
+  // Build export DOM with SVG math and capture each page at full physical size.
   function capturePages(onCanvas) {
-    var pages = document.querySelectorAll('#paperPreview .paper-preview');
+    var exam = (MT.State && MT.State.get) ? MT.State.get() : null;
     return new Promise(function (resolve) {
-      if (!pages.length) { resolve(false); return; }
+      if (!exam) { resolve(false); return; }
       if (typeof html2canvas === 'undefined') { resolve('nohtml2canvas'); return; }
+
+      // Build export DOM with SVG math (detached, full physical size)
+      var exportDom = MT.ExamRenderer.buildExportDom(exam);
+      var container = exportDom.container;
+      var pageCount = exportDom.pages;
+      var geo = exportDom.geo;
       var i = 0;
       function next() {
-        if (i >= pages.length) { resolve(true); return; }
-        var el = pages[i];
-        var wrap = el.closest('.preview-page-wrap');
-
-        // Save original styles for restore
-        var origTransform = el.style.transform;
-        var origWrapOverflow = wrap ? wrap.style.overflow : '';
-        var origWrapWidth = wrap ? wrap.style.width : '';
-        var origWrapHeight = wrap ? wrap.style.height : '';
-
-        // Remove screen-fit scaling so element is at full physical size
-        el.style.transform = 'none';
-        if (wrap) {
-          wrap.style.overflow = 'visible';
-          wrap.style.width = el.style.width || '';
-          wrap.style.height = el.style.height || '';
+        if (i >= pageCount) {
+          MT.ExamRenderer.cleanupExportDom(exportDom);
+          resolve(true);
+          return;
+        }
+        var pageWrap = container.querySelectorAll('.preview-page-wrap')[i];
+        var el = pageWrap ? pageWrap.querySelector('.paper-preview') : null;
+        if (!el) {
+          i++;
+          next();
+          return;
         }
 
-        // Read the declared full-page dimensions
-        var w = parseInt(el.style.width, 10) || el.offsetWidth;
-        var h = parseInt(el.style.height, 10) || el.offsetHeight;
-
-        function restore() {
-          el.style.transform = origTransform;
-          if (wrap) {
-            wrap.style.overflow = origWrapOverflow;
-            wrap.style.width = origWrapWidth;
-            wrap.style.height = origWrapHeight;
-          }
-        }
+        var w = geo.pxW;
+        var h = geo.pxH;
 
         html2canvas(el, {
           width: w,
@@ -781,37 +770,22 @@ MT.PaperUi = (function () {
           scale: 2,
           backgroundColor: '#fff',
           useCORS: true,
-          foreignObjectRendering: true,
+          foreignObjectRendering: false,
           onclone: function (clonedDoc) {
-            // Inject KaTeX CSS and apply export-only fixes to the CLONED document
-            return new Promise(function (resolve) {
-              var link = clonedDoc.createElement('link');
-              link.rel = 'stylesheet';
-              link.href = 'https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css';
-              link.onload = function () {
-                // Apply KaTeX overflow protection to CLONED document after CSS loads
-                var els = clonedDoc.querySelectorAll('.vlist, .vlist > span, .pstrut, .stretchy, .base');
-                els.forEach(function (el) { el.style.overflow = 'visible'; });
-                resolve();
-              };
-              link.onerror = function () { resolve(); };
-              clonedDoc.head.appendChild(link);
-              // Preload Myanmar fonts
-              var fontLink = clonedDoc.createElement('link');
-              fontLink.rel = 'preload';
-              fontLink.href = 'https://fonts.gstatic.com/s/notosansmyanmar/v25/NotoSansMyanmar-Regular.ttf';
-              fontLink.as = 'font';
-              fontLink.crossOrigin = 'anonymous';
-              clonedDoc.head.appendChild(fontLink);
-            });
+            // No KaTeX CSS injection needed - math is already SVG
+            // Preload Myanmar fonts for cloned renderer
+            var fontLink = clonedDoc.createElement('link');
+            fontLink.rel = 'preload';
+            fontLink.href = 'https://fonts.gstatic.com/s/notosansmyanmar/v25/NotoSansMyanmar-Regular.ttf';
+            fontLink.as = 'font';
+            fontLink.crossOrigin = 'anonymous';
+            clonedDoc.head.appendChild(fontLink);
           }
         }).then(function (canvas) {
-          restore();
           onCanvas(canvas, i);
           i++;
           next();
         }).catch(function () {
-          restore();
           i++;
           next();
         });
