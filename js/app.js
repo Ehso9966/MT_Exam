@@ -6,39 +6,45 @@ MT.App = (function () {
   function digits(n) { return MT.Utils.digits(n); }
 
   function init() {
-    MT.I18n.init();
-    MT.I18n.applyDOM();
-    document.title = t('appTitle');
+    try {
+      MT.I18n.init();
+      MT.I18n.applyDOM();
+      document.title = t('appTitle');
 
-    if (MT.Storage.LocalDraft.hasDraft()) {
-      const draft = MT.Storage.LocalDraft.load();
-      if (draft) {
-        MT.State.load(draft);
+      if (MT.Storage.LocalDraft.hasDraft()) {
+        const draft = MT.Storage.LocalDraft.load();
+        if (draft) {
+          MT.State.load(draft);
+        } else {
+          MT.State.reset();
+        }
       } else {
         MT.State.reset();
       }
-    } else {
-      MT.State.reset();
+
+      // Default subject = မြန်မာ
+      if (!MT.State.get().metadata.subject) {
+        MT.State.setMetadata({ subject: 'မြန်မာ' });
+      }
+
+      bindHeader();
+      bindSidebar();
+      bindStatusStrip();
+      bindFooter();
+      bindSeoLang();
+      bindAppBack();
+      bindModeToggle();
+      applyMode();
+
+      MT.State.subscribe(onStateChange);
+      MT.PaperUi.init();
+      render();
+    } catch (e) {
+      console.error('[init] Initialization error:', e);
+    } finally {
+      reveal();
     }
 
-    // Default subject = မြန်မာ
-    if (!MT.State.get().metadata.subject) {
-      MT.State.setMetadata({ subject: 'မြန်မာ' });
-    }
-
-    bindHeader();
-    bindSidebar();
-    bindStatusStrip();
-    bindFooter();
-    bindSeoLang();
-    bindAppBack();
-    bindModeToggle();
-    applyMode();
-
-    MT.State.subscribe(onStateChange);
-    MT.PaperUi.init();
-    render();
-    reveal();
     if (MT.Accordion) MT.Accordion.init();
     window.addEventListener('error', function () { reveal(); });
     if (document.fonts && document.fonts.ready) {
