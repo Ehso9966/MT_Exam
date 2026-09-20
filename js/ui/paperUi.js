@@ -792,7 +792,6 @@ MT.PaperUi = (function () {
         console.log('[capturePages] Export DOM built:', {pageCount, geo});
         console.log('[capturePages] Container in DOM:', !!container.parentNode);
 
-        return new Promise(function (resolve) {
         var i = 0;
         function next() {
           if (i >= pageCount) {
@@ -824,12 +823,6 @@ MT.PaperUi = (function () {
             return;
           }
 
-          // DEBUG: Log element stats before capture
-          const elRect = el.getBoundingClientRect();
-          console.log('[capturePages] Element rect:', {width: elRect.width, height: elRect.height});
-          console.log('[capturePages] Element children:', el.children?.length);
-          console.log('[capturePages] Element SVG count:', el.querySelectorAll('svg')?.length);
-
           var canvasPromise = html2canvas(el, {
             width: w,
             height: h,
@@ -838,9 +831,6 @@ MT.PaperUi = (function () {
             useCORS: true,
             foreignObjectRendering: false,
             onclone: function (clonedDoc) {
-              console.log('[capturePages] onclone called');
-              // No KaTeX CSS injection needed - math is already SVG
-              // Preload Myanmar fonts for cloned renderer
               var fontLink = clonedDoc.createElement('link');
               fontLink.rel = 'preload';
               fontLink.href = 'https://fonts.gstatic.com/s/notosansmyanmar/v25/NotoSansMyanmar-Regular.ttf';
@@ -850,26 +840,14 @@ MT.PaperUi = (function () {
             }
           });
 
-          var timeoutPromise = new Promise(function (_, reject) {
+          var pageTimeout = new Promise(function (_, reject) {
             setTimeout(function () {
               reject(new Error('EXPORT TIMEOUT after 30000ms: html2canvas page ' + (i + 1)));
             }, 30000);
           });
 
-          Promise.race([canvasPromise, timeoutPromise]).then(function (canvas) {
+          Promise.race([canvasPromise, pageTimeout]).then(function (canvas) {
             console.log('[capturePages] Canvas captured:', {width: canvas.width, height: canvas.height});
-            if (canvas.width === 0 || canvas.height === 0) {
-              console.error('[capturePages] CANVAS IS EMPTY (0x0)!');
-            }
-            // DEBUG: Check if canvas has content
-            const ctx = canvas.getContext('2d');
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            let nonTransparent = 0;
-            for (let j = 3; j < imageData.data.length; j += 4) {
-              if (imageData.data[j] > 0) nonTransparent++;
-            }
-            console.log('[capturePages] Non-transparent pixels:', nonTransparent, '/', imageData.data.length / 4);
-            
             onCanvas(canvas, i);
             i++;
             next();
@@ -882,7 +860,6 @@ MT.PaperUi = (function () {
         next();
       });
     });
-  });
   }
 
   function downloadPdf() {
@@ -932,7 +909,7 @@ MT.PaperUi = (function () {
         MT.Toast.success(t('ui.exportedToast', { name: name }));
       }).catch(function (err) {
         console.error('[downloadPdf] Error:', err);
-        MT.Toast.error(t('ui.noHtml2canvas'));
+        MT.Toast.error(err.message || t('ui.noHtml2canvas'));
       }).finally(function () {
         console.log('[downloadPdf] finally - hiding loading');
         hideLoading();
@@ -940,7 +917,7 @@ MT.PaperUi = (function () {
     } catch (err) {
       console.error('[downloadPdf] Synchronous error:', err);
       hideLoading();
-      MT.Toast.error(t('ui.noHtml2canvas'));
+      MT.Toast.error(err.message || t('ui.noHtml2canvas'));
     }
   }
 
@@ -997,7 +974,7 @@ MT.PaperUi = (function () {
         MT.Toast.success(t('ui.exportedToast', { name: names.join(', ') }));
       }).catch(function (err) {
         console.error('[downloadImage] Error:', err);
-        MT.Toast.error(t('ui.noHtml2canvas'));
+        MT.Toast.error(err.message || t('ui.noHtml2canvas'));
       }).finally(function () {
         console.log('[downloadImage] finally - hiding loading');
         hideLoading();
@@ -1005,7 +982,7 @@ MT.PaperUi = (function () {
     } catch (err) {
       console.error('[downloadImage] Synchronous error:', err);
       hideLoading();
-      MT.Toast.error(t('ui.noHtml2canvas'));
+      MT.Toast.error(err.message || t('ui.noHtml2canvas'));
     }
 }
 
