@@ -866,7 +866,7 @@ MT.PaperUi = (function () {
         next();
       });
     });
-  }
+  };
 
   function downloadPdf() {
     var preview = document.getElementById('paperPreview');
