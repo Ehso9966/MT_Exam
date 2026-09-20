@@ -770,9 +770,6 @@ MT.PaperUi = (function () {
       if (!exam) { resolve(false); return; }
       if (typeof html2canvas === 'undefined') { resolve('nohtml2canvas'); return; }
 
-      console.log('[capturePages] Starting capture, exam:', !!exam);
-
-      // Build export DOM with SVG math (detached, full physical size) - with timeout
       var buildPromise = new Promise(function(resolve, reject) {
         try {
           var result = MT.ExamRenderer.buildExportDom(exam);
@@ -789,24 +786,16 @@ MT.PaperUi = (function () {
         var pageCount = exportDom.pages;
         var geo = exportDom.geo;
 
-        console.log('[capturePages] Export DOM built:', {pageCount, geo});
-        console.log('[capturePages] Container in DOM:', !!container.parentNode);
-
         var i = 0;
         function next() {
           if (i >= pageCount) {
-            console.log('[capturePages] All pages captured, cleaning up');
             MT.ExamRenderer.cleanupExportDom(exportDom);
             resolve(true);
             return;
           }
-          console.log('[capturePages] Processing page', i + 1, 'of', pageCount);
           var pageWrap = container.querySelectorAll('.preview-page-wrap')[i];
-          console.log('[capturePages] pageWrap:', !!pageWrap);
           var el = pageWrap ? pageWrap.querySelector('.paper-preview') : null;
-          console.log('[capturePages] paper-preview element:', !!el);
           if (!el) {
-            console.error('[capturePages] No paper-preview element for page', i);
             i++;
             next();
             return;
@@ -814,10 +803,7 @@ MT.PaperUi = (function () {
 
           var w = geo.pxW;
           var h = geo.pxH;
-          console.log('[capturePages] Page dimensions:', {w, h, scale: 2});
-          
           if (!Number.isFinite(w) || w <= 0 || !Number.isFinite(h) || h <= 0) {
-            console.error('[capturePages] Invalid dimensions:', {w, h});
             i++;
             next();
             return;
@@ -847,7 +833,6 @@ MT.PaperUi = (function () {
           });
 
           Promise.race([canvasPromise, pageTimeout]).then(function (canvas) {
-            console.log('[capturePages] Canvas captured:', {width: canvas.width, height: canvas.height});
             onCanvas(canvas, i);
             i++;
             next();
