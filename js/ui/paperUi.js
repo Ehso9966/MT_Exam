@@ -875,10 +875,6 @@ MT.PaperUi = (function () {
       MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ'));
       return;
     }
-    if (typeof html2canvas === 'undefined' || typeof jspdf === 'undefined') {
-      MT.Toast.error(t('ui.noHtml2canvas'));
-      return;
-    }
 
     var exam = (MT.State && MT.State.get) ? MT.State.get() : null;
     var settings = (exam && exam.settings) || {};
@@ -892,6 +888,10 @@ MT.PaperUi = (function () {
     try {
       var fontsPromise = withTimeout(preloadFonts(), 30000, 'preloadFonts');
       fontsPromise.then(function () {
+        if (typeof html2canvas === 'undefined' || typeof jspdf === 'undefined') {
+          MT.Toast.error(t('ui.noHtml2canvas'));
+          return;
+        }
         console.log('[downloadPdf] Fonts preloaded, starting capturePages');
         var capturePromise = withTimeout(capturePages(function (c) { canvases.push(c); }), 60000, 'capturePages');
         return capturePromise;
@@ -937,10 +937,6 @@ MT.PaperUi = (function () {
   }
 
   function downloadImage() {
-    if (typeof html2canvas === 'undefined') {
-      MT.Toast.error(t('ui.noHtml2canvas'));
-      return;
-    }
     console.log('[downloadImage] Starting image export');
     var hideLoading = MT.Loading.show(t('ui.creatingImage'));
     var canvases = [];
@@ -948,6 +944,10 @@ MT.PaperUi = (function () {
     try {
       var fontsPromise = withTimeout(preloadFonts(), 30000, 'preloadFonts');
       fontsPromise.then(function () {
+        if (typeof html2canvas === 'undefined') {
+          MT.Toast.error(t('ui.noHtml2canvas'));
+          return;
+        }
         console.log('[downloadImage] Fonts preloaded, starting capturePages');
         var capturePromise = withTimeout(capturePages(function (c) { canvases.push(c); }), 60000, 'capturePages');
         return capturePromise;
