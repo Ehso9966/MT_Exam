@@ -4,6 +4,18 @@ MT.PaperUi = (function () {
   function t(key, vars) { return MT.Utils.t(key, vars); }
   function digits(n) { return MT.Utils.digits(n); }
 
+  // --- Timeout helper for debugging hangs ---
+  function withTimeout(promise, ms, name) {
+    return Promise.race([
+      promise,
+      new Promise(function (_, reject) {
+        setTimeout(function () {
+          reject(new Error('EXPORT TIMEOUT after ' + ms + 'ms: ' + name));
+        }, ms);
+      })
+    ]);
+  }
+
   function init() {
     const preview = document.getElementById('paperPreview');
     if (preview) preview.addEventListener('click', handlePaperClick);
@@ -743,16 +755,27 @@ MT.PaperUi = (function () {
 
       console.log('[capturePages] Starting capture, exam:', !!exam);
 
-      // Build export DOM with SVG math (detached, full physical size)
-      var exportDom = MT.ExamRenderer.buildExportDom(exam);
-      var container = exportDom.container;
-      var pageCount = exportDom.pages;
-      var geo = exportDom.geo;
+      // Build export DOM with SVG math (detached, full physical size) - with timeout
+      var buildPromise = new Promise(function(resolve, reject) {
+        try {
+          var result = MT.ExamRenderer.buildExportDom(exam);
+          resolve(result);
+        } catch (err) {
+          reject(err);
+        }
+      });
+      var timeoutPromise = new Promise(function(_, reject) {
+        setTimeout(function() { reject(new Error('EXPORT TIMEOUT after 30000ms: buildExportDom')); }, 30000);
+      });
+      Promise.race([buildPromise, timeoutPromise]).then(function (exportDom) {
+        var container = exportDom.container;
+        var pageCount = exportDom.pages;
+        var geo = exportDom.geo;
 
-      console.log('[capturePages] Export DOM built:', {pageCount, geo});
-      console.log('[capturePages] Container in DOM:', !!container.parentNode);
+        console.log('[capturePages] Export DOM built:', {pageCount, geo});
+        console.log('[capturePages] Container in DOM:', !!container.parentNode);
 
-      return new Promise(function (resolve) {
+        return new Promise(function (resolve) {
         var i = 0;
         function next() {
           if (i >= pageCount) {
@@ -790,7 +813,7 @@ MT.PaperUi = (function () {
           console.log('[capturePages] Element children:', el.children?.length);
           console.log('[capturePages] Element SVG count:', el.querySelectorAll('svg')?.length);
 
-          html2canvas(el, {
+          var canvasPromise = html2canvas(el, {
             width: w,
             height: h,
             scale: 2,
@@ -808,7 +831,15 @@ MT.PaperUi = (function () {
               fontLink.crossOrigin = 'anonymous';
               clonedDoc.head.appendChild(fontLink);
             }
-          }).then(function (canvas) {
+          });
+
+          var timeoutPromise = new Promise(function (_, reject) {
+            setTimeout(function () {
+              reject(new Error('EXPORT TIMEOUT after 30000ms: html2canvas page ' + (i + 1)));
+            }, 30000);
+          });
+
+          Promise.race([canvasPromise, timeoutPromise]).then(function (canvas) {
             console.log('[capturePages] Canvas captured:', {width: canvas.width, height: canvas.height});
             if (canvas.width === 0 || canvas.height === 0) {
               console.error('[capturePages] CANVAS IS EMPTY (0x0)!');
@@ -856,34 +887,43 @@ MT.PaperUi = (function () {
     var hideLoading = MT.Loading.show(t('ui.pdfPreparing'));
     var canvases = [];
 
-    preloadFonts().then(function () {
-      console.log('[downloadPdf] Fonts preloaded, starting capturePages');
-      return capturePages(function (c) { canvases.push(c); });
-    }).then(function (ok) {
-      console.log('[downloadPdf] capturePages returned:', ok, 'canvases:', canvases.length);
-      hideLoading();
-      if (!ok || canvases.length === 0) {
-        console.error('[downloadPdf] No canvases captured');
-        MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ'));
-        return;
-      }
-      console.log('[downloadPdf] Building PDF with', canvases.length, 'canvases');
-      var orientation = ps.h >= ps.w ? 'portrait' : 'landscape';
-      var doc = new jspdf.jsPDF({ orientation: orientation, unit: 'mm', format: [ps.w, ps.h] });
-      canvases.forEach(function (c, i) {
-        if (i > 0) doc.addPage([ps.w, ps.h], orientation);
-        doc.addImage(c.toDataURL('image/png'), 'PNG', 0, 0, ps.w, ps.h);
+    try {
+      var fontsPromise = withTimeout(preloadFonts(), 30000, 'preloadFonts');
+      fontsPromise.then(function () {
+        console.log('[downloadPdf] Fonts preloaded, starting capturePages');
+        var capturePromise = withTimeout(capturePages(function (c) { canvases.push(c); }), 60000, 'capturePages');
+        return capturePromise;
+      }).then(function (ok) {
+        console.log('[downloadPdf] capturePages returned:', ok, 'canvases:', canvases.length);
+        if (!ok || canvases.length === 0) {
+          console.error('[downloadPdf] No canvases captured');
+          MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ'));
+          return;
+        }
+        console.log('[downloadPdf] Building PDF with', canvases.length, 'canvases');
+        var orientation = ps.h >= ps.w ? 'portrait' : 'landscape';
+        var doc = new jspdf.jsPDF({ orientation: orientation, unit: 'mm', format: [ps.w, ps.h] });
+        canvases.forEach(function (c, i) {
+          if (i > 0) doc.addPage([ps.w, ps.h], orientation);
+          doc.addImage(c.toDataURL('image/png'), 'PNG', 0, 0, ps.w, ps.h);
+        });
+        var name = getSaveName() + '.pdf';
+        console.log('[downloadPdf] Saving PDF:', name);
+        doc.save(name);
+        console.log('[downloadPdf] PDF saved successfully');
+        MT.Toast.success(t('ui.exportedToast', { name: name }));
+      }).catch(function (err) {
+        console.error('[downloadPdf] Error:', err);
+        MT.Toast.error(t('ui.noHtml2canvas'));
+      }).finally(function () {
+        console.log('[downloadPdf] finally - hiding loading');
+        hideLoading();
       });
-      var name = getSaveName() + '.pdf';
-      console.log('[downloadPdf] Saving PDF:', name);
-      doc.save(name);
-      console.log('[downloadPdf] PDF saved successfully');
-      MT.Toast.success(t('ui.exportedToast', { name: name }));
-    }).catch(function (err) {
-      console.error('[downloadPdf] Error:', err);
+    } catch (err) {
+      console.error('[downloadPdf] Synchronous error:', err);
       hideLoading();
       MT.Toast.error(t('ui.noHtml2canvas'));
-    });
+    }
   }
 
   function downloadJson() {
@@ -903,43 +943,52 @@ MT.PaperUi = (function () {
     var hideLoading = MT.Loading.show(t('ui.creatingImage'));
     var canvases = [];
 
-    preloadFonts().then(function () {
-      console.log('[downloadImage] Fonts preloaded, starting capturePages');
-      return capturePages(function (c) { canvases.push(c); });
-    }).then(function (ok) {
-      console.log('[downloadImage] capturePages returned:', ok, 'canvases:', canvases.length);
-      hideLoading();
-      if (ok === 'nohtml2canvas') { MT.Toast.error(t('ui.noHtml2canvas')); return; }
-      if (!ok || canvases.length === 0) {
-        console.error('[downloadImage] No canvases captured');
-        MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ'));
-        return;
-      }
-      console.log('[downloadImage] Starting staggered PNG downloads:', canvases.length);
-      var base = getSaveName();
-      var names = [];
-      var chain = Promise.resolve();
-      canvases.forEach(function (c, i) {
-        var name = base + (canvases.length > 1 ? '-' + (i + 1) : '') + '.png';
-        names.push(name);
-        chain = chain.then(function () {
-          return new Promise(function (res) {
-            setTimeout(function () {
-              console.log('[downloadImage] Downloading PNG:', name);
-              c.toBlob(function (blob) { MT.Utils.download(name, blob, 'image/png'); res(); }, 'image/png');
-            }, i === 0 ? 0 : 400);
+    try {
+      var fontsPromise = withTimeout(preloadFonts(), 30000, 'preloadFonts');
+      fontsPromise.then(function () {
+        console.log('[downloadImage] Fonts preloaded, starting capturePages');
+        var capturePromise = withTimeout(capturePages(function (c) { canvases.push(c); }), 60000, 'capturePages');
+        return capturePromise;
+      }).then(function (ok) {
+        console.log('[downloadImage] capturePages returned:', ok, 'canvases:', canvases.length);
+        if (ok === 'nohtml2canvas') { MT.Toast.error(t('ui.noHtml2canvas')); return; }
+        if (!ok || canvases.length === 0) {
+          console.error('[downloadImage] No canvases captured');
+          MT.Toast.warning(t('ui.noQuestionsYet', 'မေးခွန်း မရှိသေးပါ'));
+          return;
+        }
+        console.log('[downloadImage] Starting staggered PNG downloads:', canvases.length);
+        var base = getSaveName();
+        var names = [];
+        var chain = Promise.resolve();
+        canvases.forEach(function (c, i) {
+          var name = base + (canvases.length > 1 ? '-' + (i + 1) : '') + '.png';
+          names.push(name);
+          chain = chain.then(function () {
+            return withTimeout(new Promise(function (res) {
+              setTimeout(function () {
+                console.log('[downloadImage] Downloading PNG:', name);
+                c.toBlob(function (blob) { MT.Utils.download(name, blob, 'image/png'); res(); }, 'image/png');
+              }, i === 0 ? 0 : 400);
+            }), 30000, 'download image ' + name);
           });
         });
-      });
-      chain.then(function () {
-        console.log('[downloadImage] All images downloaded:', names);
+        return chain;
+      }).then(function () {
+        console.log('[downloadImage] All images downloaded');
         MT.Toast.success(t('ui.exportedToast', { name: names.join(', ') }));
+      }).catch(function (err) {
+        console.error('[downloadImage] Error:', err);
+        MT.Toast.error(t('ui.noHtml2canvas'));
+      }).finally(function () {
+        console.log('[downloadImage] finally - hiding loading');
+        hideLoading();
       });
-    }).catch(function (err) {
-      console.error('[downloadImage] Error:', err);
+    } catch (err) {
+      console.error('[downloadImage] Synchronous error:', err);
       hideLoading();
       MT.Toast.error(t('ui.noHtml2canvas'));
-    });
+    }
   }
 
   return { init: init, refreshPageSizeBar: refreshPageSizeBar, openDownloadMenu: openDownloadMenu, ensureExamInfoConfirmed: ensureExamInfoConfirmed, openFabMenu: openFabMenu, openAddSectionModal: openAddSectionModal, openSectionsPopup: openSectionsPopup };
