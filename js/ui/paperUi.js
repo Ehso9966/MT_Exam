@@ -726,11 +726,22 @@ MT.PaperUi = (function () {
   }
 
   // Wait for all web fonts (including KaTeX) and KaTeX CSS to finish loading.
+  function ensureScript(url) {
+    if (typeof html2canvas !== 'undefined' && url.indexOf('html2canvas') !== -1) return Promise.resolve();
+    if (typeof jspdf !== 'undefined' && url.indexOf('jspdf') !== -1) return Promise.resolve();
+    return new Promise(function (resolve) {
+      var s = document.createElement('script');
+      s.src = url;
+      s.onload = function () { resolve(); };
+      s.onerror = function () { resolve(); };
+      document.head.appendChild(s);
+    });
+  }
+
   function preloadFonts() {
     var fontReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
     var cdnReady = (window.MT_CDN && window.MT_CDN.load) ? window.MT_CDN.load() : Promise.resolve();
-    
-    // Explicitly load required KaTeX fonts
+
     var katexFonts = [
       '16px KaTeX_Main',
       '16px KaTeX_Math',
@@ -743,8 +754,13 @@ MT.PaperUi = (function () {
     var katexReady = Promise.all(katexFonts.map(function (f) {
       return document.fonts.load(f).catch(function () {});
     }));
-    
-    return Promise.all([fontReady, cdnReady, katexReady]);
+
+    return Promise.all([fontReady, cdnReady, katexReady]).then(function () {
+      return Promise.all([
+        ensureScript('https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js'),
+        ensureScript('https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js')
+      ]);
+    });
   }
 
   // Build export DOM with SVG math and capture each page at full physical size.
