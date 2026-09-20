@@ -631,7 +631,7 @@ html += '<span class="section-title-marks">' +
     container.style.height = (geo.pxH * pages.length) + 'px';
     container.style.overflow = 'visible';
     container.style.pointerEvents = 'none';
-    container.style.visibility = 'hidden';
+    container.style.opacity = '0';
     container.style.zIndex = '-1';
     document.body.appendChild(container);
 

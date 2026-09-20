@@ -933,6 +933,7 @@ MT.PaperUi = (function () {
     console.log('[downloadImage] Starting image export');
     var hideLoading = MT.Loading.show(t('ui.creatingImage'));
     var canvases = [];
+    var names = [];
 
     try {
       var fontsPromise = withTimeout(preloadFonts(), 30000, 'preloadFonts');
@@ -954,7 +955,6 @@ MT.PaperUi = (function () {
         }
         console.log('[downloadImage] Starting staggered PNG downloads:', canvases.length);
         var base = getSaveName();
-        var names = [];
         var chain = Promise.resolve();
         canvases.forEach(function (c, i) {
           var name = base + (canvases.length > 1 ? '-' + (i + 1) : '') + '.png';
