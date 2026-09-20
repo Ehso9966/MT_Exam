@@ -1,5 +1,6 @@
 window.MT = window.MT || {};
 
+console.log('[paperUi] IIFE starting');
 MT.PaperUi = (function () {
   function t(key, vars) { return MT.Utils.t(key, vars); }
   function digits(n) { return MT.Utils.digits(n); }
@@ -991,5 +992,7 @@ MT.PaperUi = (function () {
     }
   }
 
+  console.log('[paperUi] IIFE returning object');
   return { init: init, refreshPageSizeBar: refreshPageSizeBar, openDownloadMenu: openDownloadMenu, ensureExamInfoConfirmed: ensureExamInfoConfirmed, openFabMenu: openFabMenu, openAddSectionModal: openAddSectionModal, openSectionsPopup: openSectionsPopup };
 })();
+console.log('[paperUi] IIFE completed, MT.PaperUi:', MT.PaperUi);

@@ -37,7 +37,9 @@ MT.App = (function () {
       applyMode();
 
       MT.State.subscribe(onStateChange);
+      console.log('[app] MT.PaperUi before init:', MT.PaperUi);
       MT.PaperUi.init();
+      console.log('[app] MT.PaperUi after init:', MT.PaperUi);
       render();
     } catch (e) {
       console.error('[init] Initialization error:', e);
