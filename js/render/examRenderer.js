@@ -513,7 +513,7 @@ html += '<span class="section-title-marks">' +
 
     const geo = getPrintGeometry(pageSize, settings);
     let html = pages.map(function (p) {
-      return '<div class="preview-page-wrap" style="width:' + geo.pxW + 'px;height:' + geo.pxH + 'px">' +
+      return '<div class="preview-page-wrap" style="width:' + geo.pxW + 'px;height:' + geo.pxH + 'px;overflow:visible">' +
         '<div class="paper-preview" style="width:' + geo.pxW + 'px;height:' + geo.pxH + 'px;padding:' + geo.pad + 'px;box-sizing:border-box;font-size:' + geo.fontSize + 'pt;--paper-scale:1;--qfont-size:' + geo.fontSize + 'pt;--mt-spacing:' + geo.spacing + ';max-width:none">' + p + '</div>' +
         '</div>';
     }).join('');
