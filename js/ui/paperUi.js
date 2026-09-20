@@ -867,6 +867,7 @@ MT.PaperUi = (function () {
       });
     });
   });
+  }
 
   function downloadPdf() {
     var preview = document.getElementById('paperPreview');
@@ -991,8 +992,8 @@ MT.PaperUi = (function () {
       MT.Toast.error(t('ui.noHtml2canvas'));
     }
 }
-  
+
   console.log('[paperUi] IIFE returning object');
   return { init: init, refreshPageSizeBar: refreshPageSizeBar, openDownloadMenu: openDownloadMenu, ensureExamInfoConfirmed: ensureExamInfoConfirmed, openFabMenu: openFabMenu, openAddSectionModal: openAddSectionModal, openSectionsPopup: openSectionsPopup };
-} });
+})();
 console.log('[paperUi] IIFE completed, MT.PaperUi:', MT.PaperUi);
