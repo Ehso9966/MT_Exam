@@ -763,7 +763,7 @@ MT.PaperUi = (function () {
     });
   }
 
-  // Build export DOM with SVG math and capture each page at full physical size.
+  // Build export DOM and capture each page at full physical size.
   function capturePages(onCanvas) {
     var exam = (MT.State && MT.State.get) ? MT.State.get() : null;
     return new Promise(function (resolve) {
@@ -785,6 +785,77 @@ MT.PaperUi = (function () {
         var container = exportDom.container;
         var pageCount = exportDom.pages;
         var geo = exportDom.geo;
+
+        /* ── DIAGNOSTIC: compare preview vs export KaTeX DOM ── */
+        var previewEl = document.getElementById('paperPreview');
+        if (previewEl) {
+          var prevKatex = previewEl.querySelectorAll('.katex');
+          var exportKatex = container.querySelectorAll('.katex');
+          console.log('[BRACKET-DIAG] preview .katex count:', prevKatex.length, 'export .katex count:', exportKatex.length);
+          for (var d = 0; d < Math.min(prevKatex.length, exportKatex.length); d++) {
+            var pHtml = prevKatex[d].innerHTML;
+            var eHtml = exportKatex[d].innerHTML;
+            var same = pHtml === eHtml;
+            if (!same) {
+              console.log('[BRACKET-DIAG] KaTeX #' + d + ' DIFFERS');
+              console.log('  PREVIEW:', pHtml.substring(0, 500));
+              console.log('  EXPORT :', eHtml.substring(0, 500));
+            }
+          }
+
+          var allSame = true;
+          for (var d2 = 0; d2 < Math.min(prevKatex.length, exportKatex.length); d2++) {
+            if (prevKatex[d2].innerHTML !== exportKatex[d2].innerHTML) { allSame = false; break; }
+          }
+          console.log('[BRACKET-DIAG] all KaTeX HTML identical:', allSame);
+
+          var prevDisp = previewEl.querySelectorAll('.katex-display');
+          var expDisp = container.querySelectorAll('.katex-display');
+          console.log('[BRACKET-DIAG] preview .katex-display count:', prevDisp.length, 'export:', expDisp.length);
+
+          for (var x = 0; x < Math.min(prevDisp.length, expDisp.length, 3); x++) {
+            var pRect = prevDisp[x].getBoundingClientRect();
+            var eRect = expDisp[x].getBoundingClientRect();
+            var pKatexH = prevDisp[x].querySelector('.katex');
+            var eKatexH = expDisp[x].querySelector('.katex');
+            console.log('[BRACKET-DIAG] katex-display #' + x + ':');
+            console.log('  PREVIEW rect:', {w: pRect.width.toFixed(1), h: pRect.height.toFixed(1), top: pRect.top.toFixed(1), bottom: pRect.bottom.toFixed(1)});
+            console.log('  EXPORT  rect:', {w: eRect.width.toFixed(1), h: eRect.height.toFixed(1), top: eRect.top.toFixed(1), bottom: eRect.bottom.toFixed(1)});
+            if (pKatexH) {
+              var pkRect = pKatexH.getBoundingClientRect();
+              console.log('  PREVIEW .katex rect:', {w: pkRect.width.toFixed(1), h: pkRect.height.toFixed(1), top: pkRect.top.toFixed(1), bottom: pkRect.bottom.toFixed(1)});
+            }
+            if (eKatexH) {
+              var ekRect = eKatexH.getBoundingClientRect();
+              console.log('  EXPORT  .katex rect:', {w: ekRect.width.toFixed(1), h: ekRect.height.toFixed(1), top: ekRect.top.toFixed(1), bottom: ekRect.bottom.toFixed(1)});
+            }
+            var pCs = window.getComputedStyle(prevDisp[x]);
+            var eCs = window.getComputedStyle(expDisp[x]);
+            console.log('  PREVIEW computed:', {overflow: pCs.overflow, overflowY: pCs.overflowY, height: pCs.height, maxHeight: pCs.maxHeight, lineHeight: pCs.lineHeight});
+            console.log('  EXPORT  computed:', {overflow: eCs.overflow, overflowY: eCs.overflowY, height: eCs.height, maxHeight: eCs.maxHeight, lineHeight: eCs.lineHeight});
+          }
+
+          var ppWrapExport = container.querySelector('.preview-page-wrap');
+          if (ppWrapExport) {
+            var wrapRect = ppWrapExport.getBoundingClientRect();
+            var wrapCs = window.getComputedStyle(ppWrapExport);
+            console.log('[BRACKET-DIAG] export .preview-page-wrap:', {w: wrapRect.width.toFixed(1), h: wrapRect.height.toFixed(1), overflow: wrapCs.overflow, overflowY: wrapCs.overflowY});
+          }
+          var ppExport = container.querySelector('.paper-preview');
+          if (ppExport) {
+            var ppRect = ppExport.getBoundingClientRect();
+            var ppCs = window.getComputedStyle(ppExport);
+            console.log('[BRACKET-DIAG] export .paper-preview:', {w: ppRect.width.toFixed(1), h: ppRect.height.toFixed(1), overflow: ppCs.overflow, overflowY: ppCs.overflowY, transform: ppCs.transform});
+            var allChildren = ppExport.querySelectorAll('*');
+            var maxBottom = 0;
+            for (var ci = 0; ci < allChildren.length; ci++) {
+              var cr = allChildren[ci].getBoundingClientRect();
+              if (cr.bottom > maxBottom) maxBottom = cr.bottom;
+            }
+            console.log('[BRACKET-DIAG] export max child bottom:', maxBottom.toFixed(1), 'paper bottom:', (ppRect.top + ppRect.height).toFixed(1), 'overflow by:', (maxBottom - ppRect.top - ppRect.height).toFixed(1));
+          }
+        }
+        /* ── END DIAGNOSTIC ── */
 
         var i = 0;
         function next() {
@@ -809,10 +880,24 @@ MT.PaperUi = (function () {
             return;
           }
 
+          /* ── DIAGNOSTIC: test html2canvas with overflow:visible on every ancestor ── */
+          if (window.MT_BRACKET_DIAG_SCALE1) {
+            console.log('[BRACKET-DIAG] using scale:1 for diagnostic');
+          }
+          if (window.MT_BRACKET_DIAG_OVF) {
+            var ancestors = el.querySelectorAll('*');
+            el.style.overflow = 'visible';
+            for (var ai = 0; ai < ancestors.length; ai++) {
+              ancestors[ai].style.overflow = 'visible';
+            }
+            if (pageWrap) pageWrap.style.overflow = 'visible';
+            console.log('[BRACKET-DIAG] set overflow:visible on all export ancestors');
+          }
+
           var canvasPromise = html2canvas(el, {
             width: w,
             height: h,
-            scale: 2,
+            scale: window.MT_BRACKET_DIAG_SCALE1 ? 1 : 2,
             backgroundColor: '#fff',
             useCORS: true,
             foreignObjectRendering: false,
@@ -823,6 +908,19 @@ MT.PaperUi = (function () {
               fontLink.as = 'font';
               fontLink.crossOrigin = 'anonymous';
               clonedDoc.head.appendChild(fontLink);
+              /* STEP 4: force overflow:visible inside cloned doc */
+              if (window.MT_BRACKET_DIAG_OVF) {
+                var clonedWrap = clonedDoc.querySelectorAll('.preview-page-wrap');
+                for (var ci = 0; ci < clonedWrap.length; ci++) {
+                  clonedWrap[ci].style.overflow = 'visible';
+                  clonedWrap[ci].style.setProperty('overflow', 'visible', 'important');
+                }
+                var clonedPaper = clonedDoc.querySelectorAll('.paper-preview');
+                for (var pi = 0; pi < clonedPaper.length; pi++) {
+                  clonedPaper[pi].style.overflow = 'visible';
+                  clonedPaper[pi].style.setProperty('overflow', 'visible', 'important');
+                }
+              }
             }
           });
 
