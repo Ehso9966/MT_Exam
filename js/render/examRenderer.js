@@ -522,6 +522,22 @@ html += '<span class="section-title-marks">' +
     container.innerHTML = html;
     MT.MathRenderer.renderAllInElement(container);
 
+    var tallRe = /\\begin\s*\{|\\left\s*\(|\\left\s*\[|\\left\\\(|\\vec\{|\\overline\{/;
+    var katexEls = container.querySelectorAll('.katex');
+    for (var k = 0; k < katexEls.length; k++) {
+      var ke = katexEls[k];
+      if (tallRe.test(ke.innerHTML)) {
+        ke.style.display = 'inline-block';
+        ke.style.verticalAlign = 'middle';
+        ke.style.overflow = 'visible';
+      }
+    }
+            }
+          }
+        }
+      }
+    }
+
     container.style.position = 'fixed';
     container.style.left = '-99999px';
     container.style.top = '0';
