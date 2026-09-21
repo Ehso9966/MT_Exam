@@ -786,77 +786,38 @@ MT.PaperUi = (function () {
         var pageCount = exportDom.pages;
         var geo = exportDom.geo;
 
-        /* ── DIAGNOSTIC: compare preview vs export KaTeX DOM ── */
-        var previewEl = document.getElementById('paperPreview');
-        if (previewEl) {
-          var prevKatex = previewEl.querySelectorAll('.katex');
-          var exportKatex = container.querySelectorAll('.katex');
-          console.log('[BRACKET-DIAG] preview .katex count:', prevKatex.length, 'export .katex count:', exportKatex.length);
-          for (var d = 0; d < Math.min(prevKatex.length, exportKatex.length); d++) {
-            var pHtml = prevKatex[d].innerHTML;
-            var eHtml = exportKatex[d].innerHTML;
-            var same = pHtml === eHtml;
-            if (!same) {
-              console.log('[BRACKET-DIAG] KaTeX #' + d + ' DIFFERS');
-              console.log('  PREVIEW:', pHtml.substring(0, 500));
-              console.log('  EXPORT :', eHtml.substring(0, 500));
-            }
-          }
-
-          var allSame = true;
-          for (var d2 = 0; d2 < Math.min(prevKatex.length, exportKatex.length); d2++) {
-            if (prevKatex[d2].innerHTML !== exportKatex[d2].innerHTML) { allSame = false; break; }
-          }
-          console.log('[BRACKET-DIAG] all KaTeX HTML identical:', allSame);
-
-          var prevDisp = previewEl.querySelectorAll('.katex-display');
-          var expDisp = container.querySelectorAll('.katex-display');
-          console.log('[BRACKET-DIAG] preview .katex-display count:', prevDisp.length, 'export:', expDisp.length);
-
-          for (var x = 0; x < Math.min(prevDisp.length, expDisp.length, 3); x++) {
-            var pRect = prevDisp[x].getBoundingClientRect();
-            var eRect = expDisp[x].getBoundingClientRect();
-            var pKatexH = prevDisp[x].querySelector('.katex');
-            var eKatexH = expDisp[x].querySelector('.katex');
-            console.log('[BRACKET-DIAG] katex-display #' + x + ':');
-            console.log('  PREVIEW rect:', {w: pRect.width.toFixed(1), h: pRect.height.toFixed(1), top: pRect.top.toFixed(1), bottom: pRect.bottom.toFixed(1)});
-            console.log('  EXPORT  rect:', {w: eRect.width.toFixed(1), h: eRect.height.toFixed(1), top: eRect.top.toFixed(1), bottom: eRect.bottom.toFixed(1)});
-            if (pKatexH) {
-              var pkRect = pKatexH.getBoundingClientRect();
-              console.log('  PREVIEW .katex rect:', {w: pkRect.width.toFixed(1), h: pkRect.height.toFixed(1), top: pkRect.top.toFixed(1), bottom: pkRect.bottom.toFixed(1)});
-            }
-            if (eKatexH) {
-              var ekRect = eKatexH.getBoundingClientRect();
-              console.log('  EXPORT  .katex rect:', {w: ekRect.width.toFixed(1), h: ekRect.height.toFixed(1), top: ekRect.top.toFixed(1), bottom: ekRect.bottom.toFixed(1)});
-            }
-            var pCs = window.getComputedStyle(prevDisp[x]);
-            var eCs = window.getComputedStyle(expDisp[x]);
-            console.log('  PREVIEW computed:', {overflow: pCs.overflow, overflowY: pCs.overflowY, height: pCs.height, maxHeight: pCs.maxHeight, lineHeight: pCs.lineHeight});
-            console.log('  EXPORT  computed:', {overflow: eCs.overflow, overflowY: eCs.overflowY, height: eCs.height, maxHeight: eCs.maxHeight, lineHeight: eCs.lineHeight});
-          }
-
-          var ppWrapExport = container.querySelector('.preview-page-wrap');
-          if (ppWrapExport) {
-            var wrapRect = ppWrapExport.getBoundingClientRect();
-            var wrapCs = window.getComputedStyle(ppWrapExport);
-            console.log('[BRACKET-DIAG] export .preview-page-wrap:', {w: wrapRect.width.toFixed(1), h: wrapRect.height.toFixed(1), overflow: wrapCs.overflow, overflowY: wrapCs.overflowY});
-          }
-          var ppExport = container.querySelector('.paper-preview');
-          if (ppExport) {
-            var ppRect = ppExport.getBoundingClientRect();
-            var ppCs = window.getComputedStyle(ppExport);
-            console.log('[BRACKET-DIAG] export .paper-preview:', {w: ppRect.width.toFixed(1), h: ppRect.height.toFixed(1), overflow: ppCs.overflow, overflowY: ppCs.overflowY, transform: ppCs.transform});
-            var allChildren = ppExport.querySelectorAll('*');
-            var maxBottom = 0;
-            for (var ci = 0; ci < allChildren.length; ci++) {
-              var cr = allChildren[ci].getBoundingClientRect();
-              if (cr.bottom > maxBottom) maxBottom = cr.bottom;
-            }
-            console.log('[BRACKET-DIAG] export max child bottom:', maxBottom.toFixed(1), 'paper bottom:', (ppRect.top + ppRect.height).toFixed(1), 'overflow by:', (maxBottom - ppRect.top - ppRect.height).toFixed(1));
+        var tallRe = /\\begin\s*\{|\\left\s*\(|\\left\s*\[|\\left\\\(|\\vec\{|\\overline\{/;
+        var katexEls = container.querySelectorAll('.katex');
+        var toRender = [];
+        for (var k = 0; k < katexEls.length; k++) {
+          if (tallRe.test(katexEls[k].innerHTML)) {
+            toRender.push(katexEls[k]);
           }
         }
-        /* ── END DIAGNOSTIC ── */
+        console.log('[capturePages] pre-rendering', toRender.length, 'tall KaTeX elements to images');
 
+        var renderPromise = toRender.length === 0 ? Promise.resolve() : Promise.all(toRender.map(function(ke) {
+          return html2canvas(ke, {
+            scale: 2,
+            backgroundColor: 'transparent',
+            useCORS: true,
+            foreignObjectRendering: false
+          }).then(function(canvas) {
+            var img = document.createElement('img');
+            img.src = canvas.toDataURL('image/png');
+            img.style.display = 'inline-block';
+            img.style.verticalAlign = 'middle';
+            img.width = Math.round(canvas.width / 2);
+            img.height = Math.round(canvas.height / 2);
+            img.style.width = img.width + 'px';
+            img.style.height = img.height + 'px';
+            ke.parentNode.replaceChild(img, ke);
+          }).catch(function(err) {
+            console.warn('[capturePages] pre-render KaTeX failed, keeping original:', err);
+          });
+        }));
+
+        renderPromise.then(function() {
         var i = 0;
         function next() {
           if (i >= pageCount) {
@@ -880,20 +841,6 @@ MT.PaperUi = (function () {
             return;
           }
 
-          /* ── DIAGNOSTIC: test html2canvas with overflow:visible on every ancestor ── */
-          if (window.MT_BRACKET_DIAG_SCALE1) {
-            console.log('[BRACKET-DIAG] using scale:1 for diagnostic');
-          }
-          if (window.MT_BRACKET_DIAG_OVF) {
-            var ancestors = el.querySelectorAll('*');
-            el.style.overflow = 'visible';
-            for (var ai = 0; ai < ancestors.length; ai++) {
-              ancestors[ai].style.overflow = 'visible';
-            }
-            if (pageWrap) pageWrap.style.overflow = 'visible';
-            console.log('[BRACKET-DIAG] set overflow:visible on all export ancestors');
-          }
-
           var canvasPromise = html2canvas(el, {
             width: w,
             height: h,
@@ -908,35 +855,6 @@ MT.PaperUi = (function () {
               fontLink.as = 'font';
               fontLink.crossOrigin = 'anonymous';
               clonedDoc.head.appendChild(fontLink);
-
-              /* Fix html2canvas misrendering of tall inline KaTeX:
-                 1. Normalize line-height so html2canvas computes correct baseline positions
-                 2. Force overflow:visible on all KaTeX and ancestors
-                 3. Convert tall inline KaTeX (arrays/matrices) to inline-block */
-              var fixStyle = clonedDoc.createElement('style');
-              fixStyle.textContent = [
-                '.paper-preview { line-height: 1 !important; }',
-                '.paper-preview .preview-page-wrap { overflow: visible !important; }',
-                '.paper-preview .katex { overflow: visible !important; }',
-                '.paper-preview .katex * { overflow: visible !important; }',
-                '.paper-preview .katex-mathml { position: absolute !important; width: 1px !important; height: 1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; pointer-events: none !important; }'
-              ].join('\n');
-              clonedDoc.head.appendChild(fixStyle);
-
-              /* Convert tall inline KaTeX to inline-block so html2canvas renders them correctly */
-              var katexEls = clonedDoc.querySelectorAll('.paper-preview .katex');
-              for (var k = 0; k < katexEls.length; k++) {
-                var ke = katexEls[k];
-                if (ke.querySelector('.array, .mtable, .delimsizing, .col-align-c, .col-align-l, .col-align-r')) {
-                  ke.style.setProperty('display', 'inline-block', 'important');
-                  ke.style.setProperty('vertical-align', 'middle', 'important');
-                  ke.style.setProperty('overflow', 'visible', 'important');
-                  var keParent = ke.parentElement;
-                  if (keParent && keParent.classList && keParent.classList.contains('pq-sub-text')) {
-                    keParent.style.setProperty('display', 'block', 'important');
-                  }
-                }
-              }
             }
           });
 
@@ -957,6 +875,7 @@ MT.PaperUi = (function () {
           });
         }
         next();
+        });
       });
     });
   }
