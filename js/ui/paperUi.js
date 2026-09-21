@@ -897,7 +897,7 @@ MT.PaperUi = (function () {
           var canvasPromise = html2canvas(el, {
             width: w,
             height: h,
-            scale: window.MT_BRACKET_DIAG_SCALE1 ? 1 : 2,
+            scale: 2,
             backgroundColor: '#fff',
             useCORS: true,
             foreignObjectRendering: false,
@@ -908,17 +908,33 @@ MT.PaperUi = (function () {
               fontLink.as = 'font';
               fontLink.crossOrigin = 'anonymous';
               clonedDoc.head.appendChild(fontLink);
-              /* STEP 4: force overflow:visible inside cloned doc */
-              if (window.MT_BRACKET_DIAG_OVF) {
-                var clonedWrap = clonedDoc.querySelectorAll('.preview-page-wrap');
-                for (var ci = 0; ci < clonedWrap.length; ci++) {
-                  clonedWrap[ci].style.overflow = 'visible';
-                  clonedWrap[ci].style.setProperty('overflow', 'visible', 'important');
-                }
-                var clonedPaper = clonedDoc.querySelectorAll('.paper-preview');
-                for (var pi = 0; pi < clonedPaper.length; pi++) {
-                  clonedPaper[pi].style.overflow = 'visible';
-                  clonedPaper[pi].style.setProperty('overflow', 'visible', 'important');
+
+              /* Fix html2canvas misrendering of tall inline KaTeX:
+                 1. Normalize line-height so html2canvas computes correct baseline positions
+                 2. Force overflow:visible on all KaTeX and ancestors
+                 3. Convert tall inline KaTeX (arrays/matrices) to inline-block */
+              var fixStyle = clonedDoc.createElement('style');
+              fixStyle.textContent = [
+                '.paper-preview { line-height: 1 !important; }',
+                '.paper-preview .preview-page-wrap { overflow: visible !important; }',
+                '.paper-preview .katex { overflow: visible !important; }',
+                '.paper-preview .katex * { overflow: visible !important; }',
+                '.paper-preview .katex-mathml { position: absolute !important; width: 1px !important; height: 1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; pointer-events: none !important; }'
+              ].join('\n');
+              clonedDoc.head.appendChild(fixStyle);
+
+              /* Convert tall inline KaTeX to inline-block so html2canvas renders them correctly */
+              var katexEls = clonedDoc.querySelectorAll('.paper-preview .katex');
+              for (var k = 0; k < katexEls.length; k++) {
+                var ke = katexEls[k];
+                if (ke.querySelector('.array, .mtable, .delimsizing, .col-align-c, .col-align-l, .col-align-r')) {
+                  ke.style.setProperty('display', 'inline-block', 'important');
+                  ke.style.setProperty('vertical-align', 'middle', 'important');
+                  ke.style.setProperty('overflow', 'visible', 'important');
+                  var keParent = ke.parentElement;
+                  if (keParent && keParent.classList && keParent.classList.contains('pq-sub-text')) {
+                    keParent.style.setProperty('display', 'block', 'important');
+                  }
                 }
               }
             }
