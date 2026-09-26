@@ -242,7 +242,7 @@ MT.SectionPopup = (function () {
       var lang = MT.PaperLocale.getLanguage(MT.State.getMetadata().subject);
       var textContent = (q.text || '').replace(/\r?\n/g, ' ').slice(0, 80);
       if (!textContent && q.subQuestions && q.subQuestions.length > 0) {
-        var subStyleId = (MT.State.get().settings && MT.State.get().settings.subQuestionNumberStyle) || 'parenthesizedLettersLower';
+        var subStyleId = (s.subQuestionNumberStyle || MT.State.get().settings.subQuestionNumberStyle || 'parenthesizedLettersLower');
         textContent = q.subQuestions.map(function (_, i) { return MT.NumberStyles.display(i + 1, subStyleId, lang); }).join(' ');
       }
       textContent = textContent || t('ui.emptyQuestionShort', '(ဗလာ)');
@@ -312,12 +312,12 @@ MT.SectionPopup = (function () {
     // Sub-question part rows (a), (b)... — editable text + ∑ math + 📷 image
     function renderSubRow(s, q, sub, i) {
       var row = MT.Utils.el('div', { class: 'sp-sub-row' });
-      var subStyleId = (MT.State.get().settings && MT.State.get().settings.subQuestionNumberStyle) || 'parenthesizedLettersLower';
+      var subStyleId = (s.subQuestionNumberStyle || MT.State.get().settings.subQuestionNumberStyle || 'parenthesizedLettersLower');
       var subLang = (MT.I18n && MT.I18n.getLang) ? MT.I18n.getLang() : 'my';
       var letterBtn = MT.Utils.el('button', { type: 'button', class: 'sp-sub-letter' },
         MT.NumberStyles.display(i + 1, subStyleId, subLang));
       MT.NumberStyles.bindDropdown(letterBtn, subStyleId, function (id) {
-        MT.State.get().settings.subQuestionNumberStyle = id;
+        s.subQuestionNumberStyle = id;
         MT.State.update(function () {});
         finalize();
       });

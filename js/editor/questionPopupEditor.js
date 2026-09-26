@@ -172,7 +172,7 @@ MT.QuestionPopupEditor = (function () {
       }
       subsSections.style.display = '';
 
-      const subStyleId = (MT.State.get().settings && MT.State.get().settings.subQuestionNumberStyle) || 'parenthesizedLettersLower';
+      const subStyleId = (section.subQuestionNumberStyle || MT.State.get().settings.subQuestionNumberStyle || 'parenthesizedLettersLower');
       const subLang = (MT.I18n && MT.I18n.getLang) ? MT.I18n.getLang() : 'my';
 
       subs.forEach(function (sub, si) {

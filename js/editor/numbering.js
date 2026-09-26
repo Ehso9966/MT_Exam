@@ -22,12 +22,11 @@ MT.Numbering = (function () {
   }
 
   function apply(exam) {
-    if (exam && exam.settings && exam.settings.numbering === 'section') {
+    if (!exam || !exam.settings) return exam;
+    if (exam.settings.numbering === 'section') {
       (exam.sections || []).forEach(function (s) {
         renumberSection(s, 1);
       });
-    } else {
-      renumber(exam);
     }
     return exam;
   }

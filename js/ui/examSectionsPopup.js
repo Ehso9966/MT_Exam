@@ -153,13 +153,16 @@ MT.ExamSectionsPopup = (function () {
   }
 
   // Clickable number chip that opens the number-style dropdown. Changing the
-  // style applies to every title/question in the exam (global per scope).
-  function makeNumberChip(num, styleId, scope) {
+  // style applies per-section (saved on the section object).
+  function makeNumberChip(num, styleId, scope, sectionObj) {
     var btn = MT.Utils.el('button', { type: 'button', class: scope === 'question' ? 'sp-num' : 'section-num' },
       MT.NumberStyles.display(num, styleId, lang()));
     MT.NumberStyles.bindDropdown(btn, styleId, function (id) {
-      if (scope === 'question') MT.State.get().settings.questionNumberStyle = id;
-      else MT.State.get().settings.sectionNumberStyle = id;
+      if (scope === 'question') {
+        if (sectionObj) sectionObj.questionNumberStyle = id;
+      } else {
+        if (sectionObj) sectionObj.numberStyle = id;
+      }
       MT.State.update(function () {});
     });
     return btn;
@@ -172,7 +175,8 @@ MT.ExamSectionsPopup = (function () {
 
     var head = MT.Utils.el('div', { class: 'exs-header' });
     if (section.type !== 'section_a') {
-      head.appendChild(makeNumberChip(sectionNum + 1, MT.State.get().settings.sectionNumberStyle || 'arabic', 'section'));
+      var secStyle = section.numberStyle || MT.State.get().settings.sectionNumberStyle || 'arabic';
+      head.appendChild(makeNumberChip(sectionNum + 1, secStyle, 'section', section));
     }
     var titleInput = MT.Utils.el('input', {
       class: 'input exs-title',
@@ -322,7 +326,8 @@ MT.ExamSectionsPopup = (function () {
     row.appendChild(MT.Utils.el('span', { class: 'exs-qrow-chevron' },
       (hasSubs ? (isExpanded ? '▾' : '▸') : '')));
 
-    row.appendChild(makeNumberChip(q.number, MT.State.get().settings.questionNumberStyle || 'arabic', 'question'));
+    var qStyle = (section.questionNumberStyle || MT.State.get().settings.questionNumberStyle || 'arabic');
+    row.appendChild(makeNumberChip(q.number, qStyle, 'question', section));
 
     if (q.reviewStatus && q.reviewStatus !== 'approved' && q.reviewStatus !== 'none') {
       row.appendChild(MT.Utils.el('span', { class: 'review-badge ' + q.reviewStatus },
@@ -332,7 +337,7 @@ MT.ExamSectionsPopup = (function () {
     var textContent = (q.text || '').replace(/\r?\n/g, ' ').slice(0, 80);
     var textHtml = MT.MathRenderer.renderTextWithMath(textContent);
     if (!textContent && q.subQuestions && q.subQuestions.length > 0) {
-      var subStyleId = (MT.State.get().settings && MT.State.get().settings.subQuestionNumberStyle) || 'parenthesizedLettersLower';
+      var subStyleId = (section.subQuestionNumberStyle || MT.State.get().settings.subQuestionNumberStyle || 'parenthesizedLettersLower');
       textHtml = q.subQuestions.map(function (_, i) {
         return '<span class="sp-sub-letter">' + MT.NumberStyles.display(i + 1, subStyleId, lang()) + '</span>';
       }).join('');
@@ -418,12 +423,12 @@ MT.ExamSectionsPopup = (function () {
   // Sub-question part rows (a), (b)... — read-only preview, tap to edit in place.
   function renderSubRow(listEl, section, q, sub, i) {
     var row = MT.Utils.el('div', { class: 'sp-sub-row', role: 'button', tabindex: '0' });
-    var subStyleId = (MT.State.get().settings && MT.State.get().settings.subQuestionNumberStyle) || 'parenthesizedLettersLower';
+    var subStyleId = (section.subQuestionNumberStyle || MT.State.get().settings.subQuestionNumberStyle || 'parenthesizedLettersLower');
     var subLang = lang();
     var letterBtn = MT.Utils.el('button', { type: 'button', class: 'sp-sub-letter' },
       MT.NumberStyles.display(i + 1, subStyleId, subLang));
     MT.NumberStyles.bindDropdown(letterBtn, subStyleId, function (id) {
-      MT.State.get().settings.subQuestionNumberStyle = id;
+      section.subQuestionNumberStyle = id;
       MT.State.update(function () {});
     });
     row.appendChild(letterBtn);

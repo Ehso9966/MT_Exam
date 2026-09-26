@@ -14,6 +14,9 @@ MT.ExamModel = (function () {
       hideTitle: data.hideTitle || false,
       questions: [],
       order: data.order || 0,
+      numberStyle: data.numberStyle || '',
+      questionNumberStyle: data.questionNumberStyle || '',
+      subQuestionNumberStyle: data.subQuestionNumberStyle || '',
       createdAt: new Date().toISOString()
     };
   }

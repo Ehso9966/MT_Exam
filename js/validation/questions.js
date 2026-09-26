@@ -38,7 +38,9 @@ MT.Validation.Questions = (function () {
     if (!exam || !exam.sections) return results;
     // With per-section numbering, numbers restart at 1 in each section, so
     // duplicates across sections are expected — not a problem.
-    if (exam.settings && exam.settings.numbering === 'section') return results;
+    // With global numbering, questions are not renumbered so duplicates
+    // may appear but are user-controlled.
+    if (exam.settings && (exam.settings.numbering === 'section' || exam.settings.numbering === 'global')) return results;
     const seen = {};
     exam.sections.forEach(function (s) {
       s.questions.forEach(function (q) {

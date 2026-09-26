@@ -27,7 +27,7 @@ MT.SectionManager = (function () {
       // Row 1: number chip + title input + delete (single compact row)
       const row1 = MT.Utils.el('div', { class: 'section-card-row1' });
       if (section.type !== 'section_a') {
-        const styleId = (MT.State.get().settings.sectionNumberStyle) || 'arabic';
+        const styleId = (section.numberStyle || MT.State.get().settings.sectionNumberStyle) || 'arabic';
         const lang = (MT.I18n && MT.I18n.getLang) ? MT.I18n.getLang() : 'my';
         const num = MT.Utils.el('span', { class: 'section-num' }, MT.NumberStyles.display(++sectionNum, styleId, lang));
         row1.appendChild(num);

@@ -212,7 +212,7 @@ MT.ExamRenderer = (function () {
           fb += '<div class="section-title-row"><span class="section-title">' +
             MT.Utils.escapeHtml(MT.PaperLocale.getSectionTitle(section, lang)) + '</span></div>';
           (section.questions || []).forEach(function (q) {
-            fb += renderQuestion(q, section.id, settings, lang);
+            fb += renderQuestion(q, section.id, settings, lang, section);
           });
           fb += '</div>';
         });
@@ -292,8 +292,11 @@ html += '<span class="section-title-marks">' +
   function sectionTitleWithIndex(section, lang, index, settings) {
     const title = MT.PaperLocale.getSectionTitle(section, lang);
     if (section.type !== 'section_a' && index != null) {
-      const styleId = (settings && settings.sectionNumberStyle) || 'arabic';
-      return MT.NumberStyles.display(index + 1, styleId, lang) + ' ' + title;
+      const isGlobal = settings && settings.numbering === 'global';
+      if (isGlobal) {
+        const styleId = (section.numberStyle || (settings && settings.sectionNumberStyle)) || 'arabic';
+        return MT.NumberStyles.display(index + 1, styleId, lang) + ' ' + title;
+      }
     }
     return title;
   }
@@ -315,16 +318,16 @@ html += '<span class="section-title-marks">' +
         units.push({ html: renderSectionInstruction(section, lang), type: 'instruction' });
       }
       section.questions.forEach(function (q) {
-        units.push({ html: renderQuestion(q, section.id, settings, lang), type: 'question' });
+        units.push({ html: renderQuestion(q, section.id, settings, lang, section), type: 'question' });
       });
     });
     return units;
   }
 
-  function renderQuestion(q, sectionId, settings, lang) {
+  function renderQuestion(q, sectionId, settings, lang, sectionObj) {
     const L = MT.PaperLocale.labels(lang || 'my');
     const hasSubs = q.subQuestions && q.subQuestions.length > 0;
-    const qStyleId = (settings && settings.questionNumberStyle) || 'arabic';
+    const qStyleId = (sectionObj && sectionObj.questionNumberStyle) || (settings && settings.questionNumberStyle) || 'arabic';
     const numText = MT.NumberStyles.display(q.number, qStyleId, lang);
     let html = '';
     html += '<div class="preview-question' + (q.type === 'tf' ? ' tf' : '') + '" data-qid="' + q.id + '" data-section-id="' + sectionId + '" title="' + t('render.clickToEdit') + '">';
@@ -333,7 +336,7 @@ html += '<span class="section-title-marks">' +
     // When a question has sub-questions it is just a numbered container —
     // the main question text is hidden and only (a), (b), (c)... are shown.
     if (hasSubs) {
-      html += renderSubQuestions(q.subQuestions, settings && settings.subQuestionNumberStyle, lang, settings);
+      html += renderSubQuestions(q.subQuestions, settings && settings.subQuestionNumberStyle, lang, settings, sectionObj);
     } else {
     // If text contains inline option markers (A. B. C. / က. ခ. ဂ.), split them for display.
     var extractedOptions = null;
@@ -384,8 +387,8 @@ html += '<span class="section-title-marks">' +
   }
 
   // Sub-questions (a), (b), (c)... rendered under the numbered container.
-  function renderSubQuestions(subs, styleId, lang, settings) {
-    const sId = styleId || 'parenthesizedLettersLower';
+  function renderSubQuestions(subs, styleId, lang, settings, sectionObj) {
+    const sId = (sectionObj && sectionObj.subQuestionNumberStyle) || styleId || 'parenthesizedLettersLower';
     const l = lang || 'my';
     const showMarks = !settings || settings.showMarks !== false;
     let html = '<ol class="pq-subs">';
