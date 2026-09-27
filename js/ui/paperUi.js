@@ -766,7 +766,7 @@ MT.PaperUi = (function () {
   // Build export DOM and capture each page at full physical size.
   function capturePages(onCanvas) {
     var exam = (MT.State && MT.State.get) ? MT.State.get() : null;
-    return new Promise(function (resolve) {
+    return new Promise(function (resolve, reject) {
       if (!exam) { resolve(false); return; }
       if (typeof html2canvas === 'undefined') { resolve('nohtml2canvas'); return; }
 
@@ -786,38 +786,6 @@ MT.PaperUi = (function () {
         var pageCount = exportDom.pages;
         var geo = exportDom.geo;
 
-        var tallRe = /\\begin\s*\{|\\left\s*\(|\\left\s*\[|\\left\\\(|\\vec\{|\\overline\{/;
-        var katexEls = container.querySelectorAll('.katex');
-        var toRender = [];
-        for (var k = 0; k < katexEls.length; k++) {
-          if (tallRe.test(katexEls[k].innerHTML)) {
-            toRender.push(katexEls[k]);
-          }
-        }
-        console.log('[capturePages] pre-rendering', toRender.length, 'tall KaTeX elements to images');
-
-        var renderPromise = toRender.length === 0 ? Promise.resolve() : Promise.all(toRender.map(function(ke) {
-          return html2canvas(ke, {
-            scale: 2,
-            backgroundColor: 'transparent',
-            useCORS: true,
-            foreignObjectRendering: false
-          }).then(function(canvas) {
-            var img = document.createElement('img');
-            img.src = canvas.toDataURL('image/png');
-            img.style.display = 'inline-block';
-            img.style.verticalAlign = 'middle';
-            img.width = Math.round(canvas.width / 2);
-            img.height = Math.round(canvas.height / 2);
-            img.style.width = img.width + 'px';
-            img.style.height = img.height + 'px';
-            ke.parentNode.replaceChild(img, ke);
-          }).catch(function(err) {
-            console.warn('[capturePages] pre-render KaTeX failed, keeping original:', err);
-          });
-        }));
-
-        renderPromise.then(function() {
         var i = 0;
         function next() {
           if (i >= pageCount) {
@@ -849,6 +817,13 @@ MT.PaperUi = (function () {
             useCORS: true,
             foreignObjectRendering: false,
             onclone: function (clonedDoc) {
+              var DROP = ['position', 'inset', 'top', 'right', 'bottom', 'left', 'z-index', 'float', 'clear',
+                'transform', 'transform-origin', 'transform-box', 'offset', 'rotate', 'scale', 'translate',
+                'perspective', 'contain', 'will-change'];
+              var svgs = clonedDoc.querySelectorAll('svg');
+              for (var s = 0; s < svgs.length; s++) {
+                for (var p = 0; p < DROP.length; p++) svgs[s].style.removeProperty(DROP[p]);
+              }
               var fontLink = clonedDoc.createElement('link');
               fontLink.rel = 'preload';
               fontLink.href = 'https://fonts.gstatic.com/s/notosansmyanmar/v25/NotoSansMyanmar-Regular.ttf';
@@ -875,8 +850,7 @@ MT.PaperUi = (function () {
           });
         }
         next();
-        });
-      });
+      }).catch(reject);
     });
   }
 
