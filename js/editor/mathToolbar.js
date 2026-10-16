@@ -11,6 +11,11 @@ MT.MathToolbar = (function () {
     textarea.value = value.slice(0, start) + text + value.slice(end);
     textarea.selectionStart = textarea.selectionEnd = start + text.length;
     textarea.focus();
+    // Notify listeners (char counts, live preview commit) about the
+    // programmatic change — otherwise an inserted symbol is never "seen".
+    try {
+      textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    } catch (e) { /* very old browsers: ignore */ }
   }
 
   function mathHint(sym) {

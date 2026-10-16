@@ -39,7 +39,21 @@
 .fab:hover { background: var(--color-primary-dark); transform: translateY(-2px); }
 .fab:active { transform: translateY(1px); }
 
+/* On mobile the bottom tab bar occupies the lower edge — lift the FAB clear
+   of it (and the safe area) so the two never overlap. */
+@media (max-width: 1023px) {
+  .fab {
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    right: 16px;
+  }
+}
+
 .fab-menu { display: flex; flex-direction: column; gap: 8px; }
+
+/* Filename field — only rendered inside the Download sheet */
+.dl-filename { margin-bottom: 6px; }
+.dl-filename label { font-size: .8rem; font-weight: 600; color: var(--color-text-muted); display: block; margin-bottom: 4px; }
+.dl-filename-hint { margin-top: 6px; font-size: .74rem; word-break: break-word; }
 .fab-option {
   width: 100%;
   text-align: left;
@@ -164,73 +178,27 @@
 }
 .paper-preview .inline-edit-input:focus { border-bottom-color: var(--color-primary); }
 
-/* ---- Welcome empty state on paper ---- */
-.paper-empty-state {
+/* ---- Empty preview (no sections) — non-interactive notice, rendered OUTSIDE
+   the A4 paper. Never printed / exported (no .paper-preview wrapper). ---- */
+.paper-empty-notice {
+  width: 100%;
+  max-width: 460px;
   margin-top: 48px;
   text-align: center;
-  padding: 36px 20px;
+  padding: 30px 20px;
   border: 2px dashed var(--color-border-strong);
   border-radius: 16px;
   background: var(--color-primary-pale);
+  color: var(--color-text-muted);
 }
-.paper-empty-state .empty-emoji { font-size: 3rem; line-height: 1; }
-.paper-empty-state .empty-title {
-  font-size: 1rem;
+.paper-empty-notice .empty-icon { font-size: 2.6rem; line-height: 1; }
+.paper-empty-notice-title {
+  margin: 10px 0 0;
+  font-size: .98rem;
   font-weight: 700;
   color: var(--color-text);
-  margin-top: 10px;
 }
-.paper-empty-state .empty-desc {
-  font-size: .85rem;
-  color: var(--color-text-muted);
-  margin-top: 4px;
-}
-.paper-empty-state .empty-actions {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 16px;
-  flex-wrap: wrap;
-}
-
-/* ---- Add-section placeholder ---- */
-.add-section-slot {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: calc(min(100%, 900px) * var(--paper-scale, 1));
-  max-width: 100%;
-  margin-top: 16px;
-  padding: 12px;
-  border: 2px dashed #cbd5e0;
-  border-radius: 12px;
-  background: #fafcff;
-  color: var(--color-text-muted);
-  font-size: .85rem;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: inherit;
-  transition: .15s;
-}
-.add-section-slot:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
-  background: #fffaf0;
-}
-.add-section-slot .plus {
-  width: 26px; height: 26px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: var(--color-accent);
-  color: #fff;
-  font-size: 1rem;
-  line-height: 1;
-  flex-shrink: 0;
-}
-.add-section-slot-hero { margin-top: 48px; padding: 30px; font-size: .95rem; }
+.paper-empty-notice-desc { margin: 6px 0 0; font-size: .85rem; line-height: 1.6; }
 
 /* ---- Section title on paper (click → popup) ---- */
 .paper-preview .section-title-editable {
@@ -426,7 +394,6 @@
   background: var(--color-bg);
 }
 .sections-add-bar .btn { width: 100%; }
-.sidebar-add-section-btn { width: 100%; margin-top: 8px; }
 
 /* Empty state in the sections list */
 .sections-empty { padding: 30px 16px; }

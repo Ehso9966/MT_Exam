@@ -21,28 +21,35 @@
     transition: none !important;
   }
 
-  .app-header, .app-sidebar,
-  .main-topbar, .status-strip, .editor-panel,
+  .app-header,
+  .ws-toolbar, .status-strip, .editor-panel, .ws-examinfo,
   .modal-overlay, .toast-container, .loading-overlay,
   .btn, .q-actions, .insert-indicator, .math-toolbar,
   .section-editor, .question-editor, .q-row .q-actions,
-  .panel-tabs, .sidebar-section,
+  .panel-tabs, .paper-empty-notice,
   .header-actions, .header-actions .btn, .theme-toggle,
-  .add-section-slot, .inline-edit-input,
+  .inline-edit-input,
   .page-size-bar, .fab, .sheet-handle,
-  .tour-root, .app-footer {
+  .tour-root, .app-footer,
+  /* Responsive workspace: screen-only chrome never prints */
+  .mt-tabbar, #questionListView, #questionDetailView,
+  .mw-page-header, .qlist {
     display: none !important;
   }
 
   /* Reset the paper-container chain for print */
-  .app-shell, .app-body, .app-main, #previewArea, #paperPreview {
+  .app-shell, .app-body, .app-main, .edit-col, #previewArea, #paperPreview {
     display: block !important;
+    flex-direction: column !important;
     height: auto !important;
     overflow: visible !important;
     padding: 0 !important;
     margin: 0 !important;
     box-shadow: none !important;
     background: none !important;
+    gap: 0 !important;
+    max-width: none !important;
+    min-width: 0 !important;
   }
 
   .paper-preview .editable { background: transparent; box-shadow: none; }

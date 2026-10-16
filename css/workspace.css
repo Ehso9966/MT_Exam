@@ -1,0 +1,433 @@
+/* MT Exam Studio — workspace.css
+   Screen-only styles for the responsive editor/preview workspace:
+   mobile bottom tab bar, the in-page question list, and the dedicated
+   full-page question editor. Nothing here affects print (print.css hides
+   these elements explicitly). */
+
+/* ============================================================
+   1. Mobile bottom navigation (Editor / Preview)
+   ============================================================ */
+.mt-tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Above app chrome (header 30/40, sticky rows 5/20) but below content
+     popovers (.math-dropdown 60), the FAB (500) and modals (1000+). */
+  z-index: 50;
+  display: none;                       /* shown only on mobile via media query */
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -4px 16px rgba(15, 50, 30, 0.08);
+  /* Respect notches / home indicators */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  transition: transform var(--duration) var(--ease);
+}
+
+.mt-tabbar .mt-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 8px 6px;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  position: relative;
+  transition: color var(--duration-fast) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.mt-tabbar .mt-tab .mt-tab-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--duration-fast) var(--ease);
+}
+/* Icon-only tabs: the visible label was removed to save horizontal space;
+   the accessible name + tooltip come from data-i18n-aria / data-i18n-title. */
+.mt-tabbar .mt-tab-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+.mt-tabbar .mt-tab:active .mt-tab-icon { transform: scale(0.9); }
+
+/* Active item — clearly distinguished with the primary green accent */
+.mt-tabbar .mt-tab.active {
+  color: var(--color-primary-dark);
+}
+.mt-tabbar .mt-tab.active .mt-tab-icon {
+  color: var(--color-primary);
+}
+.mt-tabbar .mt-tab.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 46px;
+  height: 3px;
+  border-radius: 0 0 3px 3px;
+  background: var(--color-primary);
+}
+/* Soft green pill behind the active icon */
+.mt-tabbar .mt-tab.active .mt-tab-icon {
+  background: var(--color-primary-soft);
+  border-radius: 12px;
+  padding: 3px 16px;
+  margin-top: -3px;
+  margin-bottom: 1px;
+}
+
+/* When the on-screen keyboard opens (mobile only), slide the tab bar and the
+   floating button out of the way so they can never cover form fields, buttons
+   or the keyboard itself. Desktop keeps its normal layout. */
+@media (max-width: 1023px) {
+  body.kb-open .mt-tabbar {
+    transform: translateY(120%);
+    pointer-events: none;
+  }
+  body.kb-open .fab {
+    transform: translateY(200%);
+    pointer-events: none;
+  }
+}
+
+/* Visible only on mobile / small tablets (below the desktop split-view
+   breakpoint). The desktop layout hides it entirely. */
+@media (max-width: 1023px) {
+  .mt-tabbar { display: flex; }
+}
+
+/* Never show the app tab bar on the SEO/landing page */
+body.seo-mode .mt-tabbar { display: none !important; }
+
+/* ============================================================
+   2. Editor column — mobile clearance for the tab bar
+   ============================================================ */
+@media (max-width: 1023px) {
+  /* Enough room that content, form fields and buttons are never hidden
+     behind the fixed tab bar (incl. safe area). */
+  .app-main { padding-bottom: 88px; }
+}
+
+/* On desktop the split view is self-contained (panels scroll internally), so
+   the mobile FAB-clearance padding is not needed. */
+@media (min-width: 1024px) {
+  .app-main { padding-bottom: 24px; }
+}
+
+/* ============================================================
+   2b. Exam Information — collapsible panel above the question list
+   ============================================================ */
+.ws-examinfo {
+  width: 100%;
+  max-width: var(--container-sm);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  overflow: hidden;
+}
+.ws-examinfo-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: .9rem;
+  font-weight: 700;
+  color: var(--color-heading);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+.ws-examinfo-head:hover { background: var(--color-primary-soft); }
+.ws-examinfo-icon { flex-shrink: 0; font-size: .95rem; line-height: 1; }
+.ws-examinfo-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ws-examinfo-chevron {
+  flex-shrink: 0;
+  width: 1.2em;
+  text-align: center;
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--color-text);
+  transition: transform var(--duration-fast) var(--ease);
+}
+.ws-examinfo.open .ws-examinfo-chevron {
+  transform: rotate(90deg);
+  color: var(--color-primary);
+}
+.ws-examinfo-body {
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ws-examinfo-body[hidden] { display: none; }
+.ws-examinfo-confirm {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 4px;
+}
+/* Export guard: while the info is unconfirmed, mark the collapsed head so the
+   user can see why an export was redirected here. */
+.ws-examinfo[data-unconfirmed='true'] .ws-examinfo-head {
+  border-left: 3px solid var(--color-warning, #e67e22);
+}
+
+/* ============================================================
+   3. In-page question list
+   ============================================================ */
+#editorArea.editor-panel { max-width: 100%; }
+
+/* The list and the full-page question editor are driven by the body class set
+   by MT.Workspace. On mobile they are mutually exclusive (full-page editor);
+   on desktop the editor is appended under the list so you can keep jumping
+   between questions. */
+#questionDetailView { display: none; }
+body.ws-editor-detail #questionDetailView { display: block; }
+
+@media (max-width: 1023px) {
+  body.ws-editor-detail #questionListView { display: none; }
+  /* Full-page editor: the document chrome steps aside so the Back bar and the
+     question fields own the whole screen. */
+  body.ws-editor-detail .ws-toolbar { display: none; }
+}
+
+.qlist {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Section heading card */
+.qlist-section {
+  border-radius: 12px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--sec, var(--color-primary));
+  overflow: hidden;
+  position: relative;
+}
+.qlist-section[draggable='true'] { cursor: grab; }
+.qlist-section-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  background: var(--sec-bg, transparent);
+}
+.qlist-section-head .section-num { flex-shrink: 0; }
+.qlist-section-head .exs-title { flex: 1; min-width: 0; }
+.qlist-section-head .exs-count { flex-shrink: 0; }
+/* Narrow phones: let the head wrap instead of squeezing the title unusably */
+@media (max-width: 640px) {
+  .qlist-section-head { flex-wrap: wrap; row-gap: 6px; }
+  .qlist-section-head .exs-title { flex: 1 1 140px; }
+}
+.qlist-chevron {
+  flex-shrink: 0;
+  width: 1.2em;
+  text-align: center;
+  font-size: .95rem;
+  font-weight: 700;
+  color: var(--color-text);
+  transition: transform var(--duration-fast) var(--ease);
+}
+.qlist-section.open .qlist-chevron { transform: rotate(90deg); color: var(--sec, var(--color-primary)); }
+.qlist-section-body {
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.qlist-questions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+/* Full-width "add question" action under each section's rows */
+.qlist-section-body .exs-add-q { justify-content: stretch; }
+.qlist-section-body .exs-add-q .btn { width: 100%; }
+
+/* Question row */
+.qlist-qrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--sec, var(--color-primary));
+  border-radius: 10px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: background var(--duration-fast) var(--ease),
+              border-color var(--duration-fast) var(--ease);
+}
+.qlist-qrow:hover { background: var(--sec-bg, transparent); }
+.qlist-qrow .sp-num { flex-shrink: 0; }
+.qlist-qrow .sp-text {
+  flex: 1;
+  min-width: 0;
+  font-size: .85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.qlist-qrow .sp-marks { flex-shrink: 0; }
+
+/* Currently-selected question — clearly highlighted */
+.qlist-qrow.is-current {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-focus);
+}
+.qlist-qrow.is-current .sp-num {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* Reorder is drag-and-drop on the row itself; only delete remains as a
+   button (the old ↑/↓ .qlist-move controls were removed). */
+.qlist-ctrl {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.qlist-del {
+  min-width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 6px;
+  font-size: .85rem;
+  line-height: 1;
+  color: var(--color-text-muted);
+}
+.qlist-del:hover { background: var(--color-error-bg); color: var(--color-error); }
+
+/* Empty state */
+.qlist-empty {
+  text-align: center;
+  padding: 36px 18px;
+  border: 2px dashed var(--color-border-strong);
+  border-radius: 14px;
+  background: var(--color-primary-pale);
+  color: var(--color-text-muted);
+  font-size: .88rem;
+  line-height: 1.6;
+}
+.qlist-empty .empty-icon { font-size: 2.2rem; line-height: 1; margin-bottom: 8px; }
+
+/* Add-section / add-question bars */
+.qlist-addbar { display: flex; gap: 8px; margin-top: 4px; }
+.qlist-addbar .btn { width: 100%; }
+
+/* Drag & drop feedback (matches existing .exs-* conventions) */
+.qlist-qrow.row-dragging { opacity: .5; border-style: dashed; }
+.qlist-qrow.row-dragover { box-shadow: 0 0 0 2px var(--color-primary); }
+.qlist-section.sec-dragging { opacity: .6; border-style: dashed; }
+.qlist-section.sec-insert-before::before,
+.qlist-section.sec-insert-after::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  height: 3px;
+  border-radius: 3px;
+  background: var(--sec, var(--color-primary));
+  box-shadow: 0 0 6px var(--sec, var(--color-primary));
+  z-index: 2;
+}
+.qlist-section.sec-insert-before::before { top: -4px; }
+.qlist-section.sec-insert-after::after { bottom: -4px; }
+
+/* ============================================================
+   4. Dedicated full-page question editor (detail view)
+   ============================================================ */
+.mw-page-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0 12px;
+  margin-bottom: 12px;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+}
+.mw-back {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 38px;
+  padding: 0 14px 0 12px;
+  white-space: nowrap;
+}
+.mw-page-title {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--color-heading);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- Editor actions row: keep Save / Delete reachable ---- */
+.mw-detail .popup-editor-actions { bottom: 0; padding-bottom: 6px; }
+
+@media (max-width: 1023px) {
+  /* The actions row is sticky to the bottom of the scroll container, which on
+     mobile ends at the viewport bottom — i.e. underneath the fixed tab bar.
+     Lift it clear so Save / Delete are always tappable. */
+  .mw-detail .popup-editor-actions {
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: 8px;
+  }
+  /* The tab bar retracts while typing, so let the row drop back down. */
+  body.kb-open .mw-detail .popup-editor-actions { bottom: 0; }
+
+  /* The quick-add FAB would sit on top of Save in this view; the page has its
+     own actions, so step aside exactly like the old modal editor did. */
+  body.ws-editor-detail .fab { display: none; }
+}

@@ -2,7 +2,7 @@
 <html lang="my">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>MT Exam — Exam Paper Creator for Myanmar Teachers | မေးခွန်းစာရွက်ဖန်တီးမှု</title>
 <meta name="description" content="MT Exam is a free online exam paper creator for Myanmar teachers. Create, format, and print မေးခွန်းစာရွက်များ with AI OCR, KaTeX math, and built-in validation. Browser-based, no install needed.">
 <link rel="canonical" href="https://mt-exam-studio.vercel.app/">
@@ -107,6 +107,7 @@
 <link rel="stylesheet" href="css/editor.css">
 <link rel="stylesheet" href="css/preview.css">
 <link rel="stylesheet" href="css/paperui.css">
+<link rel="stylesheet" href="css/workspace.css">
 <link rel="stylesheet" href="css/landing.css">
 <link rel="stylesheet" href="css/tour.css">
 <link rel="stylesheet" href="css/print.css">
@@ -270,45 +271,57 @@
 
   <div class="app-body">
 
-    <!-- ===== Sidebar (section list only) ===== -->
-    <aside class="app-sidebar" id="sidebar">
-      <div class="sidebar-section">
-        <h3 data-i18n="ui.sections">အပိုင်းများ</h3>
-        <div id="sectionList"></div>
-        <button class="btn sm sidebar-add-section-btn" id="btnAddSection" data-i18n="ui.addSectionTitle">မေးခွန်းခေါင်းစဉ် ထည့်မည်</button>
-      </div>
-    </aside>
-
     <!-- ===== Main area ===== -->
     <main class="app-main">
-      <div class="main-topbar">
-        <div class="doc-title">
-          <input type="text" id="inpDocTitle" data-i18n-placeholder="ui.filenamePlaceholder" placeholder="သိမ်းမည့် ဖိုင်အမည် ရိုက်ပါ…">
+
+      <!-- Compact workspace toolbar — save status, counts, validation,
+           paper size and spacing. One horizontally-scrollable row so the
+           editor/preview get the maximum vertical space. -->
+      <div class="ws-toolbar" id="wsToolbar">
+        <div class="ws-toolbar-scroll">
           <span class="save-status" id="saveStatus" data-state="saved"><span class="dot"></span><span id="saveStatusText" data-i18n="ui.saved">သိမ်းဆည်းပြီး</span></span>
-        </div>
-        <div class="mt-row">
           <span class="badge neutral" id="badgeQuestionCount">မေးခွန်း ၀</span>
           <span class="badge neutral" id="badgeTotalMarks">အမှတ် ၀</span>
-        </div>
-      </div>
-
-      <div class="status-strip" id="statusStrip">
-        <span class="pulse"></span>
-        <span id="statusText" data-i18n="valid.statusOk">အဆင်သင့်။</span>
-      </div>
-
-      <div id="pageSizeBar" class="page-size-bar" title="Page size">
-        <div id="pageSizeChips" class="page-size-chips"></div>
-        <div class="stepper">
-          <button type="button" id="btnPadMinus" class="stepper-btn" data-i18n-aria="ui.decreaseSpacing" data-i18n-title="ui.decreaseSpacing" aria-label="Decrease spacing">−</button>
-          <div id="pageSpacingValue" class="stepper-value" role="img" aria-label="Spacing density" title="57px">
-            <div id="pageSpacingFill" class="stepper-fill"></div>
+          <div id="statusStrip" class="status-strip">
+            <span class="pulse"></span>
+            <span id="statusText" data-i18n="valid.statusOk">အဆင်သင့်။</span>
           </div>
-          <button type="button" id="btnPadPlus" class="stepper-btn" data-i18n-aria="ui.increaseSpacing" data-i18n-title="ui.increaseSpacing" aria-label="Increase spacing">+</button>
+          <div id="pageSizeBar" class="page-size-bar" title="Page size">
+            <div id="pageSizeChips" class="page-size-chips"></div>
+            <div class="stepper">
+              <button type="button" id="btnPadMinus" class="stepper-btn" data-i18n-aria="ui.decreaseSpacing" data-i18n-title="ui.decreaseSpacing" aria-label="Decrease spacing">−</button>
+              <div id="pageSpacingValue" class="stepper-value" role="img" aria-label="Spacing density" title="57px">
+                <div id="pageSpacingFill" class="stepper-fill"></div>
+              </div>
+              <button type="button" id="btnPadPlus" class="stepper-btn" data-i18n-aria="ui.increaseSpacing" data-i18n-title="ui.increaseSpacing" aria-label="Increase spacing">+</button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div id="editorArea" class="editor-panel mt-hidden"></div>
+      <!-- Editing workspace column (question list + selected question editor).
+           On desktop this sits left of the live paper preview; on mobile it is
+           swapped with the preview via the bottom tab bar. -->
+      <div class="edit-col" id="editCol">
+
+      <!-- Exam information (title, school, subject, grade, duration, marks) -->
+      <section class="ws-examinfo" id="examInfoPanel">
+        <button type="button" class="ws-examinfo-head" id="examInfoToggle"
+                aria-expanded="false" aria-controls="examInfoBody">
+          <span class="ws-examinfo-icon" aria-hidden="true">📝</span>
+          <span class="ws-examinfo-label" data-i18n="ui.examInfo">စာမေးပွဲ အချက်အလက်</span>
+          <span class="ws-examinfo-chevron" aria-hidden="true">›</span>
+        </button>
+        <div class="ws-examinfo-body" id="examInfoBody" hidden></div>
+      </section>
+
+      <!-- Editor panel: question list view + dedicated question-detail view -->
+      <div id="editorArea" class="editor-panel">
+        <div id="questionListView"></div>
+        <div id="questionDetailView"></div>
+      </div>
+
+      </div><!-- /.edit-col -->
 
       <div id="previewArea">
         <div id="paperPreview"></div>
@@ -339,6 +352,16 @@
 
 <!-- Floating action button (mobile quick-add only, contextual) -->
 <button id="btnFab" class="fab" data-i18n-aria="ui.add" data-i18n-title="ui.add" aria-label="Add" title="Add">＋</button>
+
+<!-- Mobile bottom navigation (Editor / Preview) — hidden on desktop split view -->
+<nav class="mt-tabbar" id="mtTabbar" data-i18n-title="help.mobileTabs" title="Editor / Preview">
+  <button type="button" class="mt-tab active" id="tabEditor" data-tab="editor" aria-current="page" data-i18n-aria="nav.editor" data-i18n-title="nav.editor" aria-label="Editor" title="Editor">
+    <span class="mt-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></span>
+  </button>
+  <button type="button" class="mt-tab" id="tabPreview" data-tab="preview" data-i18n-aria="nav.preview" data-i18n-title="nav.preview" aria-label="Preview" title="Preview">
+    <span class="mt-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/></svg></span>
+  </button>
+</nav>
 
 <!-- Scripts -->
 <script>
@@ -424,6 +447,8 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
 <script src="js/editor/questionPopupEditor.js"></script>
 <script src="js/ui/sectionPopup.js"></script>
 <script src="js/ui/examSectionsPopup.js"></script>
+<script src="js/editor/questionList.js"></script>
+<script src="js/editor/workspace.js"></script>
 <script src="js/ui/accordion.js"></script>
 <script src="js/ui/tour.js"></script>
 <script src="js/ui/paperUi.js"></script>

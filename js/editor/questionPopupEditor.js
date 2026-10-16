@@ -14,7 +14,11 @@ MT.QuestionPopupEditor = (function () {
 
   // Renders the question editor inline into `container`. onSaved is called
   // after a save/delete/close action so the caller can collapse the panel.
-  function renderQuestionEditor(container, sectionId, questionId, onSaved, focusSubIndex) {
+  // `options.liveCommit` (optional) commits text/marks to state as the user
+  // types (debounced) so an on-screen live preview stays in sync — used by the
+  // desktop split view and the dedicated full-page mobile editor.
+  function renderQuestionEditor(container, sectionId, questionId, onSaved, focusSubIndex, options) {
+    const opts = options || {};
     const section = MT.State.getSection(sectionId);
     if (!section) return;
     const q = MT.State.getQuestion(sectionId, questionId);
@@ -368,19 +372,45 @@ MT.QuestionPopupEditor = (function () {
     });
     actions.appendChild(deleteBtn);
 
-    const saveBtn = MT.Utils.el('button', { class: 'btn' }, t('question.save'));
-    saveBtn.addEventListener('click', function () {
+    // Commits the current field values into application state. Used by the
+    // Save button and, when opts.liveCommit is set, by the input listeners and
+    // by the workspace when switching views (so no typed text is ever lost).
+    function commitFields() {
       const updates = {};
       if (marksInput) updates.marks = Number(marksInput.value) || 0;
       if (approveBtn && approveBtn.disabled) updates.reviewStatus = MT.Constants.REVIEW_STATUS.APPROVED;
       if (textarea) updates.text = textarea.value;
       MT.State.updateQuestion(sectionId, questionId, updates);
+    }
+
+    const saveBtn = MT.Utils.el('button', { class: 'btn' }, t('question.save'));
+    saveBtn.addEventListener('click', function () {
+      commitFields();
       MT.Toast.success(t('popup.savedToast'));
       if (onSaved) onSaved();
     });
     actions.appendChild(saveBtn);
 
     body.appendChild(actions);
+
+    // Expose a silent commit so callers (the workspace view switcher) can flush
+    // in-progress edits without showing the "saved" toast or collapsing.
+    body._mtCommit = commitFields;
+
+    // Live-commit: keep state (and therefore the on-screen paper preview) in
+    // sync as the user types, without a full re-render of this editor.
+    if (opts.liveCommit) {
+      let liveTimer = null;
+      function scheduleLiveCommit() {
+        if (liveTimer) clearTimeout(liveTimer);
+        liveTimer = setTimeout(function () {
+          liveTimer = null;
+          try { commitFields(); } catch (e) { console.error('[QuestionEditor] liveCommit', e); }
+        }, 250);
+      }
+      if (textarea) textarea.addEventListener('input', scheduleLiveCommit);
+      if (marksInput) marksInput.addEventListener('input', scheduleLiveCommit);
+    }
 
     container.appendChild(body);
     renderTypeFields();

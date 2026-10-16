@@ -165,15 +165,15 @@ MT.ExamRenderer = (function () {
     const L = MT.PaperLocale.labels(lang);
 
     if (!exam.sections || exam.sections.length === 0) {
-      container.innerHTML = wrapPage(ratio,
-        '<div class="paper-empty-state">' +
-        '<div class="empty-emoji">📄</div>' +
-        '<div class="empty-title">' + t('ui.noQuestionsTitle') + '</div>' +
-        '<div class="empty-desc">' + t('ui.scanHint') + '</div>' +
-        '<div class="empty-actions">' +
-        '<button type="button" class="btn secondary" data-empty-action="add">➕ ' + t('ui.addSectionTitle') + '</button>' +
-        '</div>' +
-        '</div>');
+      // Non-interactive notice rendered *outside* the A4 paper. Section
+      // creation happens in the Editor, so this never prints or exports
+      // (no .paper-preview wrapper → PDF/Image export reports "no questions").
+      container.innerHTML =
+        '<div class="paper-empty-notice" role="status">' +
+        '<div class="empty-icon" aria-hidden="true">📄</div>' +
+        '<p class="paper-empty-notice-title">' + t('ui.noQuestionsTitle') + '</p>' +
+        '<p class="paper-empty-notice-desc">' + t('ui.switchToEditorHint') + '</p>' +
+        '</div>';
       return;
     }
 
@@ -196,8 +196,6 @@ MT.ExamRenderer = (function () {
           '<div class="paper-preview" style="width:' + geo.pxW + 'px;height:' + geo.pxH + 'px;padding:' + geo.pad + 'px;box-sizing:border-box;font-size:' + geo.fontSize + 'pt;--paper-scale:1;--qfont-size:' + geo.fontSize + 'pt;--mt-spacing:' + geo.spacing + ';transform:scale(' + scale + ');transform-origin:top left;max-width:none">' + p + '</div>' +
           '</div>';
       }).join('');
-      html += '<button type="button" class="add-section-slot" data-add-section>' +
-        '<span class="plus">+</span><span>' + t('ui.addSectionTitle') + '</span></button>';
 
       container.innerHTML = html;
       MT.MathRenderer.renderAllInElement(container);

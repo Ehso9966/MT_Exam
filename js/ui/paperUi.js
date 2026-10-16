@@ -17,6 +17,9 @@ MT.PaperUi = (function () {
     ]);
   }
 
+  // Controller for the inline collapsible Exam Information panel.
+  var examInfoCtl = null;
+
   function init() {
     const preview = document.getElementById('paperPreview');
     if (preview) preview.addEventListener('click', handlePaperClick);
@@ -24,30 +27,13 @@ MT.PaperUi = (function () {
     bindPageSpacing();
     const fab = document.getElementById('btnFab');
     if (fab) fab.addEventListener('click', openFabMenu);
+    examInfoCtl = mountExamInfoPanel();
   }
 
   function handlePaperClick(e) {
-    const emptyAction = e.target.closest('[data-empty-action]');
-    if (emptyAction) {
-      const action = emptyAction.getAttribute('data-empty-action');
-      if (action === 'scan') {
-        const sections = MT.State.get().sections;
-        if (!sections || sections.length === 0) {
-          // One-tap start: create the first section, then scan straight into it.
-          openAddSectionModal(function (section) {
-            onFabOcr(section ? section.id : null);
-          });
-        } else {
-          onFabOcr();
-        }
-      } else if (action === 'add') {
-        openAddSectionModal();
-      }
-      return;
-    }
-
-    const addSlot = e.target.closest('[data-add-section]');
-    if (addSlot) { openAddSectionModal(); return; }
+    // Note: the preview is read-only chrome now — no "add section" slot and no
+    // empty-state action buttons are rendered. Section creation lives in the
+    // Editor column (#questionListView).
 
     const titleEl = e.target.closest('[data-section-title]');
     if (titleEl) {
@@ -254,13 +240,18 @@ MT.PaperUi = (function () {
   }
 
   /* ---------- Floating Action Button ---------- */
-  // Shared sheet modal with a list of icon+label action rows.
-  function openMenuModal(items, titleKey, fallbackTitle, helpKey) {
+  // Shared sheet modal with a list of icon+label action rows. An optional
+  // `extra` element is prepended above the rows (used by the download sheet's
+  // filename field), and an item's optional `pre` runs while the modal is
+  // still open — before it closes — so values can be captured first.
+  function openMenuModal(items, titleKey, fallbackTitle, helpKey, extra) {
     const body = document.createElement('div');
     body.className = 'fab-menu';
+    if (extra) body.appendChild(extra);
     items.forEach(function (item) {
       const row = MT.Utils.el('button', { type: 'button', class: 'fab-option' }, item.icon + '  ' + item.label);
       row.addEventListener('click', function () {
+        if (item.pre) { try { item.pre(); } catch (e) { console.error('[openMenuModal] pre', e); } }
         MT.Modal.close();
         item.fn();
       });
@@ -275,16 +266,20 @@ MT.PaperUi = (function () {
   }
 
   function openFabMenu() {
+    // Exam info and Sections were removed: exam info now lives inline in the
+    // editor column (#examInfoPanel) and sections are managed in the question
+    // list. AI OCR is available from the question editor and the add flow.
     openMenuModal([
-      { icon: '📝', label: t('ui.examInfo', 'စာမေးပွဲ အချက်အလက်'), fn: function () { openExamInfoPopup(openFabMenu); } },
-      { icon: '📚', label: t('ui.sections', 'အပိုင်းများ'), fn: openSectionsPopup },
       { icon: '🤖', label: t('ui.aiSettings', 'AI ဆက်တင်'), fn: function () { if (MT.App && MT.App.openApiSettings) MT.App.openApiSettings(); } },
       { icon: '⚙️', label: t('ui.settings', 'ဆက်တင်များ'), fn: function () { openSettingsPopup(openFabMenu); } }
     ], 'ui.quickActions', 'လျှင်မြန်သည့် လုပ်ဆောင်ချက်များ', 'help.fab');
   }
 
-  /* ---------- Exam Information popup ---------- */
-  function openExamInfoPopup(onBack) {
+  /* ---------- Exam Information (inline collapsible panel in the editor) ----
+     The same field set the old FAB popup had, now rendered into #examInfoPanel
+     so it is reachable without a modal. Collapsed by default; rebuilt on each
+     expand so values/labels always reflect current state and language. */
+  function buildExamInfoFields() {
     const body = document.createElement('div');
 
     function makeHideRow(fieldKey, labelText, fieldDiv) {
@@ -445,33 +440,96 @@ MT.PaperUi = (function () {
 
     syncSubject();
 
-    const footer = function (close) {
-      const wrap = MT.Utils.el('div', { style: { display: 'flex', gap: '8px', width: '100%', justifyContent: 'flex-end' } });
-      const doneBtn = MT.Utils.el('button', { class: 'btn' }, '✓ ' + t('ui.confirm', 'အတည်ပြုမည်'));
-      doneBtn.addEventListener('click', function () {
-        MT.State.get().settings.examInfoConfirmed = true;
-        MT.State.update(function () {});
-        close();
-      });
-      wrap.appendChild(doneBtn);
-      return wrap;
-    };
-
-    MT.Modal.open({
-      title: '📝 ' + t('ui.examInfo', 'စာမေးပွဲ အချက်အလက်'),
-      content: body,
-      sheet: true,
-      help: 'help.examInfo',
-      footer: footer,
-      onBack: onBack || null
+    // "✓ Confirm" — the export guard depends on this flag, so keep it.
+    const confirmRow = MT.Utils.el('div', { class: 'ws-examinfo-confirm' });
+    const doneBtn = MT.Utils.el('button', { type: 'button', class: 'btn sm' }, '✓ ' + t('ui.confirm', 'အတည်ပြုမည်'));
+    doneBtn.addEventListener('click', function () {
+      MT.State.get().settings.examInfoConfirmed = true;
+      MT.State.update(function () {});
+      var panel = document.getElementById('examInfoPanel');
+      if (panel) panel.setAttribute('data-unconfirmed', 'false');
+      MT.Toast.success(t('ui.examInfoConfirmed', 'စာမေးပွဲ အချက်အလက် အတည်ပြုပြီး'));
     });
+    confirmRow.appendChild(doneBtn);
+    body.appendChild(confirmRow);
+
+    return body;
   }
 
-  /* ---------- Exam info confirmation guard ---------- */
+  // Wire the collapsible #examInfoPanel in the editor column. Built lazily on
+  // first expand so the fields are always fresh (values + language).
+  function mountExamInfoPanel() {
+    const panel = document.getElementById('examInfoPanel');
+    if (!panel) return null;
+    const head = document.getElementById('examInfoToggle');
+    const bodyEl = document.getElementById('examInfoBody');
+    if (!head || !bodyEl) return null;
+
+    var expanded = false;
+    function setExpanded(open) {
+      expanded = open;
+      head.setAttribute('aria-expanded', open ? 'true' : 'false');
+      panel.classList.toggle('open', open);
+      if (open) {
+        bodyEl.innerHTML = '';
+        bodyEl.appendChild(buildExamInfoFields());
+        bodyEl.hidden = false;
+      } else {
+        bodyEl.hidden = true;
+        bodyEl.innerHTML = '';
+      }
+    }
+    head.addEventListener('click', function () { setExpanded(!expanded); });
+
+    // Language switch: rebuild the open field set so labels/values follow the
+    // new language (MT.I18n.applyDOM only touches static markup).
+    if (MT.Events && MT.EVENTS && MT.EVENTS.LANG_CHANGED) {
+      MT.Events.on(MT.EVENTS.LANG_CHANGED, function () {
+        if (expanded) {
+          bodyEl.innerHTML = '';
+          bodyEl.appendChild(buildExamInfoFields());
+        }
+      });
+    }
+
+    // Reflect the export-guard flag right away (set by ensureExamInfoConfirmed).
+    try {
+      var confirmed = MT.State.get().settings.examInfoConfirmed === true;
+      panel.setAttribute('data-unconfirmed', confirmed ? 'false' : 'true');
+    } catch (e) { /* state not ready */ }
+
+    return {
+      panel: panel,
+      isExpanded: function () { return expanded; },
+      expand: function (focusTitle) {
+        setExpanded(true);
+        if (focusTitle) {
+          var first = bodyEl.querySelector('input.input');
+          if (first) { try { first.focus(); } catch (e) {} }
+        }
+        try { panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+      },
+      collapse: function () { setExpanded(false); }
+    };
+  }
+
+  /* ---------- Exam info confirmation guard ----------
+     Export is blocked until the user clicks "✓ Confirm". The old modal is gone,
+     so reveal + expand the inline #examInfoPanel instead. The panel may be
+     hidden in this view (mobile Preview tab / question detail), so switch to
+     the Editor list view first if the workspace controller is active. */
   function ensureExamInfoConfirmed() {
     if (MT.State.get().settings.examInfoConfirmed === true) return true;
     MT.Toast.warning(t('ui.confirmExamInfoFirst', 'အရင် စာမေးပွဲ အချက်အလက်ကို အတည်ပြုပါ'), { duration: 6000 });
-    openExamInfoPopup();
+    // Land the user in the Editor list view: the panel is hidden on the mobile
+    // Preview tab and inside the full-page question editor.
+    if (MT.Workspace) {
+      if (MT.Workspace.isPreviewTab && MT.Workspace.isPreviewTab()) MT.Workspace.setTab('editor');
+      if (MT.Workspace.isDetail && MT.Workspace.isDetail()) MT.Workspace.handleBack();
+    }
+    var panel = document.getElementById('examInfoPanel');
+    if (panel) panel.setAttribute('data-unconfirmed', 'true');
+    if (examInfoCtl) examInfoCtl.expand(true);
     return false;
   }
 
@@ -631,21 +689,6 @@ MT.PaperUi = (function () {
     });
   }
 
-  /* ---------- OCR scan (used by paper empty state) ---------- */
-  function onFabOcr(sectionId) {
-    MT.CropFlow.open({
-      sectionId: sectionId || undefined,
-      openEditor: true,
-      onQuestions: function (questions, sectionId2) {
-        if (!sectionId2 || !questions || questions.length === 0) return;
-        MT.State.insertQuestions(sectionId2, questions);
-        MT.Numbering.apply(MT.State.get());
-        MT.State.update(function () {});
-        MT.Toast.success(t('ui.questionsImported', { count: digits(questions.length) }));
-      }
-    });
-  }
-
   /* ---------- Page size chips ---------- */
   function bindPageSizeBar() {
     const bar = document.getElementById('pageSizeBar');
@@ -710,19 +753,48 @@ MT.PaperUi = (function () {
     render(currentValue());
   }
 
-  /* ---------- Download menu (PDF / Image / DOCX) ---------- */
+  /* ---------- Download menu (PDF / Image / JSON) ----------
+     The filename field only exists while this sheet is open; the value is
+     captured into `lastSaveName` before the modal closes so the async export
+     paths still see it. Empty → the metadata-derived default is used. */
+  var lastSaveName = '';
+
+  function defaultSaveName() {
+    return MT.Storage.ExportJson.buildSaveName(MT.State.getMetadata(), '');
+  }
+
   function getSaveName() {
     const input = document.getElementById('inpDocTitle');
-    const custom = input ? input.value.trim() : '';
+    if (input) lastSaveName = input.value.trim();
+    const custom = lastSaveName || (input ? input.value.trim() : '');
     return MT.Storage.ExportJson.buildSaveName(MT.State.getMetadata(), custom);
+  }
+
+  function buildFilenameField() {
+    const wrap = MT.Utils.el('div', { class: 'field dl-filename' });
+    const label = MT.Utils.el('label', { for: 'inpDocTitle' },
+      t('ui.filenameLabel', 'ဖိုင်အမည်'));
+    wrap.appendChild(label);
+    const input = MT.Utils.el('input', {
+      type: 'text',
+      id: 'inpDocTitle',
+      class: 'input',
+      value: lastSaveName || '',
+      placeholder: t('ui.filenamePlaceholder', 'သိမ်းမည့် ဖိုင်အမည် ရိုက်ပါ…')
+    });
+    input.addEventListener('input', function () { lastSaveName = input.value.trim(); });
+    wrap.appendChild(input);
+    wrap.appendChild(MT.Utils.el('div', { class: 'mt-small mt-muted dl-filename-hint' },
+      MT.Utils.t('ui.filenameDefault', { name: defaultSaveName() })));
+    return wrap;
   }
 
   function openDownloadMenu() {
     openMenuModal([
-      { icon: '📄', label: t('ui.downloadPdf', 'PDF (ပုံနှိပ်)'), fn: downloadPdf },
-      { icon: '🖼️', label: t('ui.downloadImage', 'ပုံ (Image)'), fn: downloadImage },
-      { icon: '🗂️', label: t('ui.downloadJson', 'JSON'), fn: downloadJson }
-    ], 'ui.download', 'ဒေါင်းလုဒ်', 'help.download');
+      { icon: '📄', label: t('ui.downloadPdf', 'PDF (ပုံနှိပ်)'), pre: getSaveName, fn: downloadPdf },
+      { icon: '🖼️', label: t('ui.downloadImage', 'ပုံ (Image)'), pre: getSaveName, fn: downloadImage },
+      { icon: '🗂️', label: t('ui.downloadJson', 'JSON'), pre: getSaveName, fn: downloadJson }
+    ], 'ui.download', 'ဒေါင်းလုဒ်', 'help.download', buildFilenameField());
   }
 
   // Wait for all web fonts (including KaTeX) and KaTeX CSS to finish loading.

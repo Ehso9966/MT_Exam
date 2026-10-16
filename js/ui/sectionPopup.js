@@ -30,13 +30,13 @@ MT.SectionPopup = (function () {
       '<span class="aq-desc">' + MT.Utils.escapeHtml(desc) + '</span></span>';
   }
 
-  function openStructurePopup(sectionId) {
+  function openStructurePopup(sectionId, onAdded) {
     var sec = MT.State.getSection(sectionId);
     if (!sec) return;
     // For tf and mcq sections, skip the structure chooser — sub-parts don't
     // apply to true/false or multiple-choice questions.
     if (sec.type === 'tf' || sec.type === 'mcq' || sec.type === 'blank') {
-      openSourcePopup(sectionId);
+      openSourcePopup(sectionId, onAdded);
       return;
     }
 
@@ -51,7 +51,7 @@ MT.SectionPopup = (function () {
     });
     singleBtn.addEventListener('click', function () {
       MT.Modal.close();
-      openSourcePopup(sectionId);
+      openSourcePopup(sectionId, onAdded);
     });
     body.appendChild(singleBtn);
 
@@ -62,7 +62,7 @@ MT.SectionPopup = (function () {
     });
     partsBtn.addEventListener('click', function () {
       MT.Modal.close();
-      addPartsQuestion(sectionId);
+      addPartsQuestion(sectionId, onAdded);
     });
     body.appendChild(partsBtn);
 
@@ -72,11 +72,11 @@ MT.SectionPopup = (function () {
       sheet: true,
       tone: 'warn',
       help: 'help.addQuestionStructure',
-      onClose: function () { returnTo(sectionId); }
+      onClose: function () { if (!onAdded) returnTo(sectionId); }
     });
   }
 
-  function addPartsQuestion(sectionId) {
+  function addPartsQuestion(sectionId, onAdded) {
     var sec = MT.State.getSection(sectionId);
     if (!sec) return;
     var q = MT.QuestionModel.create({
@@ -91,10 +91,11 @@ MT.SectionPopup = (function () {
     MT.Numbering.apply(MT.State.get());
     MT.State.update(function () {});
     MT.Toast.success(t('ui.questionAdded', 'မေးခွန်း ထည့်ပြီ — စာသား ရိုက်ထည့်ပါ'));
+    if (onAdded) { onAdded(sectionId, q.id); return; }
     returnTo(sectionId, q.id);
   }
 
-  function openSourcePopup(sectionId) {
+  function openSourcePopup(sectionId, onAdded) {
     var body = MT.Utils.el('div', { class: 'add-question-popup' });
     body.appendChild(MT.Utils.el('div', { class: 'add-question-popup-title' },
       t('ui.chooseQuestionSource', 'မေးခွန်း ထည့်ရန် နည်းလမ်း ရွေးပါ')));
@@ -113,6 +114,7 @@ MT.SectionPopup = (function () {
       MT.Numbering.apply(MT.State.get());
       MT.State.update(function () {});
       MT.Toast.success(t('ui.questionAdded', 'မေးခွန်း ထည့်ပြီ — စာသား ရိုက်ထည့်ပါ'));
+      if (onAdded) { onAdded(sectionId, q.id); return; }
       returnTo(sectionId, q.id);
     });
     body.appendChild(manualBtn);
@@ -127,12 +129,15 @@ MT.SectionPopup = (function () {
       MT.CropFlow.open({
         sectionId: sectionId,
         title: t('crop.addTitle', '✂️ ပုံ ချုံ့ဖြတ်ပြီး မေးခွန်း ထည့်မည်'),
-        openEditor: true,
-        onBack: function () { returnTo(sectionId); },
+        // When a page-based caller is driving, don't chain into the editor
+        // modal — let onAdded() route to the dedicated page instead.
+        openEditor: !onAdded,
+        onBack: function () { if (!onAdded) returnTo(sectionId); },
         onQuestions: function (questions) {
           MT.State.insertQuestions(sectionId, questions);
           MT.Numbering.apply(MT.State.get());
           MT.State.update(function () {});
+          if (onAdded && questions && questions.length > 0) onAdded(sectionId, questions[0].id);
         }
       });
     });
@@ -144,7 +149,7 @@ MT.SectionPopup = (function () {
       sheet: true,
       tone: 'warn',
       help: 'help.addQuestionSource',
-      onClose: function () { returnTo(sectionId); }
+      onClose: function () { if (!onAdded) returnTo(sectionId); }
     });
   }
 

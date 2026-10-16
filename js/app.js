@@ -28,7 +28,6 @@ MT.App = (function () {
       }
 
       bindHeader();
-      bindSidebar();
       bindStatusStrip();
       bindFooter();
       bindSeoLang();
@@ -37,6 +36,8 @@ MT.App = (function () {
       applyMode();
 
       MT.State.subscribe(onStateChange);
+      // Responsive workspace (mobile list/detail/preview, desktop split view).
+      if (MT.Workspace && MT.Workspace.init) MT.Workspace.init();
       console.log('[app] MT.PaperUi before init:', MT.PaperUi);
       MT.PaperUi.init();
       console.log('[app] MT.PaperUi after init:', MT.PaperUi);
@@ -222,6 +223,11 @@ MT.App = (function () {
     window.addEventListener('popstate', function () {
       if (MT.Modal && MT.Modal.isOpen && MT.Modal.isOpen()) {
         MT.Modal.handleBack();
+        reGuard();
+        return;
+      }
+      // Full-page question editor open → go back to the question list.
+      if (MT.Workspace && MT.Workspace.handleBack && MT.Workspace.handleBack()) {
         reGuard();
         return;
       }
@@ -495,16 +501,6 @@ MT.App = (function () {
     document.body.removeChild(ta);
   }
 
-  /* ---------- Section-list sidebar ---------- */
-  function bindSidebar() {
-    const btn = document.getElementById('btnAddSection');
-    if (btn) {
-      btn.addEventListener('click', function () {
-        if (MT.PaperUi && MT.PaperUi.openAddSectionModal) MT.PaperUi.openAddSectionModal();
-      });
-    }
-  }
-
   /* ---------- API settings modal ---------- */
   function openApiSettings() {
     const body = MT.Utils.el('div', { class: 'ai-settings' });
@@ -638,7 +634,6 @@ MT.App = (function () {
         if (psTrack) psTrack.title = pad + (limits.unit || 'px');
       }
 
-      MT.SectionManager.renderSectionList(document.getElementById('sectionList'));
       applyPaperScale(settings);
       applyQuestionFontSize(settings);
       applyPageSpacing(settings);
